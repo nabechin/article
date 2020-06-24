@@ -1,0 +1,4 @@
+media/
+__pycache__/
+settings.py
+env.dev

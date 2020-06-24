@@ -1,0 +1,292 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <head>
+    <meta name="generator" content="Jekyll v3.8.5" />
+    <meta property="og:title" content="Layout" />
+    <meta property="og:locale" content="en_US" />
+    <meta name="description" content="AdminLTE v3 Documentaion" />
+    <meta property="og:description" content="AdminLTE v3 Documentaion" />
+    <meta property="og:site_name" content="AdminLTE v3 Documentaion" />
+    <link rel="stylesheet" href="{% static 'admin-lte/plugins/fontawesome-free/css/all.min.css' %}">
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'admin-lte/dist/css/adminlte.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/contents.css' %}"></link>
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <script src="{% static 'admin-lte/plugins/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'admin-lte/plugins/jquery-ui/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js' %} "></script>
+    <script src="{% static 'admin-lte/dist/js/adminlte.min.js' %}"></script>
+    <script src="{% static 'admin-lte/dist/js/demo.js' %}"></script>
+    <script src="{% static 'js/content.js' %}"></script>
+<script>
+$(function(){
+  var csrftoken = $('input[name="csrfmiddlewaretoken"]').val();
+  // httpメソッドがオブジェクトの読み出し->true オブジェクトの編集->false
+  function csrfSafeMethod(method) {
+      // these HTTP methods do not require CSRF protection
+      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+  }
+  // ajax通信の前にDBを更新するメソッドであればCSRFTOKENをヘッダに埋め込む
+  $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+          if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+          }
+      }
+  });
+
+  $(document).on('click','.article',function(event){
+      var articleId = $(this).attr('id');
+      location.href = "comment/"+articleId;
+    })
+    /* 自己紹介の文字カウント */
+  $('#inputDescription').on('keyup',countTweetLength);
+      function countTweetLength(){
+        var countTweetLength = $('#inputDescription').val().length;
+        $('#id_tweet_count').text(countTweetLength);
+  }
+
+  // ツイートボタンの有効無効かの判断の初期化
+  isTweetButtonValid()
+  /* ツイート文字数が０の場合,submitボタンを向こうにする */
+  $('#inputDescription').on('keyup',isTweetButtonValid);
+  function isTweetButtonValid(){
+    var countTweetLength = $('#inputDescription').val().length;
+      if(countTweetLength==0){
+        $("#id_tweet").prop("disabled", true);
+      }else{
+        $("#id_tweet").prop("disabled", false);
+      }
+  }
+
+  /* プロフィール画像のアクション発火(click、pointer) */
+  $('.article-profile_image').hover(function(){
+    $(this).css('cursor','pointer');
+    $(this).css('opacity','0.7');
+  });
+  $('.article-profile_image').mouseout(function(){
+    $(this).css('opacity','1');
+  });
+  $('.article').hover(function(){
+    $(this).css('cursor','pointer');
+  });
+
+  var afterSuccessLike = function(not_like_element,article_id){
+    return function(data){
+      $('#id_like_article_'+article_id).val(data['id'])
+      not_like_element.removeClass('not-like').addClass('already-like')
+      not_like_element.children().css('color','indianred')
+      var now_like_count = $('#id_like_count_'+article_id).text()
+      if(!now_like_count){
+        now_like_count = "0"
+      }
+      now_like_count = parseInt(now_like_count)
+      after_like_count = now_like_count + 1 
+      $('#id_like_count_'+article_id).text(after_like_count)
+    }
+  }
+  var afterSuccessNotLike = function(already_like_element,article_id){
+    already_like_element.children().css('color','')
+    already_like_element.removeClass('already-like').addClass('not-like')
+    var now_like_count = $('#id_like_count_'+article_id).text()
+    now_like_count = parseInt(now_like_count)
+    after_like_count = now_like_count -1 
+    if(after_like_count==0){
+      after_like_count = ""
+    }
+    $('#id_like_count_'+article_id).text(after_like_count)
+  }
+
+  // 記事にいいねをつける機能
+  $(document).on('click','.not-like',function(e){
+    e.stopPropagation();
+    $('.article').off('click')
+    var not_like_element = $(this)
+    article_id = not_like_element.next().attr('id').replace('id_like_article_','')
+        var data = new FormData();
+        data.append('article',article_id);
+        $.ajax({
+          url:'http://localhost/article/favoriteArticle/',
+          type:'POST',
+          dataType:'json',
+          data:data,
+          success:afterSuccessLike(not_like_element,article_id),
+          processData:false,
+          contentType:false,
+        })
+      })
+
+  // 記事にいいねを解除する
+  $(document).on('click','.already-like',function(e){
+    e.stopPropagation();
+    var already_like_element = $(this)
+    like_id = already_like_element.next().val()
+    article_id = already_like_element.next().attr('id').replace('id_like_article_','')
+        $.ajax({
+          url:'http://localhost/article/favoriteArticle/'+like_id+'/',
+          type:'DELETE',
+          dataType:'json',
+          success:afterSuccessNotLike(already_like_element,article_id),
+          processData:false,
+          contentType:false,
+        })
+      })
+    });
+</script>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+        </ul>
+        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">ログイン</a>
+        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">ログアウト</a>
+      </div>
+    </nav>
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-1">
+          </div>
+          <div class="col-2">
+            <br>
+            <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+              <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">Home</a>
+              <a class="nav-link" id="v-pills-profile-tab" href="{% url 'account:profile' user.id %}" role="tab" aria-controls="v-pills-profile" aria-selected="false">Profile</a>
+              <a class="nav-link" id="v-pills-messages-tab" data-toggle="pill" href="#v-pills-messages" role="tab" aria-controls="v-pills-messages" aria-selected="false">Messages</a>
+              <a class="nav-link" id="v-pills-settings-tab" data-toggle="pill" href="#v-pills-settings" role="tab" aria-controls="v-pills-settings" aria-selected="false">Settings</a>
+            </div>
+          </div>
+          <div class="col-5">
+            <!-- ツイートフォーム -->
+            <div class="card">
+              <div class="card-body shadow-sm">
+                <form action="{% url 'article:post' %}" method="POST">    
+                {% csrf_token %}
+                <div class="row">
+                  <div class="form-group col-2">
+                    {% if user_profile.profile_image %}
+                    <img class="rounded-circle img-bordered-sm" src="{{user_profile.profile_image.url}}"  alt="user image" style="width:50px;height:50px;">
+                    {% else %}
+                    <img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg"  alt="user image" style="width:50px;height:50px;">
+                    {% endif %}
+                  </div>
+                  <div class="form-group col-10">
+                    <textarea class="form-control h-100" id="inputDescription" name="content" placeholder="つぶやく"></textarea>
+                    <div>
+                      <span class="info-box-number" id="id_tweet_count">0</span>&nbsp;/
+                      <span class="info-box-number">1000</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="form-group col-9">
+                  </div>
+                  <div class="form-group col-3">
+                    <button type="submit" class="btn btn-primary mt-2" id="id_tweet">投稿する</button>
+                  </div>
+                </div>
+                </form>
+              </div>
+            </div>
+            <!-- ツイートフォーム -->
+            <!-- 記事一覧 -->
+              <div class="card-deck">
+                <div class="card shadow-sm bg-white rounded">
+                  {% for custom_article in custom_article_list %}
+                  <div class="card-body border-bottom article" id="{{custom_article.article.id}}">
+                    <div class="tab-content">
+                      <div class="active tab-pane" id="activity">
+                        <!-- Post -->
+                        <div class="post">
+                          <div class="user-block row">
+                            <div class="col-2">
+                            {% if custom_article.article.user.user_profile.profile_image %}
+                            <a href="{% url 'account:profile' custom_article.article.user.id %}">
+                              <img class="rounded-circle img-bordered-sm article-profile_image"  src="{{custom_article.article.user.user_profile.profile_image.url}}"  alt="user image" style="width:50px;height:50px;">
+                            </a>
+                            {% else %}
+                            <a href="{% url 'account:profile' custom_article.article.user.id %}">
+                              <img class="rounded-circle img-bordered-sm article-profile_image"  src="/media/default_profile.jpg"  alt="user image" style="width:50px;height:50px;">
+                            </a>
+                            {% endif %}
+                            </div>
+                            <div class="col-10">
+                            <a href="{% url 'account:profile' custom_article.article.user.id %}" class="text-dark" style="font-weight: bold;">
+                              {{custom_article.article.user.name}}
+                            </a><br>
+                            <small class="text-muted">2020/04/15</small>
+                            </div>
+                          </div>
+                          <!-- /.user-block -->
+                          <div class="row">
+                            <div class="col-2"></div>
+                            <div class="col-10">
+                              <a href = "{% url 'article:comment' custom_article.article.id %}" id="id_{{custom_article.article.id}}"></a>
+                              <p>
+                                {{ custom_article.article.content }}
+                              </p>
+                            </div>
+                          </div>
+                          <div class="row mt-3">
+                            <div class="col-md-4 text-center">
+                              <span class="dot-retweet text-lg"><span class="fas fa-retweet" style="color:rgb(70, 98, 107);"></span></span>
+                            </div>
+                            <div class="col-md-4 text-center align-bottom"> 
+                              {% if custom_article.is_login_user_like %}
+                              <span class="link-black text-lg already-like">
+                                <span class="far fa-thumbs-up" style="color:indianred"></span>
+                              </span>
+                              {% else %}
+                              <span class="text-lg not-like">
+                                <i class="far fa-thumbs-up"></i>
+                              </span>
+                              {% endif %}
+                              <input type="hidden" id="id_like_article_{{custom_article.article.id}}" value="{{custom_article.login_user_favorite_article_id}}">
+                              {% if custom_article.article.favorite_article.all %}
+                                <span id="id_like_count_{{custom_article.article.id}}">
+                                  {{custom_article.article.favorite_article.all.count}}
+                                </span>
+                              {% else %}
+                                <span id="id_like_count_{{custom_article.article.id}}"></span>
+                              {% endif %}
+                            </div>
+                            <div class="col-md-4 text-center align-bottom">
+                              <span class="text-lg">
+                                <i class="far fa-comments" style="color:seagreen"></i>
+                                  {% if custom_article.article.comment.all.count != 0 %}
+                                    {{custom_article.article.comment.all.count}}
+                                  {% endif %}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- /.post -->
+                  </div>
+                  {% endfor %}
+                </div>
+            </div>
+            <!-- 記事一覧 -->
+          </div>
+          <div class="col-3">
+            <br>
+            <div class="input-group mb-2">
+              <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
+              <div class="input-group-append">
+                <span class="input-group-text" id="basic-addon2"><i class="fas fa-search" style="font-size: 24px;"></i></span>
+              </div>
+            </div>
+          </div>
+          <div class="col-1">
+          </div>
+    </div>
+  </div>
+  </body>
+</html>

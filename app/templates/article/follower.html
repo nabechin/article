@@ -1,0 +1,179 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <head>
+    <meta name="generator" content="Jekyll v3.8.5" />
+    <meta property="og:title" content="Layout" />
+    <meta property="og:locale" content="en_US" />
+    <meta name="description" content="AdminLTE v3 Documentaion" />
+    <meta property="og:description" content="AdminLTE v3 Documentaion" />
+    <meta property="og:site_name" content="AdminLTE v3 Documentaion" />
+    <link rel="stylesheet" href="{% static 'admin-lte/plugins/fontawesome-free/css/all.min.css' %}">
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'admin-lte/dist/css/adminlte.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <script src="{% static 'admin-lte/plugins/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'admin-lte/plugins/jquery-ui/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js' %} "></script>
+    <script src="{% static 'admin-lte/dist/js/adminlte.min.js' %}"></script>
+    <script src="{% static 'admin-lte/dist/js/demo.js' %}"></script>
+    <script src="{% static 'js/content.js' %}"></script>
+    <script>
+    $(function(){
+          var csrftoken = $('input[name="csrfmiddlewaretoken"]').val();
+          // 
+          function csrfSafeMethod(method) {
+              // these HTTP methods do not require CSRF protection
+              return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+          }
+          // ajax通信の前にDBを更新するメソッドであればCSRFTOKENをヘッダに埋め込む
+          $.ajaxSetup({
+              beforeSend: function(xhr, settings) {
+                  if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                      xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                  }
+              }
+          });
+
+          //　フォロー後、フォローボタンを非表示、フォロー中ボタンを表示
+          var afterSuccessFollow = function(unfollowButtonElement,target){
+            return function(data){
+              unfollowButtonElement.text('フォロー中')
+              unfollowButtonElement.removeClass('un-follow').addClass('already-follow')
+              unfollowButtonElement.removeClass('btn-outline-primary').addClass('bg-gradient-primary')
+              relation_id = data['id']
+              if(relation_id){
+                $('#'+target).val(data['id']);
+              }
+            }
+          };
+          //　フォロー後、フォローボタンを表示、フォロー中ボタンを非表示
+          var afterSuccessUnfollow = function(alreadyfollowButtonElement,target){
+              alreadyfollowButtonElement.text('フォローする')
+              alreadyfollowButtonElement.removeClass('already-follow').addClass('un-follow')
+              alreadyfollowButtonElement.removeClass('bg-gradient-primary').addClass('btn-outline-primary')
+          };
+          // 
+          $('body').on('click','.un-follow',function(){
+            unfollowButtonElement = $(this)
+            var target = unfollowButtonElement.next().attr('id');
+            var data = new FormData();
+            data.append('target',target);
+            $.ajax({
+              url:'http://localhost/account/relation/',
+              type:'POST',
+              dataType:'json',
+              data:data,
+              success:afterSuccessFollow(unfollowButtonElement,target),
+              processData:false,
+              contentType:false,
+            })
+          });
+          $('body').on('click','.already-follow',function(){
+            alreadyfollowButtonElement = $(this)
+            var target = alreadyfollowButtonElement.next().val();
+            $.ajax({
+              url:'http://localhost/account/relation/'+target+'/',
+              type:'DELETE',
+              success:afterSuccessUnfollow(alreadyfollowButtonElement),
+              processData:false,
+              contentType:false,
+            })
+          });
+        });
+    </script>
+  </head>
+  <body>
+    {% csrf_token %} 
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+        </ul>
+        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">ログイン</a>
+        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">ログアウト</a>
+      </div>
+    </nav>
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-1">
+          </div>
+          <div class="col-2">
+            <br>
+            <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+              <a class="nav-link" id="v-pills-home-tab" href="{% url 'article:article' %}" role="tab" >Home</a>
+              <a class="nav-link active" id="v-pills-profile-tab" href="#v-pills-profile" role="tab">Profile</a>
+              <a class="nav-link" id="v-pills-messages-tab" href="#v-pills-messages" role="tab">Messages</a>
+              <a class="nav-link" id="v-pills-settings-tab" href="#v-pills-settings" role="tab">Settings</a>
+            </div>
+          </div>
+          <div class="col-5">
+              <!-- /.row -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <nav class="nav nav-pills flex-column flex-sm-row">
+                        <a class="flex-sm-fill text-sm-center nav-link" href="{% url 'account:following' user_id %}">フォロー中</a>
+                        <a class="flex-sm-fill text-sm-center nav-link active" href="{% url 'account:follower' user_id %}">フォロワー</a>
+                    </nav>
+                <!-- /.card-header -->
+                <div class="card-body p-0">
+                  <table class="table table-hover">
+                    <col width="20%">
+                    <col width="50%">
+                    <col width="30%">
+                    <tbody>
+                        {% for follower_dto in follower_dto_list %}
+                      <tr>
+                        <td>
+                            {% if follower_dto.relation_profile.profile_image %}
+                                <img class="rounded-circle img-bordered-sm" src="{{follower_dto.relation_profile.profile_image.url}}"  alt="user image" style="width:60px;height:60px;">
+                            {% else %}
+                                <img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg"  alt="user image" style="width:60px;height:60px;">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <strong>{{follower_dto.relation_profile.user.name}}<strong>
+                            <p class="text-muted">{{follower_dto.relation_profile.introduction}}</p>
+                        </td>
+                        <td class="text-center align-middle">
+                          {% if follower_dto.relation_profile.user.id == login_user.id %}
+                          {% elif follower_dto.is_follow == 0 %}
+                            <button type="button" class="btn btn-outline-primary float-right un-follow">フォローする</button>
+                          {% elif follower_dto.is_follow == 1 %}
+                            <button type="button" class="btn bg-gradient-primary float-right already-follow">フォロー中</button>
+                          {% endif %} 
+                            <input type='hidden' value="{{follower_dto.relation.id}}" id="{{follower_dto.relation_profile.user.id}}">
+                        </td>
+                      </tr>
+                        {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+                <!-- /.card-body -->
+              </div>
+              <!-- /.card -->
+            </div>
+          </div>
+          <!-- /.row -->
+          </div>
+          <div class="col-3">
+            <br>
+            <div class="input-group mb-2">
+              <input type="text" class="form-control" placeholder="Find Friends" aria-label="Recipient's username" aria-describedby="basic-addon2">
+              <div class="input-group-append">
+                <span class="input-group-text" id="basic-addon2"><i class="fas fa-search" style="font-size: 24px;"></i></span>
+              </div>
+            </div>
+          </div>
+          <div class="col-1">
+          </div>
+        </div>
+    </div>
+    </div>
+  </body>
+</html>

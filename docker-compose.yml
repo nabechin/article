@@ -1,0 +1,41 @@
+version: '3.7'
+services:
+  app:
+    restart: always
+    build:
+      context: ./app
+    volumes:
+      - ./app:/usr/src/app/
+      - ./app/static:/home/app/web/static
+    expose:
+      - "3031"
+    depends_on:
+      - postgres
+    command:
+      sh -c "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn app.wsgi -b 0.0.0.0:3031"
+    env_file:
+      - ./env.dev
+  nginx:
+    restart: always
+    image: nginx
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./app/static:/home/app/web/static
+      - ./app/media:/home/app/web/media
+  postgres:
+    image: postgres:12.0-alpine
+    volumes: 
+      - "dbdata:/var/lib/postgresql/data"
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=article
+
+volumes:
+  dbdata:
+  staticdata:
+
