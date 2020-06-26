@@ -78,14 +78,15 @@ $(function(){
       not_like_element.removeClass('not-like').addClass('already-like')
       not_like_element.children().css('color','indianred')
       var now_like_count = $('#id_like_count_'+article_id).text()
-      console.log(now_like_count)
-      alert(now_like_count)
       if(!now_like_count){
         now_like_count = "0"
+        var parent = $('.like-count').parent()
+        parent.css('display','block');
       }
       now_like_count = parseInt(now_like_count)
       after_like_count = now_like_count + 1 
-      $('.like-count').text(after_like_count)
+      $('.like-count').text(after_like_count);
+      $('#id_like_count_' + article_id).text(after_like_count)
     }
   }
   var afterSuccessNotLike = function(already_like_element,article_id){
@@ -96,8 +97,11 @@ $(function(){
     after_like_count = now_like_count -1 
     if(after_like_count==0){
       after_like_count = ""
+      var parent = $('.like-count').parent()
+        parent.css('display','none');
     }
-    $('.like-count').text(after_like_count)
+    $('.like-count').text(after_like_count);
+    $('#id_like_count_' + article_id).text(after_like_count)
   }
   // 記事にいいねをつける機能
   $(document).on('click','.not-like',function(e){
@@ -211,6 +215,11 @@ $(function(){
                         <a class="link-black like-count">{{custom_article.article.favorite_article.all.count}}</a> 
                         likes
                       </div>
+                      {% else %}
+                      <div class="col-6 text-center" style="display: none;">
+                        <a class="link-black like-count">{{custom_article.article.favorite_article.all.count}}</a> 
+                        likes
+                      </div>
                       {% endif %}     
                     </div>
                     <hr>
@@ -230,7 +239,7 @@ $(function(){
                           {% endif %}
                           <input type="hidden" id="id_like_article_{{custom_article.article.id}}" value="{{custom_article.login_user_favorite_article_id}}">
                           {% if custom_article.article.favorite_article.all %}
-                            <span id="id_like_count_{{custom_article.article.id}}" class="like-count">{{custom_article.article.favorite_article.all.count}}</span>
+                            <span id="id_like_count_{{custom_article.article.id}}">{{custom_article.article.favorite_article.all.count}}</span>
                           {% else %}
                             <span id="id_like_count_{{custom_article.article.id}}"></span>
                           {% endif %}
