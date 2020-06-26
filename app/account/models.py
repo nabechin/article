@@ -71,10 +71,3 @@ class Relation(models.Model):
         on_delete = models.CASCADE,
         related_name='target'
     )
-    is_deleted = models.BooleanField(
-        default=False
-    )
-
-    def delete(self):
-        self.is_deleted = True
-        self.save()
