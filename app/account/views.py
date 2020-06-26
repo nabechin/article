@@ -80,15 +80,12 @@ class Profile(LoginRequiredMixin,TemplateView):
         context = super(Profile, self).get_context_data(**kwargs)
         user = get_user_model().objects.get(pk=user_id)
         relation = Relation.objects.filter(follower=login_user.id,target=user_id)
-        number_of_follow = Relation.objects.filter(follower=user_id,is_deleted=False).count()
-        number_of_follower = Relation.objects.filter(target=user_id,is_deleted=False).count()
+        number_of_follow = Relation.objects.filter(follower=user_id).count()
+        number_of_follower = Relation.objects.filter(target=user_id).count()
         if not relation:
             context['is_follow'] = self.UNFOLLOW
         else:
-            if relation[0].is_deleted:
-                context['is_follow'] = self.UNFOLLOW
-            else: 
-                context['is_follow'] = self.FOLLOW
+            context['is_follow'] = self.FOLLOW
             context['relation'] = relation[0]
         context['number_of_follow'] = number_of_follow
         context['number_of_follower'] = number_of_follower
@@ -105,15 +102,7 @@ class RelationView(viewsets.ModelViewSet):
     queryset = Relation.objects.all()
 
     def perform_create(self,serializer):
-        target_id = serializer.validated_data.get('target',None)
-        follower_id = self.request.user
-        relation = Relation.objects.filter(follower=follower_id,target=target_id)
-        if relation.exists():
-            relation = Relation.objects.get(follower=follower_id,target=target_id)
-            relation.is_deleted = False
-            relation.save()
-        else:
-            serializer.save(follower=follower_id)
+            serializer.save(follower=self.request.user)
 
 
 class RelationDto:
@@ -133,7 +122,7 @@ class FollowerView(LoginRequiredMixin,TemplateView):
     def get(self,request,*args,**kwargs):
         user_id = kwargs['user_id']
         login_user = self.request.user
-        relation_list = Relation.objects.filter(target=user_id,is_deleted=False)
+        relation_list = Relation.objects.filter(target=user_id)
         follower_dto_list = []
 
         #　パラメータのユーザのフォロワーを取得
@@ -146,12 +135,8 @@ class FollowerView(LoginRequiredMixin,TemplateView):
                 is_follow = self.UNFOLLOW
                 follower_dto = RelationDto(relation_profile,is_follow,None)
             else:
-                if relation[0].is_deleted:
-                    is_follow = self.UNFOLLOW
-                    follower_dto = RelationDto(relation_profile,is_follow,relation[0])
-                else: 
-                    is_follow = self.FOLLOW
-                    follower_dto = RelationDto(relation_profile,is_follow,relation[0])
+                is_follow = self.FOLLOW
+                follower_dto = RelationDto(relation_profile,is_follow,relation[0])
             follower_dto_list.append(follower_dto)
         context = super(FollowerView, self).get_context_data(**kwargs)
         context['follower_dto_list'] = follower_dto_list
@@ -170,7 +155,7 @@ class FollowingView(LoginRequiredMixin,TemplateView):
     def get(self,request,*args,**kwargs):
         user_id = kwargs['user_id']
         login_user = self.request.user
-        relation_list = Relation.objects.filter(follower=user_id,is_deleted=False)
+        relation_list = Relation.objects.filter(follower=user_id)
         following_dto_list = []
 
         #　パラメータのユーザのフォローユーザを取得
@@ -183,12 +168,8 @@ class FollowingView(LoginRequiredMixin,TemplateView):
                 is_follow = self.UNFOLLOW
                 following_dto = RelationDto(relation_profile,is_follow,None)
             else:
-                if relation[0].is_deleted:
-                    is_follow = self.UNFOLLOW
-                    following_dto = RelationDto(relation_profile,is_follow,relation[0])
-                else: 
-                    is_follow = self.FOLLOW
-                    following_dto = RelationDto(relation_profile,is_follow,relation[0])
+                is_follow = self.FOLLOW
+                following_dto = RelationDto(relation_profile,is_follow,relation[0])
             following_dto_list.append(following_dto)
         context = super(FollowingView, self).get_context_data(**kwargs)
         context['following_dto_list'] = following_dto_list
@@ -217,15 +198,12 @@ class LikeArticleView(Profile):
         context = super(LikeArticleView, self).get_context_data(**kwargs)
         user = get_user_model().objects.get(pk=user_id)
         relation = Relation.objects.filter(follower=login_user.id,target=user_id)
-        number_of_follow = Relation.objects.filter(follower=user_id,is_deleted=False).count()
-        number_of_follower = Relation.objects.filter(target=user_id,is_deleted=False).count()
+        number_of_follow = Relation.objects.filter(follower=user_id).count()
+        number_of_follower = Relation.objects.filter(target=user_id).count()
         if not relation:
             context['is_follow'] = self.UNFOLLOW
         else:
-            if relation[0].is_deleted:
-                context['is_follow'] = self.UNFOLLOW
-            else: 
-                context['is_follow'] = self.FOLLOW
+            context['is_follow'] = self.FOLLOW
             context['relation'] = relation[0]
         context['number_of_follow'] = number_of_follow
         context['number_of_follower'] = number_of_follower

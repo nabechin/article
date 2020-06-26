@@ -31,7 +31,7 @@ class ArticleList(LoginRequiredMixin,TemplateView):
 
     def get(self,request,*args,**kwargs):
         login_user_id = self.request.user.id
-        login_user_following = Relation.objects.filter(follower=login_user_id,is_deleted=False)
+        login_user_following = Relation.objects.filter(follower=login_user_id)
         login_user_following_ids = [relation.target.id for relation in login_user_following]
         article_list = Article.objects.filter(Q(user__id__in=login_user_following_ids) | Q(user__id=login_user_id)).order_by('-id')
         custom_article_list =[]
