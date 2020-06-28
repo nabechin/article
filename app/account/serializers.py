@@ -3,12 +3,13 @@ from django.contrib.auth import get_user_model
 from .models import UserProfile,Relation
 
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ('name',)
+        fields = ('id','name',)
 
-
+    
 class UserProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     class Meta:
@@ -26,7 +27,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
     
+
 class RelationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Relation
-        fields = ('id','target',)
+        fields = ('id','follower','target',)
