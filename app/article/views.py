@@ -6,25 +6,14 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, TemplateView
 
 from account.models import Relation, UserProfile
+from app.dto import RelationDto, CustomArticle
 from rest_framework import permissions, viewsets
 
 from .forms import ArticleForm
 from .models import Article, Comment, FavoriteArticle, FavoriteComment
 from .serializers import CommentSerializer, FavoriteArticleSerializer, FavoriteCommentSerializer
-
-
-class CustomArticle:
-    def __init__(self,article):
-        self.article = article
-
-    def is_login_user_like(self,login_user_id):
-        self.is_login_user_like = False
-        for favorite_article in self.article.favorite_article.all():
-            if favorite_article.user.id == login_user_id:
-                self.is_login_user_like = True
-                self.login_user_favorite_article_id = favorite_article.id
-                break
         
+
 class ArticleList(LoginRequiredMixin,TemplateView):
     model = Article 
     template_name='article_list.html'
@@ -88,13 +77,20 @@ class ArticlePostView(CreateView):
 
 
 class FavoriteArticleView(viewsets.ModelViewSet):
-    serializer_class = FavoriteArticleSerializer
     queryset = FavoriteArticle.objects.all()
+    serializer_class = FavoriteArticleSerializer
     permission_class = (permissions.IsAuthenticated)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
+    
+    def get_queryset(self):
+        queryset = self.queryset
+        article_id = self.request.query_params.get('article')
+        if article_id:
+            queryset = queryset.filter(article=article_id)
+        return queryset
+        
 
 class FavoriteCommentView(viewsets.ModelViewSet):
     serializer_class = FavoriteCommentSerializer

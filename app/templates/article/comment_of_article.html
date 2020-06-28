@@ -30,6 +30,8 @@ $(function(){
   /* likeしたユーザのmodalを表示 */
   $('.show-like-people').on('click',function(e){
     e.preventDefault()
+    var article_id = $(this).attr('id').replace('id_liked_article_','');
+    show_like_people(article_id);
     $('#modal-like').modal();
   })
   /* プロフィール画像のアクション発火(click、pointer) */
@@ -109,6 +111,56 @@ $(function(){
     $('.like-count').text(after_like_count);
     $('#id_like_count_' + article_id).text(after_like_count)
   }
+
+  /* いいねをした人の情報をmodalに表示する */
+  var afterSuccessShowLikePeople = function(data_array){
+    $.each(data_array, function(i){
+
+    /* indexごとにデータをキャッシュしておく変数を設定 */
+    var data = data_array[i];
+
+    /* いいねを押した人の情報一件分の親ブロックを設定 */
+    var parent_element = $('<tr></tr>');
+
+    /* プロフィール画像の要素を設定 */
+    var child_element_for_image = $('<td></td>');
+    if (data.user_profile.profile_image){
+        var image_element = $('<img class="rounded-circle img-bordered-sm" src='+data.user_profile.profile_image+' alt="user image" style="width:60px;height:60px;">');
+    }else{
+        var image_element =　$('<img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg" alt="user image" style="width:60px;height:60px;">');
+    }
+    child_element_for_image.append(image_element)
+    parent_element.append(child_element_for_image)
+
+    /* いいねユーザ名と自己紹介の要素を設定 */
+    var child_element_for_profile = $('<td></td>');
+        var user_name_element = $('<strong>'+data.user_profile.user.name+'<strong>');
+        var user_introduction_element = $('<p class="text-muted">'+data.user_profile.introduction+'</p>');
+    child_element_for_profile.append(user_name_element)
+    child_element_for_profile.append(user_introduction_element)
+    parent_element.append(child_element_for_profile)
+
+    /* ログインユーザといいねユーザのフォロー関係を調べて、フォローボタン or フォローするボタンの要素を設定 */
+    var child_element_for_relation = $('<td class="text-center align-middle"></td>');
+    if(data.user_profile.user.id == '{{user.id}}'){
+
+    }else if(data.relation){
+        var relation_element = $('<button type="button" class="btn bg-gradient-primary float-right already-follow">フォロー中</button>');
+    }else{
+        var relation_element = $('<button type="button" class="btn btn-outline-primary float-right un-follow">フォローする</button>');
+    }
+    var element_for_relation_infomation = $('<input type="hidden" value='+ data.relation.id +'id='+data.user_profile.user.id+'>');
+    child_element_for_relation.append(relation_element)
+    child_element_for_relation.append(element_for_relation_infomation)
+    parent_element.append(child_element_for_relation)
+    
+    $("tbody").append(parent_element);
+    })
+  }
+  /* modalが消えた時にいいねした人リストを削除する */
+  $('#modal-like').on('hidden.bs.modal', function () {
+    $("tbody").empty()
+  })
   // 記事にいいねをつける機能
   $(document).on('click','.not-like',function(e){
     e.stopPropagation();
@@ -143,7 +195,18 @@ $(function(){
           contentType:false,
         })
       })
-})
+      var show_like_people = function(article_id){
+        var article_id = article_id
+        $.ajax({
+          url:'http://localhost/article/favoriteArticle/?article='+article_id,
+          type:'GET',
+          dataType:'json',
+          success:afterSuccessShowLikePeople,
+          processData:false,
+          contentType:false,
+        })
+      }
+    })
     </script>
   <body>
     {% csrf_token %} 
@@ -218,7 +281,7 @@ $(function(){
                       </div>
                       {% if custom_article.article.favorite_article.all %}
                       <div class="col-6 text-center">
-                        <a class="link-black show-like-people" href="">
+                        <a class="link-black show-like-people" href="" id="id_liked_article_{{custom_article.article.id}}">
                         <span class="like-count">{{custom_article.article.favorite_article.all.count}}</span> 
                         likes
                         </a>
@@ -286,32 +349,6 @@ $(function(){
                                 <col width="50%">
                                 <col width="30%">
                                 <tbody>
-                                  <tr>
-                                    <td>
-                                        <img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg"  alt="user image" style="width:60px;height:60px;">
-                                    </td>
-                                    <td>
-                                        <strong>ゆうま<strong>
-                                          <p class="text-muted">今週も大変疲れました</p>
-                                    </td>
-                                    <td class="text-center align-middle">
-                                        <button type="button" class="btn btn-outline-primary float-right un-follow">フォローする</button>
-                                        <input type='hidden' value="{{follower_dto.relation.id}}" id="{{follower_dto.relation_profile.user.id}}">
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td>
-                                            <img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg"  alt="user image" style="width:60px;height:60px;">
-                                    </td>
-                                    <td>
-                                        <strong>ゆうま<strong>
-                                          <p class="text-muted">今週も大変疲れました</p>
-                                    </td>
-                                    <td class="text-center align-middle">
-                                        <button type="button" class="btn btn-outline-primary float-right un-follow">フォローする</button>
-                                        <input type='hidden' value="{{follower_dto.relation.id}}" id="{{follower_dto.relation_profile.user.id}}">
-                                    </td>
-                                  </tr>
                                 </tbody>
                               </table>
                             </div>

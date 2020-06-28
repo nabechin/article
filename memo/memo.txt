@@ -1,0 +1,58 @@
+いいねした人の取得
+serializerの定義
+
+FavoriteArticleSerializer()
+user = UserSerializer()
+article = ArticleSerializer()
+fields = {'user','article'}
+
+
+<tr><tr>
+--------------------
+    <td></td>
+        if (user_profile.profile_image){
+            <img class="rounded-circle img-bordered-sm" src=user_profile.profile_image alt="user image" style="width:60px;height:60px;">
+        }else{
+            <img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg"  alt="user image" style="width:60px;height:60px;">
+        }
+--------------------
+    <td></td>
+        <strong>user_profile.user.name<strong>
+        <p class="text-muted">user_profile.introduction</p>
+--------------------
+    <td></td>
+        if(relation.follower == {{user.id}}){
+             <button type="button" class="btn bg-gradient-primary float-right already-follow">フォロー中</button>
+        }else{
+             <button type="button" class="btn btn-outline-primary float-right un-follow">フォローする</button>
+        }
+        <input type='hidden' value="relation.id" id=user_profile.user.id>
+
+
+
+for 
+var parent_element = $('<tr></tr>');
+var child_element_for_image = $('<td></td>');
+if (user_profile.profile_image){
+    var image_element = $('<img class="rounded-circle img-bordered-sm" src=user_profile.profile_image alt="user image" style="width:60px;height:60px;">');
+}else{
+     var image_element =$('<img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg"  alt="user image" style="width:60px;height:60px;">');
+}
+child_element_for_image.append(image_element)
+
+
+var child_element_for_profile = $('<td></td>');
+    var user_name_element = $('<strong>user_profile.user.name<strong>');
+    var user_introduction_element = $('<p class="text-muted">user_profile.introduction</p>');
+child_element_for_profile.append(user_name_element)
+child_element_for_profile.append(user_introduction_element)
+
+var child_element_for_relation = $('<td></td>');
+if(relation.follower == {{user.id}}){
+    var relation_element = $('<button type="button" class="btn bg-gradient-primary float-right already-follow">フォロー中</button>');
+}else{
+    var relation_element = $('<button type="button" class="btn btn-outline-primary float-right un-follow">フォローする</button>');
+}
+var element_for_relation_infomation = $('<input type='hidden' value="relation.id" id=user_profile.user.id>');
+child_element_for_relation.append(relation_element)
+child_element_for_relation.append(element_for_relation_infomation)

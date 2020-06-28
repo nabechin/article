@@ -16,7 +16,7 @@ from rest_framework.decorators import action
 from django.http import HttpResponseRedirect
 from typing import NamedTuple
 from django.db.models import Count, Exists
-from article.views import CustomArticle
+from app.dto import CustomArticle, RelationDto
 
 
 # Create your views here.
@@ -103,13 +103,6 @@ class RelationView(viewsets.ModelViewSet):
 
     def perform_create(self,serializer):
             serializer.save(follower=self.request.user)
-
-
-class RelationDto:
-    def __init__(self,relation_profile,is_follow,relation):
-        self.relation_profile = relation_profile
-        self.is_follow = is_follow
-        self.relation = relation
 
 
 class FollowerView(LoginRequiredMixin,TemplateView):
