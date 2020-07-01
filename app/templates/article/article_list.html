@@ -63,11 +63,11 @@ $(function(){
   }
 
   /* プロフィール画像のアクション発火(click、pointer) */
-  $('.article-profile_image').hover(function(){
+  $('.article-profile-image').hover(function(){
     $(this).css('cursor','pointer');
     $(this).css('opacity','0.7');
   });
-  $('.article-profile_image').mouseout(function(){
+  $('.article-profile-image').mouseout(function(){
     $(this).css('opacity','1');
   });
   $('.article').hover(function(){
@@ -208,11 +208,11 @@ $(function(){
                             <div class="col-2">
                             {% if custom_article.article.user.user_profile.profile_image %}
                             <a href="{% url 'account:profile' custom_article.article.user.id %}">
-                              <img class="rounded-circle img-bordered-sm article-profile_image"  src="{{custom_article.article.user.user_profile.profile_image.url}}"  alt="user image" style="width:50px;height:50px;">
+                              <img class="rounded-circle img-bordered-sm article-profile-image"  src="{{custom_article.article.user.user_profile.profile_image.url}}"  alt="user image" style="width:50px;height:50px;">
                             </a>
                             {% else %}
                             <a href="{% url 'account:profile' custom_article.article.user.id %}">
-                              <img class="rounded-circle img-bordered-sm article-profile_image"  src="/media/default_profile.jpg"  alt="user image" style="width:50px;height:50px;">
+                              <img class="rounded-circle img-bordered-sm article-profile-image"  src="/media/default_profile.jpg"  alt="user image" style="width:50px;height:50px;">
                             </a>
                             {% endif %}
                             </div>

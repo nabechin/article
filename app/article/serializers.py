@@ -28,8 +28,9 @@ class FavoriteArticleSerializer(serializers.ModelSerializer):
             return user_profile
 
     def get_relation(self, obj):
+        user =  self.context['request'].user
         try:
-            relation = RelationSerializer(Relation.objects.all().filter(target = get_user_model().objects.get(id=obj.user.id).id),many=True).data
+            relation = RelationSerializer(Relation.objects.all().filter(target = get_user_model().objects.get(id=obj.user.id).id,follower=user.id),many=True).data
             return relation
         except:
             relation = None

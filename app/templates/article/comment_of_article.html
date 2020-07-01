@@ -27,24 +27,24 @@ $(function(){
   $('#id_comment').on('click',function(){
     $('#modal-comment').modal();
   })
-  /* likeしたユーザのmodalを表示 */
-  $('.show-like-people').on('click',function(e){
-    e.preventDefault()
-    var article_id = $(this).attr('id').replace('id_liked_article_','');
-    show_like_people(article_id);
-    $('#modal-like').modal();
-  })
   /* プロフィール画像のアクション発火(click、pointer) */
-  $('.article-profile_image').hover(function(){
+  $(document).on("hover",".article-profile-image",function(){
     $(this).css('cursor','pointer');
     $(this).css('opacity','0.7');
   });
-  $('.article-profile_image').mouseout(function(){
+  $(document).on("mouseout",".article-profile-image",function(){
     $(this).css('opacity','1');
   });
-  $('.article').hover(function(){
+  $(document).on("hover",".article", function(){
     $(this).css('cursor','pointer');
   });
+
+  $(document).on('click','.people-like-list',function(){
+    user_id = $(this).attr('id').replace('id_profile_','');
+    var url = "{% url 'account:profile' 1000 %}";
+    document.location.href = url.replace('1000', user_id);
+  })
+
   //ajax通信が成功した後リロード処理
   var afterPost = function(data){
         window.location.reload();
@@ -80,6 +80,67 @@ $(function(){
       contentType: false 
     })
   })
+
+  /* いいねをした人の情報をmodalに表示する */
+  var afterSuccessShowLikePeople = function(data_array){
+    $.each(data_array, function(i){
+
+    /* indexごとにデータをキャッシュしておく変数を設定 */
+    var data = data_array[i];
+
+    /* いいねを押した人の情報一件分の親ブロックを設定 */
+    var parent_element = $('<tr></tr>');
+    parent_element.attr('id','id_profile_'+data.user)
+    parent_element.addClass('people-like-list')
+
+    /* プロフィール画像の要素を設定 */
+    var child_element_for_image = $('<td></td>');
+    if (data.user_profile.profile_image){
+        var image_element = $('<img class="rounded-circle img-bordered-sm article-profile-image" src='+data.user_profile.profile_image+' alt="user image" style="width:60px;height:60px;">');
+    }else{
+        var image_element =　$('<img class="rounded-circle img-bordered-sm article-profile-image" src="/media/default_profile.jpg" alt="user image" style="width:60px;height:60px;">');
+    }
+    child_element_for_image.append(image_element)
+    parent_element.append(child_element_for_image)
+
+    /* いいねユーザ名と自己紹介の要素を設定 */
+    var child_element_for_profile = $('<td></td>');
+
+    // ユーザ名にプロフィールへのリンクを持たせる
+    var user_name_element = $('<a class="text-dark" style="font-weight: bold";></a>')
+    var url = "{% url 'account:profile' 0 %}";
+    user_name_element.attr('href', url.replace('0', data.user));
+    user_name_element.text(data.user_profile.user.name)
+
+    var user_introduction_element = $('<p class="text-muted">'+data.user_profile.introduction+'</p>');
+    child_element_for_profile.append(user_name_element)
+    child_element_for_profile.append(user_introduction_element)
+    parent_element.append(child_element_for_profile)
+
+    /* ログインユーザといいねユーザのフォロー関係を調べて、フォローボタン or フォローするボタンの要素を設定 */
+    var child_element_for_relation = $('<td class="text-center align-middle"></td>');
+    if(data.user_profile.user.id == '{{user.id}}'){
+
+    }else if(data.relation && data.relation.length){
+        var relation_element = $('<button type="button" class="btn bg-gradient-primary float-right already-follow">フォロー中</button>');
+        var element_for_relation_infomation = $('<input type="hidden" value='+ data.relation[0].id +' id='+data.user_profile.user.id+'>')
+        relation_element.append(element_for_relation_infomation);
+    }else{
+        var relation_element = $('<button type="button" class="btn btn-outline-primary float-right un-follow">フォローする</button>');
+        var element_for_relation_infomation = $('<input type="hidden" value="" id='+data.user_profile.user.id+'>')
+    }
+    child_element_for_relation.append(relation_element)
+    child_element_for_relation.append(element_for_relation_infomation)
+    parent_element.append(child_element_for_relation)
+    
+    $("tbody").append(parent_element);
+    })
+  }
+  /* modalが消えた時にいいねした人リストを削除する */
+  $('#modal-like').on('hidden.bs.modal', function () {
+    $("tbody").empty()
+  })
+
   var afterSuccessLike = function(not_like_element,article_id){
     return function(data){
       $('#id_like_article_'+article_id).val(data['id'])
@@ -88,7 +149,7 @@ $(function(){
       var now_like_count = $('#id_like_count_'+article_id).text()
       if(!now_like_count){
         now_like_count = "0"
-        var parent = $('.like-count').parent()
+        var parent = $('.show-like-people').parent()
         parent.css('display','block');
       }
       now_like_count = parseInt(now_like_count)
@@ -105,62 +166,13 @@ $(function(){
     after_like_count = now_like_count -1 
     if(after_like_count==0){
       after_like_count = ""
-      var parent = $('.like-count').parent()
+      var parent = $('.show-like-people').parent()
         parent.css('display','none');
     }
     $('.like-count').text(after_like_count);
     $('#id_like_count_' + article_id).text(after_like_count)
   }
 
-  /* いいねをした人の情報をmodalに表示する */
-  var afterSuccessShowLikePeople = function(data_array){
-    $.each(data_array, function(i){
-
-    /* indexごとにデータをキャッシュしておく変数を設定 */
-    var data = data_array[i];
-
-    /* いいねを押した人の情報一件分の親ブロックを設定 */
-    var parent_element = $('<tr></tr>');
-
-    /* プロフィール画像の要素を設定 */
-    var child_element_for_image = $('<td></td>');
-    if (data.user_profile.profile_image){
-        var image_element = $('<img class="rounded-circle img-bordered-sm" src='+data.user_profile.profile_image+' alt="user image" style="width:60px;height:60px;">');
-    }else{
-        var image_element =　$('<img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg" alt="user image" style="width:60px;height:60px;">');
-    }
-    child_element_for_image.append(image_element)
-    parent_element.append(child_element_for_image)
-
-    /* いいねユーザ名と自己紹介の要素を設定 */
-    var child_element_for_profile = $('<td></td>');
-        var user_name_element = $('<strong>'+data.user_profile.user.name+'<strong>');
-        var user_introduction_element = $('<p class="text-muted">'+data.user_profile.introduction+'</p>');
-    child_element_for_profile.append(user_name_element)
-    child_element_for_profile.append(user_introduction_element)
-    parent_element.append(child_element_for_profile)
-
-    /* ログインユーザといいねユーザのフォロー関係を調べて、フォローボタン or フォローするボタンの要素を設定 */
-    var child_element_for_relation = $('<td class="text-center align-middle"></td>');
-    if(data.user_profile.user.id == '{{user.id}}'){
-
-    }else if(data.relation){
-        var relation_element = $('<button type="button" class="btn bg-gradient-primary float-right already-follow">フォロー中</button>');
-    }else{
-        var relation_element = $('<button type="button" class="btn btn-outline-primary float-right un-follow">フォローする</button>');
-    }
-    var element_for_relation_infomation = $('<input type="hidden" value='+ data.relation.id +'id='+data.user_profile.user.id+'>');
-    child_element_for_relation.append(relation_element)
-    child_element_for_relation.append(element_for_relation_infomation)
-    parent_element.append(child_element_for_relation)
-    
-    $("tbody").append(parent_element);
-    })
-  }
-  /* modalが消えた時にいいねした人リストを削除する */
-  $('#modal-like').on('hidden.bs.modal', function () {
-    $("tbody").empty()
-  })
   // 記事にいいねをつける機能
   $(document).on('click','.not-like',function(e){
     e.stopPropagation();
@@ -195,8 +207,11 @@ $(function(){
           contentType:false,
         })
       })
-      var show_like_people = function(article_id){
-        var article_id = article_id
+       /* likeしたユーザのmodalを表示 */
+  $(document).on('click','.show-like-people',function(e){
+    e.preventDefault()
+    var article_id = $(this).attr('id').replace('id_liked_article_','');
+    $('#modal-like').modal();
         $.ajax({
           url:'http://localhost/article/favoriteArticle/?article='+article_id,
           type:'GET',
@@ -205,8 +220,58 @@ $(function(){
           processData:false,
           contentType:false,
         })
+      });
+
+  var afterSuccessFollow = function(unfollowButtonElement,target){
+      return function(data){
+        unfollowButtonElement.text('フォロー中')
+        unfollowButtonElement.removeClass('un-follow').addClass('already-follow')
+        unfollowButtonElement.removeClass('btn-outline-primary').addClass('bg-gradient-primary')
+        relation_id = data['id']
+        if(relation_id){
+          $('#'+target).val(data['id']);
+        }
       }
+    };
+
+  var afterSuccessUnfollow = function(alreadyfollowButtonElement,target){
+      alreadyfollowButtonElement.text('フォローする')
+      alreadyfollowButtonElement.removeClass('already-follow').addClass('un-follow')
+      alreadyfollowButtonElement.removeClass('bg-gradient-primary').addClass('btn-outline-primary')
+  };
+
+  $('body').on('click','.un-follow',function(e){
+    e.stopPropagation();
+    unfollowButtonElement = $(this)
+    var target = unfollowButtonElement.next().attr('id');
+    alert(target)
+    var data = new FormData();
+    data.append('target',target);
+    $.ajax({
+      url:'http://localhost/account/relation/',
+      type:'POST',
+      dataType:'json',
+      data:data,
+      success:afterSuccessFollow(unfollowButtonElement,target),
+      processData:false,
+      contentType:false,
     })
+  });
+  
+  $('body').on('click','.already-follow',function(e){
+    e.stopPropagation();
+    alreadyfollowButtonElement = $(this)
+    var target = alreadyfollowButtonElement.next().val();
+      alert(target)
+    $.ajax({
+      url:'http://localhost/account/relation/'+target+'/',
+      type:'DELETE',
+      success:afterSuccessUnfollow(alreadyfollowButtonElement),
+      processData:false,
+      contentType:false,
+    })
+  });
+})
     </script>
   <body>
     {% csrf_token %} 
@@ -247,11 +312,11 @@ $(function(){
                         <div class="col-2">
                           {% if custom_article.article.user.user_profile.profile_image %}
                           <a href="{% url 'account:profile' custom_article.article.user.id %}">
-                            <img class="rounded-circle img-bordered-sm article-profile_image" src="{{custom_article.article.user.user_profile.profile_image.url}}"  alt="user image" style="width:50px;height:50px;">
+                            <img class="rounded-circle img-bordered-sm article-profile-image" src="{{custom_article.article.user.user_profile.profile_image.url}}"  alt="user image" style="width:50px;height:50px;">
                           </a>
                             {% else %}
                           <a href="{% url 'account:profile' custom_article.article.user.id %}">
-                            <img class="rounded-circle img-bordered-sm article-profile_image" src="/media/default_profile.jpg"  alt="user image" style="width:50px;height:50px;">
+                            <img class="rounded-circle img-bordered-sm article-profile-image" src="/media/default_profile.jpg"  alt="user image" style="width:50px;height:50px;">
                           </a>
                             {% endif %}
                         </div>
@@ -287,8 +352,8 @@ $(function(){
                         </a>
                       </div>
                       {% else %}
-                      <div class="col-6 text-center link-black" style="display: none;" href="">
-                        <a class="link-black show-like-people" href="">
+                      <div class="col-6 text-center link-black" style="display: none;">
+                        <a class="link-black show-like-people" href="" id="id_liked_article_{{custom_article.article.id}}">
                         <span class="like-count">{{custom_article.article.favorite_article.all.count}}</span> 
                         likes
                         </a>
@@ -393,7 +458,7 @@ $(function(){
                           </div>
                           <hr>
                           <form action="article/commentForArticle" method="POST" id="id_submit_comment">
-                          <div class="row">
+                            <div class="row">
                               <div class="col-2">
                                 <!-- ログインユーザーの画像を貼り付ける -->
                                 {% if user.user_profile.profile_image %}
@@ -409,7 +474,7 @@ $(function(){
                                 </div>
                                 <div>
                                   <textarea class="form-control" rows="3" placeholder="コメントを書く" id="id_comment_for_submit"></textarea>
-                                  <input type="hidden" name="article" value="{{article.id}}" id="id_article">
+                                  <input type="hidden" name="article" value="{{custom_article.article.id}}" id="id_article">
                                 </div>
                               </div>
                             </div>
