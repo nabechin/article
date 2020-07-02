@@ -239,12 +239,11 @@ $(function(){
       alreadyfollowButtonElement.removeClass('already-follow').addClass('un-follow')
       alreadyfollowButtonElement.removeClass('bg-gradient-primary').addClass('btn-outline-primary')
   };
-
+  
   $('body').on('click','.un-follow',function(e){
     e.stopPropagation();
     unfollowButtonElement = $(this)
     var target = unfollowButtonElement.next().attr('id');
-    alert(target)
     var data = new FormData();
     data.append('target',target);
     $.ajax({
@@ -262,7 +261,6 @@ $(function(){
     e.stopPropagation();
     alreadyfollowButtonElement = $(this)
     var target = alreadyfollowButtonElement.next().val();
-      alert(target)
     $.ajax({
       url:'http://localhost/account/relation/'+target+'/',
       type:'DELETE',
@@ -271,7 +269,68 @@ $(function(){
       contentType:false,
     })
   });
-})
+
+  var afterSuccessLikeComment = function(not_like_element,comment_id){
+    return function(data){
+      $('#id_like_comment_'+comment_id).val(data['id'])
+      not_like_element.removeClass('not-like-comment').addClass('already-like-comment')
+      not_like_element.children().css('color','indianred')
+      var now_like_count = $('#id_like_comment_count_'+comment_id).text()
+      if(!now_like_count){
+        now_like_count = "0"
+      }
+      now_like_count = parseInt(now_like_count)
+      after_like_count = now_like_count + 1 
+      $('#id_like_comment_count_' + comment_id).text(after_like_count)
+    }
+  }
+
+  var afterSuccessNotLikeComment = function(already_like_element,comment_id){
+    already_like_element.children().css('color','')
+    already_like_element.removeClass('already-like-comment').addClass('not-like-comment')
+    var now_like_count = $('#id_like_comment_count_'+comment_id).text()
+    now_like_count = parseInt(now_like_count)
+    after_like_count = now_like_count -1 
+    if(after_like_count==0){
+      after_like_count = ""
+    }
+    $('#id_like_comment_count_' + comment_id).text(after_like_count)
+  }
+
+  // コメントにいいねをつける機能
+  $(document).on('click','.not-like-comment',function(e){
+    e.stopPropagation();
+    var not_like_element = $(this)
+    comment_id = not_like_element.next().attr('id').replace('id_like_comment_','')
+      var data = new FormData();
+      data.append('comment',comment_id);
+        $.ajax({
+          url:'http://localhost/article/favoriteComment/',
+          type:'POST',
+          dataType:'json',
+          data:data,
+          success:afterSuccessLikeComment(not_like_element,comment_id),
+          processData:false,
+          contentType:false,
+        })
+      })
+
+  // コメントのいいねを解除する
+  $(document).on('click','.already-like-comment',function(e){
+    e.stopPropagation();
+    var already_like_element = $(this)
+    like_id = already_like_element.next().val()
+    comment_id = already_like_element.next().attr('id').replace('id_like_comment_','')
+      $.ajax({
+        url:'http://localhost/article/favoriteComment/'+like_id+'/',
+        type:'DELETE',
+        dataType:'json',
+        success:afterSuccessNotLikeComment(already_like_element,comment_id),
+        processData:false,
+        contentType:false,
+      })
+    })
+  })
     </script>
   <body>
     {% csrf_token %} 
@@ -385,8 +444,8 @@ $(function(){
                       <div class="col-md-4 text-center">
                         <span class="text-lg">
                           <i class="far fa-comments" id="id_comment"></i>
-                          {% if custom_article.article.comment.all.count != 0 %}
-                          {{article.comment.all.count}}
+                          {% if custom_article.article.comment.all %}
+                          {{custom_article.article.comment.all.count}}
                           {% endif %}
                         </span>
                       </div>
@@ -491,23 +550,23 @@ $(function(){
                   </div>
                   <!-- /.modal -->
                   <!-- リツイート、ライク、コメントのアクション -->
-                  {% for comment in custom_article.article.comment.all%}
+                  {% for comment_dto in custom_article.comment_list %}
                   <div class="card-body article border-bottom">
                     <div class="tab-content">
                       <div class="active tab-pane" id="activity">
                         <!-- Post -->
-                        <div class="post" onclick="F_POST(this);">
+                        <div class="post">
                           <div class="user-block row">
                             <div class="col-2">
-                              {% if comment.user.user_profile.profile_image %}
-                              <img class="rounded-circle img-bordered-sm" src="{{comment.user.user_profile.profile_image.url}}"  alt="user image" style="width:50px;height:50px;">
+                              {% if comment_dto.comment.user.user_profile.profile_image %}
+                              <img class="rounded-circle img-bordered-sm" src="{{comment_dto.comment.user.user_profile.profile_image.url}}"  alt="user image" style="width:50px;height:50px;">
                               {% else %}
                               <img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg"  alt="user image" style="width:50px;height:50px;">
                               {% endif %}
                             </div>
                             <div class="col-10">
                             <strong>
-                            {{comment.user.name}}
+                            {{comment_dto.comment.user.name}}
                             </strong><br>
                             <small class="text-muted">2020/04/15</small>
                             </div>
@@ -517,7 +576,7 @@ $(function(){
                             <div class="col-2"></div>
                             <div class="col-10">
                           <p>
-                            {{ comment }}
+                            {{ comment_dto.comment.content }}
                           </p>
                             </div>
                           </div>
@@ -525,15 +584,32 @@ $(function(){
                           <div class="col-md-4 text-center">
                             <span class="link-black text-lg"><i class="fas fa-retweet"></i></span>
                           </div>
-                          <div class="col-md-4 text-center"> 
-                            <span class="link-black text-lg"><i class="far fa-thumbs-up"></i></span>
+
+                          <!-- コメントへのいいね表示 -->
+                          <div class="col-md-4 text-center align-bottom"> 
+                            {% if comment_dto.is_login_user_like_comment %}
+                            <span class="link-black text-lg already-like-comment">
+                              <span class="far fa-thumbs-up" style="color:indianred"></span>
+                            </span>
+                            {% else %}
+                            <span class="text-lg not-like-comment">
+                              <i class="far fa-thumbs-up"></i>
+                            </span>
+                            {% endif %}
+                            <input type="hidden" id="id_like_comment_{{comment_dto.comment.id}}" value="{{comment_dto.login_user_favorite_comment_id}}">
+                            {% if comment_dto.comment.favorite_comment.all %}
+                              <span id="id_like_comment_count_{{comment_dto.comment.id}}">
+                                {{comment_dto.comment.favorite_comment.all.count}}
+                              </span>
+                            {% else %}
+                              <span id="id_like_comment_count_{{comment_dto.comment.id}}"></span>
+                            {% endif %}
                           </div>
+                          <!-- コメントへのいいね表示 -->
+
                           <div class="col-md-4 text-center">
                             <span class="link-black text-lg">
                               <i class="far fa-comments"></i>
-                              {% if article.comment.all.count != 0 %}
-                              {{article.comment.all.count}}
-                              {% endif %}
                             </span>
                           </div>
                         </div>

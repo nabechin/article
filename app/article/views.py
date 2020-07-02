@@ -43,6 +43,7 @@ class CommentOfArticle(TemplateView):
         article = Article.objects.get(id=kwargs['article_id'])
         custom_article = CustomArticle(article)
         custom_article.is_login_user_like(login_user_id)
+        custom_article.is_login_user_like_comment(login_user_id)
         context = super(CommentOfArticle,self).get_context_data(**kwargs)
         context['custom_article'] = custom_article
         return render(self.request,self.template_name,context)
@@ -99,3 +100,5 @@ class FavoriteCommentView(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    
