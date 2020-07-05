@@ -94,8 +94,8 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
         </ul>
-        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">ログイン</a>
-        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">ログアウト</a>
+        <a class="nav-link text-dark" href="{% url 'account:login' %}" tabindex="-1" aria-disabled="true">ログイン</a>
+        <a class="nav-link text-dark" href="{% url 'account:logout' %}" tabindex="-1" aria-disabled="true">ログアウト</a>
       </div>
     </nav>
       <div class="container-fluid">
@@ -128,7 +128,7 @@
                     <col width="30%">
                     <tbody>
                         {% for follower_dto in follower_dto_list %}
-                      <tr>
+                      <tr style="cursor: pointer;">
                         <td>
                             {% if follower_dto.relation_profile.profile_image %}
                                 <img class="rounded-circle img-bordered-sm" src="{{follower_dto.relation_profile.profile_image.url}}"  alt="user image" style="width:60px;height:60px;">
@@ -137,7 +137,9 @@
                             {% endif %}
                         </td>
                         <td>
-                            <strong>{{follower_dto.relation_profile.user.name}}<strong>
+                            <a href="{% url 'account:profile' follower_dto.relation_profile.user.id %}" class="text-dark" style="font-weight: bold;">
+                              {{follower_dto.relation_profile.user.name}}
+                            </a>
                             <p class="text-muted">{{follower_dto.relation_profile.introduction}}</p>
                         </td>
                         <td class="text-center align-middle">

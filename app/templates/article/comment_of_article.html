@@ -341,8 +341,8 @@ $(function(){
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
         </ul>
-        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">ログイン</a>
-        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">ログアウト</a>
+        <a class="nav-link text-dark" href="{% url 'account:login' %}" tabindex="-1" aria-disabled="true">ログイン</a>
+        <a class="nav-link text-dark" href="{% url 'account:logout' %}" tabindex="-1" aria-disabled="true">ログアウト</a>
       </div>
     </nav>
       <div class="container-fluid">
@@ -362,7 +362,7 @@ $(function(){
             <div class="card-deck">
                 <div class="card">
                   <div class="card-header d-flex p-0">
-                    <h3 class="card-title p-3">tweet</h3>
+                    <h3 class="card-title p-3"></h3>
                   </div>
                   <!-- article -->
                   <div class="card-body">
@@ -422,15 +422,15 @@ $(function(){
                     <hr>
                     <div class="row">
                       <div class="col-md-4 text-center">
-                        <span class="text-lg"><i class="fas fa-retweet"></i></span>
+                        <span class="text-lg" style="cursor: pointer;"><i class="fas fa-retweet"></i></span>
                       </div>
                       <div class="col-md-4 text-center"> 
                         {% if custom_article.is_login_user_like %}
-                          <span class="text-lg already-like">
+                          <span class="text-lg already-like" style="cursor: pointer;">
                             <span class="far fa-thumbs-up" style="color:indianred"></span>
                           </span>
                           {% else %}
-                          <span class="text-lg not-like">
+                          <span class="text-lg not-like" style="cursor: pointer;">
                             <i class="far fa-thumbs-up"></i>
                           </span>
                           {% endif %}
@@ -441,7 +441,7 @@ $(function(){
                             <span id="id_like_count_{{custom_article.article.id}}"></span>
                           {% endif %}
                       </div>
-                      <div class="col-md-4 text-center">
+                      <div class="col-md-4 text-center" style="cursor: pointer;">
                         <span class="text-lg">
                           <i class="far fa-comments" id="id_comment"></i>
                           {% if custom_article.article.comment.all %}
@@ -523,7 +523,7 @@ $(function(){
                                 {% if user.user_profile.profile_image %}
                                   <img class="rounded-circle img-bordered-sm" src="{{user.user_profile.profile_image.url}}"  alt="user image" style="width:50px;height:50px;">
                                 {% else %}
-                                  <img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg"  alt="user image" style="width:50px;height:05px;">
+                                  <img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg"  alt="user image" style="width:50px;height:50px;">
                                 {% endif %}
                                 <!-- ログインユーザーの画像を貼り付ける -->
                               </div>

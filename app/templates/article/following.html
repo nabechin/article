@@ -20,73 +20,81 @@
     <script src="{% static 'admin-lte/dist/js/adminlte.min.js' %}"></script>
     <script src="{% static 'admin-lte/dist/js/demo.js' %}"></script>
     <script src="{% static 'js/content.js' %}"></script>
-    <script>
-    $(function(){
-           // is_follow -> 0 フォローボタン表示　is_follow -> 1 フォロー中ボタン表示
-           var is_follow = $('.judge_relation').val()
-           if(is_follow==0){
-            $('.un-follow').css('display','block')
-           }
-           if(is_follow==1){
-            $('.already-follow').css('display','block')
-           }
-          // フォローボタンを押すとフォロー状態とする
-          var csrftoken = $('input[name="csrfmiddlewaretoken"]').val();
-          function csrfSafeMethod(method) {
-              // these HTTP methods do not require CSRF protection
-              return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+<script>
+$(function(){
+      /* プロフィール画像のアクション発火(click、pointer) */
+      $('.following_profile_image').hover(function(){
+        $(this).css('cursor','pointer');
+        $(this).css('opacity','0.7');
+      });
+      $('.following_profile_image').mouseout(function(){
+        $(this).css('opacity','1');
+      });
+        // is_follow -> 0 フォローボタン表示　is_follow -> 1 フォロー中ボタン表示
+        var is_follow = $('.judge_relation').val()
+        if(is_follow==0){
+        $('.un-follow').css('display','block')
+        }
+        if(is_follow==1){
+        $('.already-follow').css('display','block')
+        }
+      // フォローボタンを押すとフォロー状態とする
+      var csrftoken = $('input[name="csrfmiddlewaretoken"]').val();
+      function csrfSafeMethod(method) {
+          // these HTTP methods do not require CSRF protection
+          return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+      }
+      $.ajaxSetup({
+          beforeSend: function(xhr, settings) {
+              if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                  xhr.setRequestHeader("X-CSRFToken", csrftoken);
+              }
           }
-          $.ajaxSetup({
-              beforeSend: function(xhr, settings) {
-                  if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                      xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                  }
-              }
-          });
-          var afterSuccessFollow = function(unfollowButtonElement,target){
-            return function(data){
-              unfollowButtonElement.text('フォロー中')
-              unfollowButtonElement.removeClass('un-follow').addClass('already-follow')
-              unfollowButtonElement.removeClass('btn-outline-primary').addClass('bg-gradient-primary')
-              relation_id = data['id']
-              if(relation_id){
-                $('#'+target).val(data['id']);
-              }
-            }
-          };
-          var afterSuccessUnfollow = function(alreadyfollowButtonElement,target){
-              alreadyfollowButtonElement.text('フォローする')
-              alreadyfollowButtonElement.removeClass('already-follow').addClass('un-follow')
-              alreadyfollowButtonElement.removeClass('bg-gradient-primary').addClass('btn-outline-primary')
-          };
-          $('body').on('click','.un-follow',function(){
-            unfollowButtonElement = $(this)
-            var target = unfollowButtonElement.next().attr('id');
-            var data = new FormData();
-            data.append('target',target);
-            $.ajax({
-              url:'http://localhost/account/relation/',
-              type:'POST',
-              dataType:'json',
-              data:data,
-              success:afterSuccessFollow(unfollowButtonElement,target),
-              processData:false,
-              contentType:false,
-            })
-          });
-          $('body').on('click','.already-follow',function(){
-            alreadyfollowButtonElement = $(this)
-            var target = alreadyfollowButtonElement.next().val();
-            $.ajax({
-              url:'http://localhost/account/relation/'+target+'/',
-              type:'DELETE',
-              success:afterSuccessUnfollow(alreadyfollowButtonElement),
-              processData:false,
-              contentType:false,
-            })
-          });
-        });
-    </script>
+      });
+      var afterSuccessFollow = function(unfollowButtonElement,target){
+        return function(data){
+          unfollowButtonElement.text('フォロー中')
+          unfollowButtonElement.removeClass('un-follow').addClass('already-follow')
+          unfollowButtonElement.removeClass('btn-outline-primary').addClass('bg-gradient-primary')
+          relation_id = data['id']
+          if(relation_id){
+            $('#'+target).val(data['id']);
+          }
+        }
+      };
+      var afterSuccessUnfollow = function(alreadyfollowButtonElement,target){
+          alreadyfollowButtonElement.text('フォローする')
+          alreadyfollowButtonElement.removeClass('already-follow').addClass('un-follow')
+          alreadyfollowButtonElement.removeClass('bg-gradient-primary').addClass('btn-outline-primary')
+      };
+      $('body').on('click','.un-follow',function(){
+        unfollowButtonElement = $(this)
+        var target = unfollowButtonElement.next().attr('id');
+        var data = new FormData();
+        data.append('target',target);
+        $.ajax({
+          url:'http://localhost/account/relation/',
+          type:'POST',
+          dataType:'json',
+          data:data,
+          success:afterSuccessFollow(unfollowButtonElement,target),
+          processData:false,
+          contentType:false,
+        })
+      });
+      $('body').on('click','.already-follow',function(){
+        alreadyfollowButtonElement = $(this)
+        var target = alreadyfollowButtonElement.next().val();
+        $.ajax({
+          url:'http://localhost/account/relation/'+target+'/',
+          type:'DELETE',
+          success:afterSuccessUnfollow(alreadyfollowButtonElement),
+          processData:false,
+          contentType:false,
+        })
+      });
+    });
+</script>
   </head>
   <body>
     {% csrf_token %} 
@@ -97,8 +105,8 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
         </ul>
-        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">ログイン</a>
-        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">ログアウト</a>
+        <a class="nav-link text-dark" href="{% url 'account:login' %}" tabindex="-1" aria-disabled="true">ログイン</a>
+        <a class="nav-link text-dark" href="{% url 'account:logout' %}" tabindex="-1" aria-disabled="true">ログアウト</a>
       </div>
     </nav>
       <div class="container-fluid">
@@ -131,17 +139,22 @@
                     <col width="30%">
                     <tbody>
                         {% for following_dto in following_dto_list %}
-                      <tr>
+                      <tr style="cursor: pointer;">
                         <td>
                             {% if following_dto.relation_profile.profile_image %}
-                                <img class="rounded-circle img-bordered-sm" src="{{following_dto.relation_profile.profile_image.url}}"  alt="user image" style="width:60px;height:60px;">
+                              <a href="{% url 'account:profile' following_dto.relation_profile.user.id %}" class="text-dark" style="font-weight: bold;">
+                                <img class="rounded-circle img-bordered-sm following_profile_image" src="{{following_dto.relation_profile.profile_image.url}}"  alt="user image" style="width:60px;height:60px;">
+                              </a>
                             {% else %}
-                                <img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg"  alt="user image" style="width:60px;height:60px;">
+                              <a href="{% url 'account:profile' following_dto.relation_profile.user.id %}" class="text-dark" style="font-weight: bold;">
+                                <img class="rounded-circle img-bordered-sm following_profile_image" src="/media/default_profile.jpg"  alt="user image" style="width:60px;height:60px;">
+                              </a>
                             {% endif %}
                         </td>
                         <td>
-                            <strong>{{following_dto.relation_profile.user.name}}<strong>
-                              
+                           <a href="{% url 'account:profile' following_dto.relation_profile.user.id %}" class="text-dark" style="font-weight: bold;">
+                             {{following_dto.relation_profile.user.name}}
+                           </a>
                             <p class="text-muted">{{following_dto.relation_profile.introduction}}</p>
                         </td>
                         <td class="text-center align-middle">
