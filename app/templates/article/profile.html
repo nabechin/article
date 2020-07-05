@@ -14,6 +14,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'admin-lte/dist/css/adminlte.min.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/contents.css' %}">
     <script src="{% static 'admin-lte/plugins/jquery/jquery.min.js' %}"></script>
     <script src="{% static 'admin-lte/plugins/jquery-ui/jquery-ui.min.js' %}"></script>
     <script src="{% static 'admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js' %} "></script>
@@ -304,7 +305,7 @@
             <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
               <a class="nav-link" id="v-pills-home-tab" href="{% url 'article:article' %}" role="tab" >Home</a>
               <a class="nav-link active" id="v-pills-profile-tab" href="{% url 'account:profile' user.id %}" role="tab">Profile</a>
-              <a class="nav-link" id="v-pills-messages-tab" href="#v-pills-messages" role="tab">Messages</a>
+              <a class="nav-link" id="v-pills-messages-tab" href="{% url 'messages:talkroom' %}" role="tab">Messages</a>
               <a class="nav-link" id="v-pills-settings-tab" href="#v-pills-settings" role="tab">Settings</a>
             </div>
           </div>
@@ -329,8 +330,11 @@
                      </div>
                     </div>
                     <div class="col-5">
+                      <a href="{% url 'messages:talkroom' user.id %}" class="nav-link float-right mail-font">
+                        <i class="far fa-envelope"></i>
+                      </a>
                       <!-- フォローとフォロワー数  -->
-                       <div>
+                       <div class="float-right">
                         <a href="{% url 'account:following' user.id %}" class="text-dark"><strong>{{number_of_follow}}</strong>&nbsp;フォロー中</a>&nbsp;
                         <a href="{% url 'account:follower' user.id %}" class="text-dark"><strong id='id_number-of_follower'>{{number_of_follower}}</strong>&nbsp;フォロワー</a>
                       </div>
