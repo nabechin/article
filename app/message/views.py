@@ -1,5 +1,8 @@
 from django.shortcuts import render
-from django.views.generic import TemplateView
+from django.urls import reverse
+from django.contrib.auth import get_user_model
+from django.utils.http import urlencode
+from django.views.generic import TemplateView, RedirectView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import TalkRoom, Message, UserOwnTalkRoom
 from .serializers import MessageSerializer
@@ -34,6 +37,22 @@ class MessageView(LoginRequiredMixin, TemplateView):
         context['messages'] = messages
         context['talkroom'] = talk_room_id
         return render(self.request,self.template_name,context)
+
+
+class UserOwnTalkRoomView(LoginRequiredMixin, RedirectView):
+
+    def get_redirect_url(self, *args, **kwargs):
+        login_user = self.request.user
+        talk_rooms = UserOwnTalkRoom.objects.all().filter(participant=login_user.id).values('talk_room')
+        talk_rooms = UserOwnTalkRoom.objects.all().filter(talk_room__in=talk_rooms,participant=kwargs['sender'])
+        if not talk_rooms:
+            talk_room = TalkRoom.objects.create(last_message='')
+            UserOwnTalkRoom.objects.create(participant=login_user,talk_room=talk_room)
+            sender = get_user_model().objects.get(pk=kwargs['sender'])
+            UserOwnTalkRoom.objects.create(participant=sender,talk_room=talk_room)
+        else:
+            talk_room = talk_rooms[0]
+        return reverse('messages:message',args=(talk_room.id,))
 
 
 class SendMessageView(viewsets.ModelViewSet):
