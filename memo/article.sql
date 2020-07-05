@@ -39,3 +39,8 @@ values('user47のコメント',12,47)
 
 /* フォロー、アンフォロー関係データinsert */
 insert into account_relation(follower_id,target_id)values(47,49);
+
+
+/* メッセージの情報を登録 */
+insert into message_talkroom(login_user_id,talk_to_id)values(50,49);
+insert into message_message(receiver_id,sender_id,talk_room_id,create_at,body)values(49,50,1,current_timestamp,'あああ');

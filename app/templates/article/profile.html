@@ -330,7 +330,7 @@
                     </div>
                     <div class="col-5">
                       <!-- フォローとフォロワー数  -->
-                       <div style="margin:30px 0 0 0;">
+                       <div>
                         <a href="{% url 'account:following' user.id %}" class="text-dark"><strong>{{number_of_follow}}</strong>&nbsp;フォロー中</a>&nbsp;
                         <a href="{% url 'account:follower' user.id %}" class="text-dark"><strong id='id_number-of_follower'>{{number_of_follower}}</strong>&nbsp;フォロワー</a>
                       </div>

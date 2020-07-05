@@ -1,0 +1,231 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <meta name="generator" content="Jekyll v3.8.5" />
+    <meta property="og:title" content="Layout" />
+    <meta property="og:locale" content="en_US" />
+    <meta name="description" content="AdminLTE v3 Documentaion" />
+    <meta property="og:description" content="AdminLTE v3 Documentaion" />
+    <meta property="og:site_name" content="AdminLTE v3 Documentaion" />
+    <link rel="stylesheet" href="{% static 'admin-lte/plugins/fontawesome-free/css/all.min.css' %}">
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'admin-lte/dist/css/adminlte.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/contents.css' %}">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <script src="{% static 'admin-lte/plugins/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'admin-lte/plugins/jquery-ui/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js' %} "></script>
+    <script src="{% static 'admin-lte/dist/js/adminlte.min.js' %}"></script>
+    <script src="{% static 'admin-lte/dist/js/demo.js' %}"></script>
+    <script src="{% static 'js/content.js' %}"></script>
+  <body>   
+  <script>
+$(function(){
+    /* メッセージを最新のbodyまでスクロール */
+    var obj = document.getElementById('id_chat_body');
+    obj.scrollTop = obj.scrollHeight;
+
+    var csrftoken = $('input[name="csrfmiddlewaretoken"]').val();
+    // httpメソッドがオブジェクトの読み出し->true オブジェクトの編集->false
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    // ajax通信の前にDBを更新するメソッドであればCSRFTOKENをヘッダに埋め込む
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+
+    /* トークルームを押すとメッセージを取得するリクエストを送る */
+    $('.talk-room').on('click',function(){
+     var talk_room_id = $(this).attr('id').replace('id_talk_room_','');
+        var url = "{% url 'messages:message' 0 %}";
+        document.location.href = url.replace('0', talk_room_id);
+    })
+
+    var afterSuccessSendMessage = function(talk_room_id){
+      return function(data){
+        var body = $('<div class="direct-chat-msg"></div>');
+        body.addClass('right')
+
+
+        var profile_body = $('<div class="direct-chat-light clearfix"></div>');
+        var profile_name = $('<small class="text-muted"></small>');
+        profile_name.addClass('float-right');
+        profile_name.text(data.user_profile.user.name)
+        profile_body.append(profile_name)
+        profile_body.append(create_date)
+
+        if (data.user_profile.profile_image){
+            var profile_image = $('<img class="direct-chat-img" src='+data.user_profile.profile_image+' alt="message user image"/>');
+        }else{
+            var profile_image = $('<img class="direct-chat-img" src="/media/default_profile.jpg" alt="message user image"/>');
+        }
+
+        var message_body = $('<div class="direct-chat-text w-50 float-right mr-2"></div>');
+        message_body.text(data.body);
+        
+        var create_date = $('<span class="direct-chat-timestamp float-right mr-2"></span>');
+        var create_time = data.create_at.match(/\d+:\d+/);
+        create_date.text(create_time)
+
+        body.append(profile_body);
+        body.append(profile_image);
+        body.append(message_body);
+        body.append(create_date);
+        $('.chat-body').append(body);  
+        $('#id_talk_room_'+talk_room_id+' .text-muted').text(data.body)
+        var obj = document.getElementById('id_chat_body');
+        obj.scrollTop = obj.scrollHeight;
+      }
+    }
+
+    $('#id_submit_message').on('click',function(){
+        var message_body = $('input[name="message"]').val()
+        var talk_room_id = $('input[name="talkRoom"]').val()
+        var sender = '{{login_user_id}}'
+        var data = new FormData();
+        var chat_number = $('.direct-chat-text').length;
+        data.append('sender',sender);
+        data.append('body',message_body);
+        data.append('talk_room',talk_room_id);
+        $.ajax({
+            url:'http://localhost/messages/message/',
+            type:'POST',
+            dataType:'json',
+            data:data,
+            success:afterSuccessSendMessage(talk_room_id),
+            processData:false,
+            contentType:false,
+        })
+    })
+})
+  </script>
+    {% csrf_token %} 
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+        </ul>
+        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">ログイン</a>
+        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">ログアウト</a>
+      </div>
+    </nav>
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-1">
+          </div>
+          <div class="col-2">
+            <br>
+            <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+              <a class="nav-link" id="v-pills-home-tab" href="{% url 'article:article' %}" role="tab" >Home</a>
+              <a class="nav-link" id="v-pills-profile-tab" href="#v-pills-profile" role="tab">Profile</a>
+              <a class="nav-link active" id="v-pills-messages-tab" href="#v-pills-messages" role="tab">Messages</a>
+              <a class="nav-link" id="v-pills-settings-tab" href="#v-pills-settings" role="tab">Settings</a>
+            </div>
+          </div>
+          <div class="col-4">
+              <!-- /.row -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex p-0">
+                        <h3 class="card-title p-3">メッセージ</h3>
+                      </div>
+                <!-- /.card-body -->
+                <div class="card-body p-0">
+                  <table class="table table-hover">
+                    <col width="20%">
+                    <col width="50%">
+                    <col width="30%">
+                    <tbody>
+                    {% for talk_room in talk_rooms %}
+                    <tr id='id_talk_room_{{talk_room.talk_room.id}}' class='talk-room'>
+                        <td>
+                            {% if talk_room.participant.user_profile.profile_image %}
+                              <img class="rounded-circle img-bordered-sm" name="profile_image" style="width:60px;height:60px;" src="{{talk_room.participant.user_profile.profile_image.url}}" id="id_profile_img">
+                            {% else %}
+                              <img class="rounded-circle img-bordered-sm" name="profile_image" style="width:60px;height:60px;" src="/media/default_profile.jpg" id="id_profile_img">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <strong id="id_strong_name_id_{{talk_room.talk_room.id}}">{{talk_room.participant.name}}</strong>
+                            <p class="text-muted">{{talk_room.talk_room.last_message}}</p>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+                <!-- /.card-body -->
+              </div>
+              <!-- /.card -->
+            </div>
+          </div>
+          <!-- /.row -->
+          </div>
+          <div class="col-5">
+            <div class="card direct-chat direct-chat-primary" style='height: 600px;'>
+                <div class="card-header">
+                  <h3 class="card-title font-weight-bold" id="id_header_name"></h3>
+                </div>
+                <div class="card-body">
+                  <div class="direct-chat-messages chat-body" id='id_chat_body' style='height: 500px;'>
+                    {% for message in messages %}
+                      {% if message.sender.id == login_user_id %}
+                        <div class="direct-chat-msg right">
+                          <div class="direct-chat-light clearfix">
+                              <small class="text-muted float-right">{{message.sender.name}}</small>
+                          </div>
+                          {% if message.sender.user_profile.profile_image %}
+                            <img class="direct-chat-img" src="{{message.sender.user_profile.profile_image.url}}" alt="message user image"/>
+                          {% else %}
+                            <img class="direct-chat-img" src="/media/default_profile.jpg" alt="message user image"/>
+                          {% endif %}
+                          <div class="direct-chat-text w-50 float-right mr-2">{{ message.body }}</div>
+                          <span class="direct-chat-timestamp float-right mr-2">{{ message.create_at|date:"H:i" }}</span>
+                        </div>
+                      {% else %}
+                      <div class="direct-chat-msg">
+                        <div class="direct-chat-light clearfix">
+                            <small class="text-muted float-left">{{message.sender.name}}</small>
+                        </div>
+                        {% if message.sender.user_profile.profile_image %}
+                          <img class="direct-chat-img" src="{{message.sender.user_profile.profile_image.url}}" alt="message user image"/>
+                        {% else %}
+                          <img class="direct-chat-img" src="/media/default_profile.jpg" alt="message user image"/>
+                        {% endif %}
+                        <div class="direct-chat-text w-50 float-left ml-2">{{ message.body }}</div>
+                        <span class="direct-chat-timestamp float-left ml-2">{{ message.create_at|date:"H:i" }}</span>
+                      </div>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+                <div class="card-footer">
+                  <form action="#" method="post">
+                    <div class="input-group">
+                      <input type="text" name="message" placeholder="テキストの入力" class="form-control">
+                      <input type="hidden" name="talkRoom" value="{{talkroom}}"/>
+                      <span class="input-group-append">
+                        <button type="button" class="btn btn-primary" id="id_submit_message">送信</button>
+                      </span>
+                    </div>
+                  </form>
+                </div>
+              </div>
+          <div class="col-1">
+          </div>
+        </div>
+    </div>
+    </div>
+  </body>
+</html>
