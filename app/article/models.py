@@ -1,7 +1,8 @@
-from django.db import models
-from django.conf import settings
 import uuid
 import os
+
+from django.db import models
+from django.conf import settings
 
 
 def article_media_save_path(instance, file_name):
