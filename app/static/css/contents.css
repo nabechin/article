@@ -1,3 +1,27 @@
-.mail-font{
-    font-size: 25px;
+.mail-font {
+  font-size: 25px;
+}
+
+figure {
+  position: relative;
+  display: inline-block;
+  margin-right: 20px;
+  width: 400px;
+}
+
+figure img {
+  max-width: 100%;
+  vertical-align: top;
+}
+
+figure figcaption {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 5px 10px;
+  font-size: 86%;
+  color: #fff;
+  background: #333;
+  float: right;
+  cursor: pointer;
 }

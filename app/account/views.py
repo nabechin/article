@@ -6,16 +6,17 @@ from .forms import UserRegisterForm, LoginForm
 from django.contrib import messages
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import UserProfile,Relation
+from .models import UserProfile, Relation
 from article.models import Article, FavoriteArticle
 from rest_framework import viewsets
-from .serializers import UserProfileSerializer,RelationSerializer
-from rest_framework import permissions 
+from .serializers import UserProfileSerializer, RelationSerializer
+from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.http import HttpResponseRedirect
 from typing import NamedTuple
 from django.db.models import Count, Exists
+from django.db.models import Q
 from app.dto import CustomArticle, RelationDto
 
 
@@ -25,7 +26,7 @@ class UserRegisterView(CreateView):
     form_class = UserRegisterForm
     template_name = 'signup.html'
     success_url = '/account/login/'
-    
+
     def form_valid(self, form):
         del form.cleaned_data['password2']
         validate_data = form.cleaned_data
@@ -56,30 +57,33 @@ class Login(LoginView):
     template_name = 'login.html'
 
 
-class Logout(LoginRequiredMixin,LogoutView):
+class Logout(LoginRequiredMixin, LogoutView):
     template_name = 'logout.html'
 
 
-class Profile(LoginRequiredMixin,TemplateView):
+class Profile(LoginRequiredMixin, TemplateView):
     UNFOLLOW = 0
     FOLLOW = 1
     template_name = 'profile.html'
     raise_exception = True
     permission_classes = (permissions.IsAuthenticated,)
 
-    def get(self,request,*args,**kwargs):
+    def get(self, request, *args, **kwargs):
         login_user = self.request.user
         user_id = kwargs['user_id']
-        article_list = Article.objects.all().prefetch_related('comment').filter(user__id=user_id)
+        article_list = Article.objects.all().prefetch_related(
+            'comment').filter(user__id=user_id)
         custom_article_list = []
         for article in article_list:
             custom_article = CustomArticle(article)
             custom_article.is_login_user_like(login_user.id)
             custom_article_list.append(custom_article)
-        user_profile = UserProfile.objects.select_related('user').get(user__id=user_id)
+        user_profile = UserProfile.objects.select_related(
+            'user').get(user__id=user_id)
         context = super(Profile, self).get_context_data(**kwargs)
         user = get_user_model().objects.get(pk=user_id)
-        relation = Relation.objects.filter(follower=login_user.id,target=user_id)
+        relation = Relation.objects.filter(
+            follower=login_user.id, target=user_id)
         number_of_follow = Relation.objects.filter(follower=user_id).count()
         number_of_follower = Relation.objects.filter(target=user_id).count()
         if not relation:
@@ -93,7 +97,7 @@ class Profile(LoginRequiredMixin,TemplateView):
         context['user'] = user
         context['login_user'] = login_user
         context['user_profile'] = user_profile
-        return render(self.request, self.template_name,context)
+        return render(self.request, self.template_name, context)
 
 
 class RelationView(viewsets.ModelViewSet):
@@ -101,18 +105,18 @@ class RelationView(viewsets.ModelViewSet):
     permissions_classes = (permissions.IsAuthenticated)
     queryset = Relation.objects.all()
 
-    def perform_create(self,serializer):
-            serializer.save(follower=self.request.user)
+    def perform_create(self, serializer):
+        serializer.save(follower=self.request.user)
 
 
-class FollowerView(LoginRequiredMixin,TemplateView):
-    #htmlのフォロー、フォロワーボタンの表示、非表示で使用
+class FollowerView(LoginRequiredMixin, TemplateView):
+    # htmlのフォロー、フォロワーボタンの表示、非表示で使用
     UNFOLLOW = 0
     FOLLOW = 1
     template_name = 'follower.html'
     permission_classes = (permissions.IsAuthenticated)
 
-    def get(self,request,*args,**kwargs):
+    def get(self, request, *args, **kwargs):
         user_id = kwargs['user_id']
         login_user = self.request.user
         relation_list = Relation.objects.filter(target=user_id)
@@ -123,13 +127,15 @@ class FollowerView(LoginRequiredMixin,TemplateView):
         for follower in relation_list:
             follower_id = follower.follower.id
             relation_profile = UserProfile.objects.get(user__id=follower_id)
-            relation = Relation.objects.filter(follower=login_user.id,target=follower_id)
+            relation = Relation.objects.filter(
+                follower=login_user.id, target=follower_id)
             if not relation:
                 is_follow = self.UNFOLLOW
-                follower_dto = RelationDto(relation_profile,is_follow,None)
+                follower_dto = RelationDto(relation_profile, is_follow, None)
             else:
                 is_follow = self.FOLLOW
-                follower_dto = RelationDto(relation_profile,is_follow,relation[0])
+                follower_dto = RelationDto(
+                    relation_profile, is_follow, relation[0])
             follower_dto_list.append(follower_dto)
         context = super(FollowerView, self).get_context_data(**kwargs)
         context['follower_dto_list'] = follower_dto_list
@@ -138,14 +144,14 @@ class FollowerView(LoginRequiredMixin,TemplateView):
         return render(self.request, self.template_name, context)
 
 
-class FollowingView(LoginRequiredMixin,TemplateView):
-    #htmlのフォロー、フォロワーボタンの表示、非表示で使用
+class FollowingView(LoginRequiredMixin, TemplateView):
+    # htmlのフォロー、フォロワーボタンの表示、非表示で使用
     UNFOLLOW = 0
     FOLLOW = 1
     template_name = 'following.html'
     permission_classes = (permissions.IsAuthenticated)
 
-    def get(self,request,*args,**kwargs):
+    def get(self, request, *args, **kwargs):
         user_id = kwargs['user_id']
         login_user = self.request.user
         relation_list = Relation.objects.filter(follower=user_id)
@@ -156,13 +162,15 @@ class FollowingView(LoginRequiredMixin,TemplateView):
         for following in relation_list:
             follower_id = following.target.id
             relation_profile = UserProfile.objects.get(user__id=follower_id)
-            relation = Relation.objects.filter(follower=login_user.id,target=follower_id)
+            relation = Relation.objects.filter(
+                follower=login_user.id, target=follower_id)
             if not relation:
                 is_follow = self.UNFOLLOW
-                following_dto = RelationDto(relation_profile,is_follow,None)
+                following_dto = RelationDto(relation_profile, is_follow, None)
             else:
                 is_follow = self.FOLLOW
-                following_dto = RelationDto(relation_profile,is_follow,relation[0])
+                following_dto = RelationDto(
+                    relation_profile, is_follow, relation[0])
             following_dto_list.append(following_dto)
         context = super(FollowingView, self).get_context_data(**kwargs)
         context['following_dto_list'] = following_dto_list
@@ -171,15 +179,16 @@ class FollowingView(LoginRequiredMixin,TemplateView):
         return render(self.request, self.template_name, context)
 
 
-
 class LikeArticleView(Profile):
     template_name = "like.html"
 
-    def get(self,request,*args,**kwargs):
+    def get(self, request, *args, **kwargs):
         login_user = self.request.user
         user_id = kwargs['user_id']
-        sub_query = FavoriteArticle.objects.filter(user=login_user.id).values('article')
-        favorite_article_ids = FavoriteArticle.objects.values('article__id').filter(article__in = sub_query)
+        sub_query = FavoriteArticle.objects.filter(
+            user=user_id).values('article')
+        favorite_article_ids = FavoriteArticle.objects.values(
+            'article__id').filter(article__in=sub_query)
         article_list = Article.objects.filter(pk__in=favorite_article_ids)
         custom_article_list = []
         for article in article_list:
@@ -187,10 +196,12 @@ class LikeArticleView(Profile):
             custom_article.is_login_user_like(login_user.id)
             custom_article_list.append(custom_article)
         # article_idに対応するArticleとそのfavoriteが１対１になるDTOを用意しリスト化
-        user_profile = UserProfile.objects.select_related('user').get(user__id=user_id)
+        user_profile = UserProfile.objects.select_related(
+            'user').get(user__id=user_id)
         context = super(LikeArticleView, self).get_context_data(**kwargs)
         user = get_user_model().objects.get(pk=user_id)
-        relation = Relation.objects.filter(follower=login_user.id,target=user_id)
+        relation = Relation.objects.filter(
+            follower=login_user.id, target=user_id)
         number_of_follow = Relation.objects.filter(follower=user_id).count()
         number_of_follower = Relation.objects.filter(target=user_id).count()
         if not relation:
@@ -204,11 +215,39 @@ class LikeArticleView(Profile):
         context['user'] = user
         context['login_user'] = login_user
         context['user_profile'] = user_profile
-        return render(self.request, self.template_name,context)
-
-        
+        return render(self.request, self.template_name, context)
 
 
+class ArticleMedia(Profile):
+    template_name = 'media.html'
 
-
-
+    def get(self, request, *args, **kwargs):
+        login_user = self.request.user
+        user_id = kwargs['user_id']
+        article_list = Article.objects.all().prefetch_related(
+            'comment').filter(user__id=user_id).exclude(article_media='')
+        custom_article_list = []
+        for article in article_list:
+            custom_article = CustomArticle(article)
+            custom_article.is_login_user_like(login_user.id)
+            custom_article_list.append(custom_article)
+        user_profile = UserProfile.objects.select_related(
+            'user').get(user__id=user_id)
+        context = super(ArticleMedia, self).get_context_data(**kwargs)
+        user = get_user_model().objects.get(pk=user_id)
+        relation = Relation.objects.filter(
+            follower=login_user.id, target=user_id)
+        number_of_follow = Relation.objects.filter(follower=user_id).count()
+        number_of_follower = Relation.objects.filter(target=user_id).count()
+        if not relation:
+            context['is_follow'] = self.UNFOLLOW
+        else:
+            context['is_follow'] = self.FOLLOW
+            context['relation'] = relation[0]
+        context['number_of_follow'] = number_of_follow
+        context['number_of_follower'] = number_of_follower
+        context['custom_article_list'] = custom_article_list
+        context['user'] = user
+        context['login_user'] = login_user
+        context['user_profile'] = user_profile
+        return render(self.request, self.template_name, context)

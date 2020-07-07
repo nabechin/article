@@ -392,6 +392,9 @@ $(function(){
                     <p>
                       {{ custom_article.article.content }}
                     </p>
+                        {% if custom_article.article.article_media %}
+                          <img class="article-profile-image rounded border border-dark"  src="{{custom_article.article.article_media.url}}"  alt="user image" style="width:100%;height:250px;">
+                        {% endif %}
                       </div>
                     </div>
                     </div>
