@@ -1,6 +1,5 @@
 from django.db import models
 from django.conf import settings
-# Create your models here.
 
 
 class TalkRoom(models.Model):
@@ -13,13 +12,13 @@ class TalkRoom(models.Model):
 class UserOwnTalkRoom(models.Model):
     participant = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        null = True,
+        null=True,
         on_delete=models.CASCADE,
         related_name='participant',
     )
     talk_room = models.ForeignKey(
         'TalkRoom',
-        null = True,
+        null=True,
         on_delete=models.CASCADE,
     )
 
@@ -27,7 +26,7 @@ class UserOwnTalkRoom(models.Model):
 class Message(models.Model):
     talk_room = models.ForeignKey(
         'TalkRoom',
-        null = True,
+        null=True,
         on_delete=models.CASCADE,
     )
     body = models.CharField(
@@ -36,7 +35,7 @@ class Message(models.Model):
     )
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        null = True,
+        null=True,
         on_delete=models.CASCADE,
         related_name='sender',
     )
@@ -44,4 +43,3 @@ class Message(models.Model):
         auto_now_add=True,
         blank=True,
     )
-

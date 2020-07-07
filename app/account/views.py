@@ -1,26 +1,25 @@
-from django.shortcuts import render
-from django.views.generic import TemplateView, CreateView
-from django.contrib.auth import get_user_model
-from django.shortcuts import redirect
-from .forms import UserRegisterForm, LoginForm
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import UserProfile, Relation
-from article.models import Article, FavoriteArticle
+from django.shortcuts import render
+from django.shortcuts import redirect
+from django.db.models import Count
+from django.db.models import Q
+from django.views.generic import TemplateView, CreateView
+
 from rest_framework import viewsets
-from .serializers import UserProfileSerializer, RelationSerializer
 from rest_framework import permissions
 from rest_framework.response import Response
-from rest_framework.decorators import action
-from django.http import HttpResponseRedirect
-from typing import NamedTuple
-from django.db.models import Count, Exists
-from django.db.models import Q
+
+from .forms import UserRegisterForm, LoginForm
+from .models import UserProfile, Relation
+from .serializers import UserProfileSerializer, RelationSerializer
+
+from article.models import Article, FavoriteArticle
 from app.dto import CustomArticle, RelationDto
 
 
-# Create your views here.
 class UserRegisterView(CreateView):
     model = get_user_model()
     form_class = UserRegisterForm

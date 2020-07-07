@@ -3,16 +3,17 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView, TemplateView, FormView
-from django.http import HttpResponseRedirect
+from django.views.generic import CreateView, ListView, TemplateView
 
-from account.models import Relation, UserProfile
-from app.dto import RelationDto, CustomArticle
 from rest_framework import permissions, viewsets
 
 from .forms import ArticleForm
 from .models import Article, Comment, FavoriteArticle, FavoriteComment
 from .serializers import CommentSerializer, FavoriteArticleSerializer, FavoriteCommentSerializer
+
+from account.models import Relation, UserProfile
+from app.dto import RelationDto, CustomArticle
+
 
 
 class ArticleList(LoginRequiredMixin, TemplateView):
