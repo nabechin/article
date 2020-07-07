@@ -1,8 +1,11 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="ja">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
   <head>
     <title>記事</title>
     <meta name="generator" content="Jekyll v3.8.5" />
@@ -11,34 +14,54 @@
     <meta name="description" content="AdminLTE v3 Documentaion" />
     <meta property="og:description" content="AdminLTE v3 Documentaion" />
     <meta property="og:site_name" content="AdminLTE v3 Documentaion" />
-    <link rel="stylesheet" href="{% static 'admin-lte/plugins/fontawesome-free/css/all.min.css' %}">
-    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-    <link rel="stylesheet" type="text/css" href="{% static 'admin-lte/dist/css/adminlte.min.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
-    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <link
+      rel="stylesheet"
+      href="{% static 'admin-lte/plugins/fontawesome-free/css/all.min.css' %}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'admin-lte/dist/css/adminlte.min.css' %}"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700"
+      rel="stylesheet"
+    />
     <script src="{% static 'admin-lte/plugins/jquery/jquery.min.js' %}"></script>
     <script src="{% static 'admin-lte/plugins/jquery-ui/jquery-ui.min.js' %}"></script>
     <script src="{% static 'admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js' %} "></script>
     <script src="{% static 'admin-lte/dist/js/adminlte.min.js' %}"></script>
     <script src="{% static 'admin-lte/dist/js/demo.js' %}"></script>
     <script>
-    $(function(){
-      $("#id_loginButton").on('click',function(){
-        var username = $("#id_username").val();
-        var password = $("#id_password").val();
-        if(!username || !password){
-          $("#id_errorMessage").css('display','block');
-          return false;
-        }
-          $("#id_login").submit()
-      })
-    });
+      $(function () {
+        $("#id_loginButton").on("click", function () {
+          var username = $("#id_username").val();
+          var password = $("#id_password").val();
+          if (!username || !password) {
+            $("#id_errorMessage").css("display", "block");
+            return false;
+          }
+          $("#id_login").submit();
+        });
+      });
     </script>
   </head>
   <body class="hold-transition login-page">
     <!-- {% if messages %}
     {% for message in messages %} -->
-    <div class="alert alert-primary alert-dismissible" style="margin-bottom:70px;">
+    <div
+      class="alert alert-primary alert-dismissible"
+      style="margin-bottom: 70px;"
+    >
       <h5 style="margin: 0 auto;">{{message}}</h5>
     </div>
     <!-- {% endfor %}
@@ -54,11 +77,16 @@
           <p>{{ error }}</p>
         </div>
         {% endfor %}
-        <div class="errormessage" style="color: crimson; margin-left: 10px; display:none;" id="id_errorMessage">メールアドレスまたはパスワードを入力してください</div>
+        <div
+          class="errormessage"
+          style="color: crimson; margin-left: 10px; display: none;"
+          id="id_errorMessage"
+        >
+          メールアドレスまたはパスワードを入力してください
+        </div>
         <div class="card-body login-card-body">
           <form action="" method="post" id="id_login">
-            {% csrf_token %}
-            {% for field in form %}
+            {% csrf_token %} {% for field in form %}
             <div class="form-group">
               <label>{{ field.label }}</label>
               {{ field }}
@@ -67,7 +95,7 @@
             <div class="row">
               <div class="col-8">
                 <div class="icheck-primary">
-                  <input type="checkbox" id="remember">
+                  <input type="checkbox" id="remember" />
                   <label for="remember">
                     Remember Me
                   </label>
@@ -75,13 +103,19 @@
               </div>
               <!-- /.col -->
               <div class="col-4">
-                <button type="submit" class="btn btn-primary btn-block" id="id_loginButton">ログイン</button>
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-block"
+                  id="id_loginButton"
+                >
+                  ログイン
+                </button>
               </div>
               <!-- /.col -->
             </div>
           </form>
           <div class="social-auth-links text-center mb-3">
-            <br/>
+            <br />
             <a href="#" class="btn btn-block btn-outline-primary">
               <i class="fab fa-facebook mr-2"></i>Facebookアカウントでログイン
             </a>
@@ -90,18 +124,19 @@
             </a>
           </div>
           <!-- /.social-auth-links -->
-    
+
           <p class="mb-1">
             <a href="forgot-password.html">パスワードを忘れた場合</a>
           </p>
           <p class="mb-0">
-            <a href="{% url 'account:signup' %}" class="text-center">アカウントを作成</a>
+            <a href="{% url 'account:signup' %}" class="text-center"
+              >アカウントを作成</a
+            >
           </p>
         </div>
         <!-- /.login-card-body -->
       </div>
     </div>
     <!-- /.login-box -->
-    
   </body>
 </html>

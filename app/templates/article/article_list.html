@@ -37,11 +37,37 @@ $(function(){
           }
       }
   });
-
-  $(document).on('click','.article',function(event){
+    /* 記事をクリックすると、記事詳細に遷移 */
+    $(document).on('click','.article',function(event){
       var articleId = $(this).attr('id');
       location.href = "comment/"+articleId;
     })
+
+    /* カメラマーククリック後、ファイル選択を映す */
+    $('#id_post_media').on('click', function(){
+      　$('#id_post_media_file').trigger('click');
+    })
+
+    /* 選択した画像を表示する。 */
+    $('#id_post_media_file').on('change', function(e){
+      var reader = new FileReader();
+        reader.onload = function(e){
+            $('#id_show_post_image').parent().css('display','block');
+            $('#id_show_post_image').attr('src',e.target.result);
+            isTweetButtonValid();
+          }
+          reader.readAsDataURL(e.target.files[0]);
+    })
+
+    /* 投稿用に選択したimgを削除する */
+    $('#id_close_media').on('click', function(){
+      $('#id_show_post_image').removeAttr('src');
+      $('#id_show_post_image').parent().css('display','none');
+      $('#id_post_media_file').val('');
+      isTweetButtonValid();
+    })
+    
+  
     /* 自己紹介の文字カウント */
   $('#inputDescription').on('keyup',countTweetLength);
       function countTweetLength(){
@@ -55,6 +81,11 @@ $(function(){
   $('#inputDescription').on('keyup',isTweetButtonValid);
   function isTweetButtonValid(){
     var countTweetLength = $('#inputDescription').val().length;
+    var image_value = $('#id_post_media_file').val()
+    if(image_value){
+      $("#id_tweet").prop("disabled", false);
+      return 
+    }
       if(countTweetLength==0){
         $("#id_tweet").prop("disabled", true);
       }else{
@@ -166,7 +197,7 @@ $(function(){
             <!-- ツイートフォーム -->
             <div class="card">
               <div class="card-body shadow-sm">
-                <form action="{% url 'article:post' %}" method="POST">    
+                <form action="{% url 'article:post' %}" method="POST" enctype="multipart/form-data">    
                 {% csrf_token %}
                 <div class="row">
                   <div class="form-group col-2">
@@ -176,19 +207,31 @@ $(function(){
                     <img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg"  alt="user image" style="width:50px;height:50px;">
                     {% endif %}
                   </div>
-                  <div class="form-group col-10">
-                    <textarea class="form-control h-100" id="inputDescription" name="content" placeholder="つぶやく"></textarea>
+                  <div class="form-group col-7">
+                    <textarea class="form-control h-100" id="inputDescription" name="content" placeholder="つぶやく" style="margin-right:0px;"></textarea>
                     <div>
                       <span class="info-box-number" id="id_tweet_count">0</span>&nbsp;/
                       <span class="info-box-number">1000</span>
                     </div>
                   </div>
-                </div>
-                <div class="row">
-                  <div class="form-group col-9">
-                  </div>
                   <div class="form-group col-3">
-                    <button type="submit" class="btn btn-primary mt-2" id="id_tweet">投稿する</button>
+                    <input type="file" id="id_post_media_file" name="article_media" style="display:none">
+                    <button type="submit" class="btn btn-primary" id="id_tweet">投稿する</button>
+                    <div class="mt-2">
+                      <i class="fa fa-camera-retro fa-lg" style="color:grey; cursor: pointer;" id="id_post_media"></i>
+                    </div>
+                  </div>
+                </div>
+                <div class="row mt-3">
+                  <div class="form-group col-2">
+                  </div>
+                  <div class="col-7">
+                    <figure style="display: none;">
+                      <img id="id_show_post_image"></img>
+                      <figcaption id="id_close_media"><i class="fas fa-times text-lg"></i></figcaption>
+                    </figure>
+                  </div>
+                  <div class="col-3">
                   </div>
                 </div>
                 </form>
@@ -231,6 +274,9 @@ $(function(){
                               <p>
                                 {{ custom_article.article.content }}
                               </p>
+                              {% if custom_article.article.article_media %}
+                              <img class="article-profile-image rounded border border-dark"  src="{{custom_article.article.article_media.url}}"  alt="user image" style="width:100%;height:250px;">
+                              {% endif %}
                             </div>
                           </div>
                           <div class="row mt-3">

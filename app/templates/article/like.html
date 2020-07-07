@@ -446,7 +446,7 @@ $(function(){
                 </div>
                     <nav class="nav nav-pills flex-column flex-sm-row">
                         <a class="flex-sm-fill text-sm-center nav-link" href="{% url 'account:profile' user.id %}">Article</a>
-                        <a class="flex-sm-fill text-sm-center nav-link" href="#">Media</a>
+                        <a class="flex-sm-fill text-sm-center nav-link" href="{% url 'account:media' user.id %}">Media</a>
                         <a class="flex-sm-fill text-sm-center nav-link active" href="{% url 'account:like' user.id %}">Like</a>
                     </nav>
               </div>
@@ -485,6 +485,9 @@ $(function(){
                           <p>
                             {{ custom_article.article.content }}
                           </p>
+                            {% if custom_article.article.article_media %}
+                                <img class="article-profile-image rounded border border-dark"  src="{{custom_article.article.article_media.url}}"  alt="user image" style="width:100%;height:250px;">
+                            {% endif %}
                           </div>
                         </div>
                         <div class="row">
