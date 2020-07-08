@@ -24,12 +24,14 @@
 <script>
 $(function(){
   var csrftoken = $('input[name="csrfmiddlewaretoken"]').val();
-  // httpメソッドがオブジェクトの読み出し->true オブジェクトの編集->false
+
+  // httpメソッドがリソースの読み出し->true リソースの編集->false
   function csrfSafeMethod(method) {
-      // these HTTP methods do not require CSRF protection
+  // 下記HTTPメソッドはリソース変更しないため、CSRFTokenをヘッダに埋め込まない
       return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
   }
-  // ajax通信の前にDBを更新するメソッドであればCSRFTOKENをヘッダに埋め込む
+
+  // ajax通信の前にリソースを更新するメソッドであればCSRFTOKENをヘッダに埋め込む
   $.ajaxSetup({
       beforeSend: function(xhr, settings) {
           if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
@@ -37,10 +39,11 @@ $(function(){
           }
       }
   });
+
     /* 記事をクリックすると、記事詳細に遷移 */
     $(document).on('click','.article',function(event){
-      var articleId = $(this).attr('id');
-      location.href = "comment/"+articleId;
+      var $articleId = $(this).attr('id');
+      location.href = "comment/"+$articleId;
     })
 
     /* カメラマーククリック後、ファイル選択を映す */
@@ -67,7 +70,6 @@ $(function(){
       isTweetButtonValid();
     })
     
-  
     /* 自己紹介の文字カウント */
   $('#inputDescription').on('keyup',countTweetLength);
       function countTweetLength(){
@@ -93,74 +95,87 @@ $(function(){
       }
   }
 
-  /* プロフィール画像のアクション発火(click、pointer) */
+  /* 記事に付随するプロフィール画像にカーソルが当たると矢印から指マークに変わる
+　　　写真の明るさが暗くなる　*/
   $('.article-profile-image').hover(function(){
     $(this).css('cursor','pointer');
     $(this).css('opacity','0.7');
   });
+
+  /* 記事に付随するプロフィール画像にカーソルから外れると
+　　　写真の明るさがデフォルトに戻る　*/
   $('.article-profile-image').mouseout(function(){
     $(this).css('opacity','1');
   });
+
+  /* 記事ににカーソルが当たると矢印から指マークに変わる　*/
   $('.article').hover(function(){
     $(this).css('cursor','pointer');
   });
 
-  var afterSuccessLike = function(not_like_element,article_id){
+  /* 特定の記事にいいねを押してajax通信した後の処理
+  　　いいねボタンが赤色変わり、いいねカウントが１加算される */
+  var afterSuccessLike = function($NotLikeElement,articleId){
     return function(data){
-      $('#id_like_article_'+article_id).val(data['id'])
-      not_like_element.removeClass('not-like').addClass('already-like')
-      not_like_element.children().css('color','indianred')
-      var now_like_count = $('#id_like_count_'+article_id).text()
-      if(!now_like_count){
-        now_like_count = "0"
+      $('#id_like_article_'+articleId).val(data['id'])
+      $NotLikeElement.removeClass('not-like').addClass('already-like')
+      $NotLikeElement.children().css('color','indianred')
+      var nowLikeCount = $('#id_like_count_'+articleId).text()
+      if(!nowLikeCount){
+        nowLikeCount = "0"
       }
-      now_like_count = parseInt(now_like_count)
-      after_like_count = now_like_count + 1 
-      $('#id_like_count_'+article_id).text(after_like_count)
+      nowLikeCount = parseInt(nowLikeCount)
+      afterLikeCount = nowLikeCount + 1 
+      $('#id_like_count_'+articleId).text(afterLikeCount)
     }
   }
-  var afterSuccessNotLike = function(already_like_element,article_id){
-    already_like_element.children().css('color','')
-    already_like_element.removeClass('already-like').addClass('not-like')
-    var now_like_count = $('#id_like_count_'+article_id).text()
-    now_like_count = parseInt(now_like_count)
-    after_like_count = now_like_count -1 
-    if(after_like_count==0){
-      after_like_count = ""
+  
+  /* 特定の記事のいいねを解除してajax通信した後の処理
+  　　いいねボタンがグレー色に変わり、いいねカウントが１減算される */
+  var afterSuccessNotLike = function($alreadyLikeElement,article_id){
+    $alreadyLikeElement.children().css('color','')
+    $alreadyLikeElement.removeClass('already-like').addClass('not-like')
+    var nowLikeCount = $('#id_like_count_'+article_id).text()
+    nowLikeCount = parseInt(nowLikeCount)
+    afterLikeCount = nowLikeCount -1 
+    if(afterLikeCount==0){
+      afterLikeCount = ""
     }
-    $('#id_like_count_'+article_id).text(after_like_count)
+    $('#id_like_count_'+article_id).text(afterLikeCount)
   }
 
-  // 記事にいいねをつける機能
+  /* 特定の記事にいいねをつけた時のアクション
+  記事に対するいいねをajax通信でpostする */
   $(document).on('click','.not-like',function(e){
     e.stopPropagation();
     $('.article').off('click')
-    var not_like_element = $(this)
-    article_id = not_like_element.next().attr('id').replace('id_like_article_','')
+    var $notLikeElement = $(this)
+    articleId = $notLikeElement.next().attr('id').replace('id_like_article_','')
         var data = new FormData();
-        data.append('article',article_id);
+        data.append('article',articleId);
         $.ajax({
           url:'http://localhost/article/favoriteArticle/',
           type:'POST',
           dataType:'json',
           data:data,
-          success:afterSuccessLike(not_like_element,article_id),
+          success:afterSuccessLike($notLikeElement,articleId),
           processData:false,
           contentType:false,
         })
       })
 
-  // 記事にいいねを解除する
+  /* 記事いいねを解除した時のアクション
+     記事に対するいいねをajax通信でdeleteする */
   $(document).on('click','.already-like',function(e){
     e.stopPropagation();
-    var already_like_element = $(this)
-    like_id = already_like_element.next().val()
-    article_id = already_like_element.next().attr('id').replace('id_like_article_','')
+    var $alreadyLikeElement = $(this)
+    likeId = $alreadyLikeElement.next().val()
+    articleId = $alreadyLikeElement.next().attr('id').replace('id_like_article_','')
         $.ajax({
-          url:'http://localhost/article/favoriteArticle/'+like_id+'/',
+          url:'http://localhost/article/favoriteArticle/'+likeId+'/',
           type:'DELETE',
           dataType:'json',
-          success:afterSuccessNotLike(already_like_element,article_id),
+          success:afterSuccessNotLike($alreadyLikeElement,articleId),
           processData:false,
           contentType:false,
         })

@@ -27,8 +27,8 @@
       function toggleFollowButton(){
         const UNFOLLOW = 0 
         const FOLLOW = 1
-        var is_follow = "{{is_follow}}"
-        if(is_follow == UNFOLLOW){
+        var isFollow = "{{is_follow}}"
+        if(isFollow == UNFOLLOW){
           $('#id_already_follow').hide()
           $('#id_follow').show()
         }else{
@@ -40,23 +40,46 @@
       $(document).on('click','.article',function(event){
         var relation = "{{relation.id}}"
         var url = "{% url 'article:comment' 1000 %}";
-        var article_id = $(this).attr('id');
-        document.location.href = url.replace('1000', article_id);
+        var articleId = $(this).attr('id');
+        document.location.href = url.replace('1000', articleId);
       });
-      /* 背景画像のアクション発火(click、pointer) */
+
+      /* プロフィールの画像編集 */
+      // 背景画像クリック後、画像選択 
       $('#id_background_img').on('click',function(){
         $('#id_background_img_file').trigger('click');
       });
+      // 背景画像にカーソルが当たると矢印から指マークに変わる 
       $('#id_background_img').hover(function(){
         $(this).css('cursor','pointer');
       });
-      /* プロフィール画像のアクション発火(click、pointer) */
+      //プロフィール画面クリック後、画像選択
       $('#id_profile_img').on('click',function(){
         $('#id_profile_img_file').trigger('click');
       });
+      // プロフィール画像にカーソルが当たると矢印から指マークに変わる
       $('#id_profile_img').hover(function(){
         $(this).css('cursor','pointer');
       });
+      // 選択したプロフィール画像をimgに貼り付ける 
+      $('#id_profile_img_file').on('change', function(e){
+        var reader = new FileReader();
+        reader.onload = function(e){
+            $('#id_profile_img').attr('src',e.target.result)
+        }
+        reader.readAsDataURL(e.target.files[0]);
+      })
+      // 選択した背景画像をimgに貼り付ける 
+      $('#id_background_img_file').on('change', function(e){
+        var reader = new FileReader();
+        reader.onload = function(e){
+            $('#id_background_img').attr('src',e.target.result)
+        }
+        reader.readAsDataURL(e.target.files[0]);
+      })
+      /* プロフィールの画像編集 */
+
+
       /* 名前の文字カウント */
       $('#id_name_text').on('keyup',countNameLength);
       function countNameLength(){
@@ -69,44 +92,11 @@
         var introductionAmount = $('#id_introduction_text').val().length;
         $('#id_introduction_count').text(introductionAmount);
       }
-      /* 選択したファイルをimgに貼り付ける */
-      $('#id_profile_img_file').on('change', function(e){
-        var reader = new FileReader();
-        reader.onload = function(e){
-            $('#id_profile_img').attr('src',e.target.result)
-        }
-        reader.readAsDataURL(e.target.files[0]);
-      })
-      $('#id_background_img_file').on('change', function(e){
-        var reader = new FileReader();
-        reader.onload = function(e){
-            $('#id_background_img').attr('src',e.target.result)
-        }
-        reader.readAsDataURL(e.target.files[0]);
-      })
     });
     // ajax通信処理
-    var afterSuccess = function(data){
-      var introduction = data['0']['introduction'];
-      var name = data['0']['user']['name']
-      $('#id_introduction_count').text(introduction.length);
-      $('#id_introduction_text').val(introduction);
-      $('#id_name_count').text(name.length);
-      $('#id_name_text').val(name);
-    }
-    var afterUpdate = function(data){
-          window.location.reload();
-    }
+    
     $(function(){
-      //ユーザのプロフィールをgetするための処理
-      $('#id_user_profile').on('click',function(){
-        $.ajax({
-          url:'http://localhost/account/profileEdit/',
-          type:'GET',
-          headers: {csrfmiddlewaretoken: 'Token ' +window.CSRF_TOKEN},
-          success: afterSuccess,
-        });
-      })
+
       var csrftoken = $('input[name="csrfmiddlewaretoken"]').val();
       function csrfSafeMethod(method) {
           // these HTTP methods do not require CSRF protection
@@ -119,33 +109,55 @@
               }
           }
       });
+
+      var afterSuccessGetProfile = function(data){
+        var introduction = data['0']['introduction'];
+        var name = data['0']['user']['name']
+        $('#id_introduction_count').text(introduction.length);
+        $('#id_introduction_text').val(introduction);
+        $('#id_name_count').text(name.length);
+        $('#id_name_text').val(name);
+      }
+      //ユーザのプロフィールをgetするための処理
+      $('#id_user_profile').on('click',function(){
+        $.ajax({
+          url:'http://localhost/account/profileEdit/',
+          type:'GET',
+          headers: {csrfmiddlewaretoken: 'Token ' +window.CSRF_TOKEN},
+          success: afterSuccessGetProfile,
+        });
+      })
+      
+      var afterSuccessEditProfile = function(data){
+            window.location.reload();
+      }
       //ユーザのプロフィールを更新するための処理
       $('#id_updateProfile').on('submit',function(e){
         e.preventDefault()
         var name = $("#id_name_text").val()
         var introduction = $("#id_introduction_text").val()
         //プロフィール画像のファイルデータ取得
-        var profile_image = $("#id_profile_img_file")[0].files[0];
+        var profileImage = $("#id_profile_img_file")[0].files[0];
         //背景画像のファイルデータ取得
-        var background_image = $("#id_background_img_file")[0].files[0];
+        var backgroundImage = $("#id_background_img_file")[0].files[0];
         var data = new FormData();
         data.append('user.name',name);
         data.append('introduction',introduction);
-        if (profile_image){
-        var profileExtension = profile_image.name.split(".").pop()
+        if (profileImage){
+        var profileExtension = profileImage.name.split(".").pop()
           if(profileExtension!="png" && profileExtension!="jpg"){
             alert("プロフィール画像の拡張子はjpegもしくはpngでアップロードしてください")
             return 
           }
-          data.append('profile_image',profile_image);
+          data.append('profile_image',profileImage);
         }
-        if(background_image){
-          var backgroundExtension = background_image.name.split(".").pop()
+        if(backgroundImage){
+          var backgroundExtension = backgroundImage.name.split(".").pop()
             if(backgroundExtension!='png'&& backgroundExtension!='jpg'){
               alert("背景画像の拡張子はjpegもしくはpngでアップロードしてください")
               return 
           }
-          data.append('background_image',background_image);
+          data.append('background_image',backgroundImage);
         }
         if(!name){
           $("#id_name_text").addClass('is-invalid');
@@ -158,7 +170,7 @@
           dataType:'json',
           data:data,
           enctype: 'multipart/form-data',
-          success: afterUpdate,
+          success: afterSuccessEditProfile,
           processData: false,  // tell jQuery not to process the data
           contentType: false 
         });
@@ -179,21 +191,21 @@
           }
       });
       var afterSuccessFollow = function(data){
-        relation_id = data['id']
-        if(relation_id){
-        $("#id_relation_id_port").val(relation_id)
+        var relationId = data['id']
+        if(relationId){
+        $("#id_relation_id_port").val(relationId)
         }
         $('#id_follow').hide()
         $('#id_already_follow').show()
-        var number_of_follower = parseInt($('#id_number-of_follower').text())
-        $('#id_number-of_follower').text(number_of_follower+1)
+        var numberOfFollower = parseInt($('#id_number-of_follower').text())
+        $('#id_number-of_follower').text(numberOfFollower+1)
       };
       var afterSuccessUnfollow = function(){
         $('#id_already_follow').hide()
         $('#id_follow').show()
         $('#modal-action-unfollow').modal('hide')
-        var number_of_follower = parseInt($('#id_number-of_follower').text())
-        $('#id_number-of_follower').text(number_of_follower-1)
+        var numberOfFollower = parseInt($('#id_number-of_follower').text())
+        $('#id_number-of_follower').text(numberOfFollower-1)
       };
       $('#id_follow').on('click',function(){
         var target = "{{user.id}}"
@@ -210,9 +222,9 @@
         })
       });
       $('#id_unrelate_button').on('click',function(){
-        relation_id = $("#id_relation_id_port").val()
+        var relationId = $("#id_relation_id_port").val()
         $.ajax({
-          url:'http://localhost/account/relation/'+relation_id+'/',
+          url:'http://localhost/account/relation/'+relationId+'/',
           type:'DELETE',
           success:afterSuccessUnfollow,
           processData:false,
@@ -220,46 +232,46 @@
         })
       });
 
-    var afterSuccessLike = function(not_like_element,article_id){
+    var afterSuccessLike = function($notLikeElement,articleId){
     return function(data){
-      $('#id_like_article_'+article_id).val(data['id'])
-      not_like_element.removeClass('not-like').addClass('already-like')
-      not_like_element.children().css('color','indianred')
-      var now_like_count = $('#id_like_count_'+article_id).text()
-      if(!now_like_count){
-        now_like_count = "0"
+      $('#id_like_article_'+articleId).val(data['id'])
+      $notLikeElement.removeClass('not-like').addClass('already-like')
+      $notLikeElement.children().css('color','indianred')
+      var nowLikeCount = $('#id_like_count_'+articleId).text()
+      if(!nowLikeCount){
+        nowLikeCount = "0"
       }
-      now_like_count = parseInt(now_like_count)
-      after_like_count = now_like_count + 1 
-      $('#id_like_count_'+article_id).text(after_like_count)
+      nowLikeCount = parseInt(nowLikeCount)
+      afterLikeCount = nowLikeCount + 1 
+      $('#id_like_count_'+articleId).text(afterLikeCount)
     }
   }
-  var afterSuccessNotLike = function(already_like_element,article_id){
-    already_like_element.children().css('color','')
-    already_like_element.removeClass('already-like').addClass('not-like')
-    var now_like_count = $('#id_like_count_'+article_id).text()
-    now_like_count = parseInt(now_like_count)
-    after_like_count = now_like_count -1 
-    if(after_like_count==0){
-      after_like_count = ""
+  var afterSuccessNotLike = function($alreadyLikeElement,articleId){
+    $alreadyLikeElement.children().css('color','')
+    $alreadyLikeElement.removeClass('already-like').addClass('not-like')
+    var nowLikeCount = $('#id_like_count_'+articleId).text()
+    nowLikeCount = parseInt(nowLikeCount)
+    afterLikeCount = nowLikeCount -1 
+    if(afterLikeCount==0){
+      afterLikeCount = ""
     }
-    $('#id_like_count_'+article_id).text(after_like_count)
+    $('#id_like_count_'+articleId).text(afterLikeCount)
   }
 
   // 記事にいいねをつける機能
   $(document).on('click','.not-like',function(e){
     e.stopPropagation();
     $('.article').off('click')
-    var not_like_element = $(this)
-    article_id = not_like_element.next().attr('id').replace('id_like_article_','')
+    var $notLikeElement = $(this)
+    articleId = $notLikeElement.next().attr('id').replace('id_like_article_','')
         var data = new FormData();
-        data.append('article',article_id);
+        data.append('article',articleId);
         $.ajax({
           url:'http://localhost/article/favoriteArticle/',
           type:'POST',
           dataType:'json',
           data:data,
-          success:afterSuccessLike(not_like_element,article_id),
+          success:afterSuccessLike($notLikeElement,articleId),
           processData:false,
           contentType:false,
         })
@@ -268,14 +280,14 @@
   // 記事にいいねを解除する
   $(document).on('click','.already-like',function(e){
     e.stopPropagation();
-    var already_like_element = $(this)
-    like_id = already_like_element.next().val()
-    article_id = already_like_element.next().attr('id').replace('id_like_article_','')
+    var $alreadyLikeElement = $(this)
+    likeId = $alreadyLikeElement.next().val()
+    articleId = $alreadyLikeElement.next().attr('id').replace('id_like_article_','')
         $.ajax({
-          url:'http://localhost/article/favoriteArticle/'+like_id+'/',
+          url:'http://localhost/article/favoriteArticle/'+likeId+'/',
           type:'DELETE',
           dataType:'json',
-          success:afterSuccessNotLike(already_like_element,article_id),
+          success:afterSuccessNotLike($alreadyLikeElement,articleId),
           processData:false,
           contentType:false,
         })
