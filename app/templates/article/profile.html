@@ -454,23 +454,23 @@
             </div>
             <div class="card-deck">
                 <div class="card">
-                  {% for custom_article in custom_article_list %}
-                  <div class="card-body border-bottom article" id="{{custom_article.article.id}}">
+                  {% for article_info in article_info_list %}
+                  <div class="card-body border-bottom article" id="{{article_info.article.id}}">
                     <div class="tab-content">
                       <div class="active tab-pane" id="activity">
                         <!-- Post -->
                         <div class="post">
                           <div class="user-block row">
                             <div class="col-2">
-                              {% if custom_article.article.user.user_profile.profile_image %}
-                              <img class="rounded-circle img-bordered-sm" src="{{custom_article.article.user.user_profile.profile_image.url}}"  alt="user image" style="width:50px;height:50px;">
+                              {% if article_info.article.user.user_profile.profile_image %}
+                              <img class="rounded-circle img-bordered-sm" src="{{article_info.article.user.user_profile.profile_image.url}}"  alt="user image" style="width:50px;height:50px;">
                               {% else %}
                               <img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg"  alt="user image" style="width:50px;height:50px;">
                               {% endif %}
                             </div>
                             <div class="col-10">
                             <strong>
-                              {{ custom_article.article.user.name }}
+                              {{ article_info.article.user.name }}
                             </strong><br>
                             <small class="text-muted">2020/04/15</small>
                             </div>
@@ -480,10 +480,10 @@
                             <div class="col-2"></div>
                             <div class="col-10">
                               <p>
-                                {{ custom_article.article.content }}
+                                {{ article_info.article.content }}
                               </p>
-                              {% if custom_article.article.article_media %}
-                                  <img class="article-profile-image rounded border border-dark"  src="{{custom_article.article.article_media.url}}"  alt="user image" style="width:100%;height:250px;">
+                              {% if article_info.article.article_media %}
+                                  <img class="article-profile-image rounded border border-dark"  src="{{article_info.article.article_media.url}}"  alt="user image" style="width:100%;height:250px;">
                               {% endif %}
                            </div>
                         </div>
@@ -494,7 +494,7 @@
                             </span>
                           </div>
                           <div class="col-md-4 text-center align-bottom"> 
-                            {% if custom_article.is_login_user_like %}
+                            {% if article_info.is_login_user_like %}
                             <span class="link-black text-lg already-like">
                               <span class="far fa-thumbs-up" style="color:indianred"></span>
                             </span>
@@ -503,20 +503,20 @@
                               <i class="far fa-thumbs-up"></i>
                             </span>
                             {% endif %}
-                            <input type="hidden" id="id_like_article_{{custom_article.article.id}}" value="{{custom_article.login_user_favorite_article_id}}">
-                            {% if custom_article.article.favorite_article.all %}
-                              <span id="id_like_count_{{custom_article.article.id}}">
-                                {{custom_article.article.favorite_article.all.count}}
+                            <input type="hidden" id="id_like_article_{{article_info.article.id}}" value="{{article_info.login_user_favorite_article_id}}">
+                            {% if article_info.article.favorite_article.all %}
+                              <span id="id_like_count_{{article_info.article.id}}">
+                                {{article_info.article.favorite_article.all.count}}
                               </span>
                             {% else %}
-                              <span id="id_like_count_{{custom_article.article.id}}"></span>
+                              <span id="id_like_count_{{article_info.article.id}}"></span>
                             {% endif %}
                           </div>
                           <div class="col-md-4 text-center">
                             <a class="link-black text-lg">
                               <i class="far fa-comments mr-1"></i>
-                              {% if custom_article.article.comment.all.count != 0 %}
-                              {{ custom_article.article.comment.all.count }}
+                              {% if article_info.article.comment.all.count != 0 %}
+                              {{ article_info.article.comment.all.count }}
                               {% endif %}
                             </a>
                           </div>

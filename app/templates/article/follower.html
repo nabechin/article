@@ -127,29 +127,29 @@
                     <col width="50%">
                     <col width="30%">
                     <tbody>
-                        {% for follower_dto in follower_dto_list %}
+                        {% for follower_info in follower_info_list %}
                       <tr style="cursor: pointer;">
                         <td>
-                            {% if follower_dto.relation_profile.profile_image %}
-                                <img class="rounded-circle img-bordered-sm" src="{{follower_dto.relation_profile.profile_image.url}}"  alt="user image" style="width:60px;height:60px;">
+                            {% if follower_info.relation_profile.profile_image %}
+                                <img class="rounded-circle img-bordered-sm" src="{{follower_info.relation_profile.profile_image.url}}"  alt="user image" style="width:60px;height:60px;">
                             {% else %}
                                 <img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg"  alt="user image" style="width:60px;height:60px;">
                             {% endif %}
                         </td>
                         <td>
-                            <a href="{% url 'account:profile' follower_dto.relation_profile.user.id %}" class="text-dark" style="font-weight: bold;">
-                              {{follower_dto.relation_profile.user.name}}
+                            <a href="{% url 'account:profile' follower_info.relation_profile.user.id %}" class="text-dark" style="font-weight: bold;">
+                              {{follower_info.relation_profile.user.name}}
                             </a>
-                            <p class="text-muted">{{follower_dto.relation_profile.introduction}}</p>
+                            <p class="text-muted">{{follower_info.relation_profile.introduction}}</p>
                         </td>
                         <td class="text-center align-middle">
-                          {% if follower_dto.relation_profile.user.id == login_user.id %}
-                          {% elif follower_dto.is_follow == 0 %}
+                          {% if follower_info.relation_profile.user.id == login_user.id %}
+                          {% elif follower_info.is_follow == 0 %}
                             <button type="button" class="btn btn-outline-primary float-right un-follow">フォローする</button>
-                          {% elif follower_dto.is_follow == 1 %}
+                          {% elif follower_info.is_follow == 1 %}
                             <button type="button" class="btn bg-gradient-primary float-right already-follow">フォロー中</button>
                           {% endif %} 
-                            <input type='hidden' value="{{follower_dto.relation.id}}" id="{{follower_dto.relation_profile.user.id}}">
+                            <input type='hidden' value="{{follower_info.relation.id}}" id="{{follower_info.relation_profile.user.id}}">
                         </td>
                       </tr>
                         {% endfor %}
