@@ -369,19 +369,19 @@ $(function(){
                     <div class="tab-content">
                       <div class="row">
                         <div class="col-2">
-                          {% if custom_article.article.user.user_profile.profile_image %}
-                          <a href="{% url 'account:profile' custom_article.article.user.id %}">
-                            <img class="rounded-circle img-bordered-sm article-profile-image" src="{{custom_article.article.user.user_profile.profile_image.url}}"  alt="user image" style="width:50px;height:50px;">
+                          {% if article_info.article.user.user_profile.profile_image %}
+                          <a href="{% url 'account:profile' article_info.article.user.id %}">
+                            <img class="rounded-circle img-bordered-sm article-profile-image" src="{{article_info.article.user.user_profile.profile_image.url}}"  alt="user image" style="width:50px;height:50px;">
                           </a>
                             {% else %}
-                          <a href="{% url 'account:profile' custom_article.article.user.id %}">
+                          <a href="{% url 'account:profile' article_info.article.user.id %}">
                             <img class="rounded-circle img-bordered-sm article-profile-image" src="/media/default_profile.jpg"  alt="user image" style="width:50px;height:50px;">
                           </a>
                             {% endif %}
                         </div>
                         <div class="col-10">
-                          <a href="{% url 'account:profile' custom_article.article.user.id %}" class="text-dark" style="font-weight: bold;">
-                        {{ custom_article.article.user.name }}
+                          <a href="{% url 'account:profile' article_info.article.user.id %}" class="text-dark" style="font-weight: bold;">
+                        {{ article_info.article.user.name }}
                           </a><br>
                         <small class="text-muted">2020/04/15</small>
                       </div>
@@ -390,10 +390,10 @@ $(function(){
                       <div class="col-2"></div>
                       <div class="col-10">
                     <p>
-                      {{ custom_article.article.content }}
+                      {{ article_info.article.content }}
                     </p>
-                        {% if custom_article.article.article_media %}
-                          <img class="article-profile-image rounded border border-dark"  src="{{custom_article.article.article_media.url}}"  alt="user image" style="width:100%;height:250px;">
+                        {% if article_info.article.article_media %}
+                          <img class="article-profile-image rounded border border-dark"  src="{{article_info.article.article_media.url}}"  alt="user image" style="width:100%;height:250px;">
                         {% endif %}
                       </div>
                     </div>
@@ -406,17 +406,17 @@ $(function(){
                       <div class="col-md-6 text-center">
                         <a href="#" class="link-black">3 retweets</a>
                       </div>
-                      {% if custom_article.article.favorite_article.all %}
+                      {% if article_info.article.favorite_article.all %}
                       <div class="col-6 text-center">
-                        <a class="link-black show-like-people" href="" id="id_liked_article_{{custom_article.article.id}}">
-                        <span class="like-count">{{custom_article.article.favorite_article.all.count}}</span> 
+                        <a class="link-black show-like-people" href="" id="id_liked_article_{{article_info.article.id}}">
+                        <span class="like-count">{{article_info.article.favorite_article.all.count}}</span> 
                         likes
                         </a>
                       </div>
                       {% else %}
                       <div class="col-6 text-center link-black" style="display: none;">
-                        <a class="link-black show-like-people" href="" id="id_liked_article_{{custom_article.article.id}}">
-                        <span class="like-count">{{custom_article.article.favorite_article.all.count}}</span> 
+                        <a class="link-black show-like-people" href="" id="id_liked_article_{{article_info.article.id}}">
+                        <span class="like-count">{{article_info.article.favorite_article.all.count}}</span> 
                         likes
                         </a>
                       </div>
@@ -428,7 +428,7 @@ $(function(){
                         <span class="text-lg" style="cursor: pointer;"><i class="fas fa-retweet"></i></span>
                       </div>
                       <div class="col-md-4 text-center"> 
-                        {% if custom_article.is_login_user_like %}
+                        {% if article_info.is_login_user_like %}
                           <span class="text-lg already-like" style="cursor: pointer;">
                             <span class="far fa-thumbs-up" style="color:indianred"></span>
                           </span>
@@ -437,18 +437,18 @@ $(function(){
                             <i class="far fa-thumbs-up"></i>
                           </span>
                           {% endif %}
-                          <input type="hidden" id="id_like_article_{{custom_article.article.id}}" value="{{custom_article.login_user_favorite_article_id}}">
-                          {% if custom_article.article.favorite_article.all %}
-                            <span id="id_like_count_{{custom_article.article.id}}">{{custom_article.article.favorite_article.all.count}}</span>
+                          <input type="hidden" id="id_like_article_{{article_info.article.id}}" value="{{article_info.login_user_favorite_article_id}}">
+                          {% if article_info.article.favorite_article.all %}
+                            <span id="id_like_count_{{article_info.article.id}}">{{article_info.article.favorite_article.all.count}}</span>
                           {% else %}
-                            <span id="id_like_count_{{custom_article.article.id}}"></span>
+                            <span id="id_like_count_{{article_info.article.id}}"></span>
                           {% endif %}
                       </div>
                       <div class="col-md-4 text-center" style="cursor: pointer;">
                         <span class="text-lg">
                           <i class="far fa-comments" id="id_comment"></i>
-                          {% if custom_article.article.comment.all %}
-                          {{custom_article.article.comment.all.count}}
+                          {% if article_info.article.comment.all %}
+                          {{article_info.article.comment.all.count}}
                           {% endif %}
                         </span>
                       </div>
@@ -503,18 +503,18 @@ $(function(){
                         <div class="modal-body rounded">
                           <div class="row">
                             <div class="col-2">
-                              {% if custom_article.article.user.user_profile.profile_image %}
-                                <img class="rounded-circle img-bordered-sm" src="{{custom_article.article.user.user_profile.profile_image.url}}"  alt="user image" style="width:50px;height:50px;">
+                              {% if article_info.article.user.user_profile.profile_image %}
+                                <img class="rounded-circle img-bordered-sm" src="{{article_info.article.user.user_profile.profile_image.url}}"  alt="user image" style="width:50px;height:50px;">
                               {% else %}
                                 <img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg"  alt="user image" style="width:50px;height:50px;">
                               {% endif %}
                             </div>
                             <div class="col-10">
                               <div class="mb-2">
-                                <strong>{{ custom_article.article.user.name }}</strong>
+                                <strong>{{ article_info.article.user.name }}</strong>
                               </div>
                               <div>
-                                {{ custom_article.article.content }}
+                                {{ article_info.article.content }}
                               </div>
                             </div>
                           </div>
@@ -536,7 +536,7 @@ $(function(){
                                 </div>
                                 <div>
                                   <textarea class="form-control" rows="3" placeholder="コメントを書く" id="id_comment_for_submit"></textarea>
-                                  <input type="hidden" name="article" value="{{custom_article.article.id}}" id="id_article">
+                                  <input type="hidden" name="article" value="{{article_info.article.id}}" id="id_article">
                                 </div>
                               </div>
                             </div>
@@ -553,7 +553,7 @@ $(function(){
                   </div>
                   <!-- /.modal -->
                   <!-- リツイート、ライク、コメントのアクション -->
-                  {% for comment_dto in custom_article.comment_list %}
+                  {% for comment_dto in article_info.comment_list %}
                   <div class="card-body article border-bottom">
                     <div class="tab-content">
                       <div class="active tab-pane" id="activity">

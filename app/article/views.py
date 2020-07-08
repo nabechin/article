@@ -10,10 +10,10 @@ from rest_framework import permissions, viewsets
 from .forms import ArticleForm
 from .models import Article, Comment, FavoriteArticle, FavoriteComment
 from .serializers import CommentSerializer, FavoriteArticleSerializer, FavoriteCommentSerializer
+from .article_info import ArticleInfo
 
 from account.models import Relation, UserProfile
-from app.dto import RelationDto, CustomArticle
-
+from app.dto import RelationInfo
 
 
 class ArticleList(LoginRequiredMixin, TemplateView):
@@ -27,13 +27,13 @@ class ArticleList(LoginRequiredMixin, TemplateView):
             relation.target.id for relation in login_user_following]
         article_list = Article.objects.filter(
             Q(user__id__in=login_user_following_ids) | Q(user__id=login_user_id)).order_by('-id')
-        custom_article_list = []
+        article_info_list = []
         for article in article_list:
-            custom_article = CustomArticle(article)
-            custom_article.is_login_user_like(login_user_id)
-            custom_article_list.append(custom_article)
+            article_info = ArticleInfo(article)
+            article_info.is_login_user_like(login_user_id)
+            article_info_list.append(article_info)
         context = super(ArticleList, self).get_context_data(**kwargs)
-        context['custom_article_list'] = custom_article_list
+        context['article_info_list'] = article_info_list
         context['user_profile'] = UserProfile.objects.get(
             user__id=login_user_id)
         return render(self.request, self.template_name, context)
@@ -46,11 +46,11 @@ class CommentOfArticle(TemplateView):
     def get(self, request, *args, **kwargs):
         login_user_id = self.request.user.id
         article = Article.objects.get(id=kwargs['article_id'])
-        custom_article = CustomArticle(article)
-        custom_article.is_login_user_like(login_user_id)
-        custom_article.is_login_user_like_comment(login_user_id)
+        article_info = ArticleInfo(article)
+        article_info.is_login_user_like(login_user_id)
+        article_info.is_login_user_like_comment(login_user_id)
         context = super(CommentOfArticle, self).get_context_data(**kwargs)
-        context['custom_article'] = custom_article
+        context['article_info'] = article_info
         return render(self.request, self.template_name, context)
 
     def get_context_data(self, **kwargs):
