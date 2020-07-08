@@ -27,35 +27,43 @@ $(function(){
   $('#id_comment').on('click',function(){
     $('#modal-comment').modal();
   })
-  /* プロフィール画像のアクション発火(click、pointer) */
+
+  /* 記事に付随するプロフィール画像にカーソルが当たると矢印から指マークに変わる
+　　　写真の明るさが暗くなる　*/
   $(document).on("hover",".article-profile-image",function(){
     $(this).css('cursor','pointer');
     $(this).css('opacity','0.7');
   });
+
+  /* 記事に付随するプロフィール画像にカーソルから外れると
+　　　写真の明るさがデフォルトに戻る　*/
   $(document).on("mouseout",".article-profile-image",function(){
     $(this).css('opacity','1');
   });
+
+  /* 記事ににカーソルが当たると矢印から指マークに変わる　*/
   $(document).on("hover",".article", function(){
     $(this).css('cursor','pointer');
   });
 
   $(document).on('click','.people-like-list',function(){
-    user_id = $(this).attr('id').replace('id_profile_','');
+    userId = $(this).attr('id').replace('id_profile_','');
     var url = "{% url 'account:profile' 1000 %}";
-    document.location.href = url.replace('1000', user_id);
+    document.location.href = url.replace('1000', userId);
   })
 
-  //ajax通信が成功した後リロード処理
-  var afterPost = function(data){
+  //　記事に対するコメントをajax通信でpostした後にページを更新する
+  var afterPostCommentForArticle = function(data){
         window.location.reload();
   }
-  // ajaxの送信方法を確認
+
+  // httpメソッドがリソースの読み出し->true リソースの編集->false
   var csrftoken = $('input[name="csrfmiddlewaretoken"]').val();
     function csrfSafeMethod(method) {
-        // these HTTP methods do not require CSRF protection
+    // 下記HTTPメソッドはリソース変更しないため、CSRFTokenをヘッダに埋め込まない
         return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
     }
-    // tokenをヘッダーに埋め込む
+    // ajax通信の前にリソースを更新するメソッドであればCSRFTOKENをヘッダに埋め込む
     $.ajaxSetup({
         beforeSend: function(xhr, settings) {
             if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
@@ -63,6 +71,9 @@ $(function(){
             }
         }
     });
+
+  /* 記事に対してコメントを送信したときのアクション
+     コメントをajaxでpostする */
   $('#id_submit_comment').on('submit',function(e){
     e.preventDefault()
     var article = $('#id_article').val()
@@ -75,8 +86,8 @@ $(function(){
       type:'POST',
       dataType:'json',
       data:data,
-      success:afterPost,
-      processData: false,  // tell jQuery not to process the data
+      success:afterPostCommentForArticle,
+      processData: false,
       contentType: false 
     })
   })
@@ -85,55 +96,66 @@ $(function(){
   var afterSuccessShowLikePeople = function(data_array){
     $.each(data_array, function(i){
 
-    /* indexごとにデータをキャッシュしておく変数を設定 */
+    /* indexごとにユーザ情報をキャッシュしておく変数を設定 */
     var data = data_array[i];
 
-    /* いいねを押した人の情報一件分の親ブロックを設定 */
-    var parent_element = $('<tr></tr>');
-    parent_element.attr('id','id_profile_'+data.user)
-    parent_element.addClass('people-like-list')
+    /* ここのいいねしたユーザ情報をブロックでまとめる要素を設定 */
+    var $parentElement = $('<tr></tr>');
+    $parentElement.attr('id','id_profile_'+data.user)
+    $parentElement.addClass('people-like-list')
 
     /* プロフィール画像の要素を設定 */
-    var child_element_for_image = $('<td></td>');
+    var $childElementForImage = $('<td></td>');
     if (data.user_profile.profile_image){
-        var image_element = $('<img class="rounded-circle img-bordered-sm article-profile-image" src='+data.user_profile.profile_image+' alt="user image" style="width:60px;height:60px;">');
+        var $imageElement = $('<img class="rounded-circle img-bordered-sm article-profile-image" src='+data.user_profile.profile_image+' alt="user image" style="width:60px;height:60px;">');
     }else{
-        var image_element =　$('<img class="rounded-circle img-bordered-sm article-profile-image" src="/media/default_profile.jpg" alt="user image" style="width:60px;height:60px;">');
+        var $imageElement =　$('<img class="rounded-circle img-bordered-sm article-profile-image" src="/media/default_profile.jpg" alt="user image" style="width:60px;height:60px;">');
     }
-    child_element_for_image.append(image_element)
-    parent_element.append(child_element_for_image)
 
-    /* いいねユーザ名と自己紹介の要素を設定 */
-    var child_element_for_profile = $('<td></td>');
+    // プロフィール画像を親要素にeppend
+    $childElementForImage.append($imageElement)
+    $parentElement.append($childElementForImage)
+
+    /* いいねユーザ名と自己紹介をブロックでまとめる要素を設定 */
+    var $childElementForProfile = $('<td></td>');
 
     // ユーザ名にプロフィールへのリンクを持たせる
-    var user_name_element = $('<a class="text-dark" style="font-weight: bold";></a>')
+    var $userNameElement = $('<a class="text-dark" style="font-weight: bold";></a>')
     var url = "{% url 'account:profile' 0 %}";
-    user_name_element.attr('href', url.replace('0', data.user));
-    user_name_element.text(data.user_profile.user.name)
+    $userNameElement.attr('href', url.replace('0', data.user));
+    $userNameElement.text(data.user_profile.user.name)
 
-    var user_introduction_element = $('<p class="text-muted">'+data.user_profile.introduction+'</p>');
-    child_element_for_profile.append(user_name_element)
-    child_element_for_profile.append(user_introduction_element)
-    parent_element.append(child_element_for_profile)
+    // ユーザの自己紹介を要素に入れ込む
+    var $userIntroductionElement = $('<p class="text-muted">'+data.user_profile.introduction+'</p>');
 
-    /* ログインユーザといいねユーザのフォロー関係を調べて、フォローボタン or フォローするボタンの要素を設定 */
-    var child_element_for_relation = $('<td class="text-center align-middle"></td>');
+    // リンクを貼ったユーザ名と自己紹介を親の要素にappend
+    $childElementForProfile.append($userNameElement)
+    $childElementForProfile.append($userIntroductionElement)
+    $parentElement.append($childElementForProfile)
+
+    // ログインユーザといいねユーザのフォロー関係を調べて、フォローボタン or フォローするボタンの要素を設定 
+    var $childElementForRelation = $('<td class="text-center align-middle"></td>');
+
+    /*  ログインユーザ自身 -> 処理しない
+        ログインユーザがフォローしている場合 -> 「フォロー」ボタンを表示。後にフォロー解除できるように、relationIdとフォローユーザIdを要素に入れ込む
+        ログインユーザがフォローしていない場合 -> 「フォローする」ボタンを表示。後にフォローできるように、ユーザId要素に埋め込む*/
     if(data.user_profile.user.id == '{{user.id}}'){
 
     }else if(data.relation && data.relation.length){
-        var relation_element = $('<button type="button" class="btn bg-gradient-primary float-right already-follow">フォロー中</button>');
-        var element_for_relation_infomation = $('<input type="hidden" value='+ data.relation[0].id +' id='+data.user_profile.user.id+'>')
-        relation_element.append(element_for_relation_infomation);
+        var $relationElement = $('<button type="button" class="btn bg-gradient-primary float-right already-follow">フォロー中</button>');
+        var $elementForRelationInformation = $('<input type="hidden" value='+ data.relation[0].id +' id='+data.user_profile.user.id+'>')
+        $relationElement.append($elementForRelationInformation);
     }else{
-        var relation_element = $('<button type="button" class="btn btn-outline-primary float-right un-follow">フォローする</button>');
-        var element_for_relation_infomation = $('<input type="hidden" value="" id='+data.user_profile.user.id+'>')
+        var $relationElement = $('<button type="button" class="btn btn-outline-primary float-right un-follow">フォローする</button>');
+        var $elementForRelationInformation = $('<input type="hidden" value="" id='+data.user_profile.user.id+'>')
     }
-    child_element_for_relation.append(relation_element)
-    child_element_for_relation.append(element_for_relation_infomation)
-    parent_element.append(child_element_for_relation)
+
+    // ログインユーザといいねした人のフォロー情報を親の要素にappend
+    $childElementForRelation.append($relationElement)
+    $childElementForRelation.append($elementForRelationInformation)
+    $parentElement.append($childElementForRelation)
     
-    $("tbody").append(parent_element);
+    $("tbody").append($parentElement);
     })
   }
   /* modalが消えた時にいいねした人リストを削除する */
@@ -141,79 +163,90 @@ $(function(){
     $("tbody").empty()
   })
 
-  var afterSuccessLike = function(not_like_element,article_id){
+  /* 特定の記事にいいねを押してajax通信した後の処理
+  　　いいねボタンが赤色変わり、いいねカウントが１加算される */
+  var afterSuccessLike = function($notLikeElement,articleId){
     return function(data){
-      $('#id_like_article_'+article_id).val(data['id'])
-      not_like_element.removeClass('not-like').addClass('already-like')
-      not_like_element.children().css('color','indianred')
-      var now_like_count = $('#id_like_count_'+article_id).text()
-      if(!now_like_count){
-        now_like_count = "0"
+      $('#id_like_article_'+articleId).val(data['id'])
+      $notLikeElement.removeClass('not-like').addClass('already-like')
+      $notLikeElement.children().css('color','indianred')
+      var nowLikeCount = $('#id_like_count_'+articleId).text()
+      if(!nowLikeCount){
+        nowLikeCount = "0"
+        // defaultの記事のいいね数が０の場合、いいねカウントを表示するよう変更する
         var parent = $('.show-like-people').parent()
         parent.css('display','block');
       }
-      now_like_count = parseInt(now_like_count)
-      after_like_count = now_like_count + 1 
-      $('.like-count').text(after_like_count);
-      $('#id_like_count_' + article_id).text(after_like_count)
+      nowLikeCount = parseInt(nowLikeCount)
+      afterLikeCount = nowLikeCount + 1 
+      $('.like-count').text(afterLikeCount);
+      $('#id_like_count_' + articleId).text(afterLikeCount)
     }
   }
-  var afterSuccessNotLike = function(already_like_element,article_id){
-    already_like_element.children().css('color','')
-    already_like_element.removeClass('already-like').addClass('not-like')
-    var now_like_count = $('#id_like_count_'+article_id).text()
-    now_like_count = parseInt(now_like_count)
-    after_like_count = now_like_count -1 
-    if(after_like_count==0){
-      after_like_count = ""
+
+  /* 特定の記事のいいねを解除してajax通信した後の処理
+  　　いいねボタンがグレー色に変わり、いいねカウントが１減算される */
+  var afterSuccessNotLike = function($alreadyLikeElement,articleId){
+    $alreadyLikeElement.children().css('color','')
+    $alreadyLikeElement.removeClass('already-like').addClass('not-like')
+    var nowLikeCount = $('#id_like_count_'+articleId).text()
+    nowLikeCount = parseInt(nowLikeCount)
+    afterLikeCount = nowLikeCount -1 
+    if(afterLikeCount==0){
+      afterLikeCount = ""
+      // いいねを解除した結果、いいねカウントが0になった場合、いいねカウントを非表示にする
       var parent = $('.show-like-people').parent()
         parent.css('display','none');
     }
-    $('.like-count').text(after_like_count);
-    $('#id_like_count_' + article_id).text(after_like_count)
+    $('.like-count').text(afterLikeCount);
+    $('#id_like_count_' + articleId).text(afterLikeCount)
   }
 
-  // 記事にいいねをつける機能
+  /* 特定の記事にいいねを押した時のアクション
+  記事に対するいいねをajax通信でpostする */
   $(document).on('click','.not-like',function(e){
     e.stopPropagation();
     $('.article').off('click')
-    var not_like_element = $(this)
-    article_id = not_like_element.next().attr('id').replace('id_like_article_','')
+    var $notLikeElement = $(this)
+    articleId = $notLikeElement.next().attr('id').replace('id_like_article_','')
         var data = new FormData();
-        data.append('article',article_id);
+        data.append('article',articleId);
         $.ajax({
           url:'http://localhost/article/favoriteArticle/',
           type:'POST',
           dataType:'json',
           data:data,
-          success:afterSuccessLike(not_like_element,article_id),
+          success:afterSuccessLike($notLikeElement,articleId),
           processData:false,
           contentType:false,
         })
       })
 
-  // 記事にいいねを解除する
+  /* 記事いいねを解除した時のアクション
+     記事に対するいいねをajax通信でdeleteする */
   $(document).on('click','.already-like',function(e){
     e.stopPropagation();
-    var already_like_element = $(this)
-    like_id = already_like_element.next().val()
-    article_id = already_like_element.next().attr('id').replace('id_like_article_','')
+    var $alreadyLikeElement = $(this)
+    likeId = $alreadyLikeElement.next().val()
+    articleId = $alreadyLikeElement.next().attr('id').replace('id_like_article_','')
         $.ajax({
-          url:'http://localhost/article/favoriteArticle/'+like_id+'/',
+          url:'http://localhost/article/favoriteArticle/'+likeId+'/',
           type:'DELETE',
           dataType:'json',
-          success:afterSuccessNotLike(already_like_element,article_id),
+          success:afterSuccessNotLike($alreadyLikeElement,articleId),
           processData:false,
           contentType:false,
         })
       })
-       /* likeしたユーザのmodalを表示 */
+
+  /* いいねカウントをクリックした後に発火するアクション
+     記事にいいねをした人の情報を取得する　*/
   $(document).on('click','.show-like-people',function(e){
     e.preventDefault()
-    var article_id = $(this).attr('id').replace('id_liked_article_','');
+    var articleId = $(this).attr('id').replace('id_liked_article_','');
     $('#modal-like').modal();
         $.ajax({
-          url:'http://localhost/article/favoriteArticle/?article='+article_id,
+          url:'http://localhost/article/favoriteArticle/?article='+articleId,
           type:'GET',
           dataType:'json',
           success:afterSuccessShowLikePeople,
@@ -222,28 +255,35 @@ $(function(){
         })
       });
 
-  var afterSuccessFollow = function(unfollowButtonElement,target){
+　/* フォローのリクエストをajax通信でpostした後の処理
+　  「フォローする」-> 「フォロー中」にボタンを変更
+　　後にフォロー解除ができるように、relationIdを埋め込む */
+  var afterSuccessFollow = function($unfollowButtonElement,target){
       return function(data){
-        unfollowButtonElement.text('フォロー中')
-        unfollowButtonElement.removeClass('un-follow').addClass('already-follow')
-        unfollowButtonElement.removeClass('btn-outline-primary').addClass('bg-gradient-primary')
-        relation_id = data['id']
-        if(relation_id){
+        $unfollowButtonElement.text('フォロー中')
+        $unfollowButtonElement.removeClass('un-follow').addClass('already-follow')
+        $unfollowButtonElement.removeClass('btn-outline-primary').addClass('bg-gradient-primary')
+        relationId = data['id']
+        if(relationId){
           $('#'+target).val(data['id']);
         }
       }
     };
 
-  var afterSuccessUnfollow = function(alreadyfollowButtonElement,target){
-      alreadyfollowButtonElement.text('フォローする')
-      alreadyfollowButtonElement.removeClass('already-follow').addClass('un-follow')
-      alreadyfollowButtonElement.removeClass('bg-gradient-primary').addClass('btn-outline-primary')
+  /* フォロー解除をdeleteメソッドでリクエストをした後の処理
+     「フォロー中」-> 「フォローする」にボタンを変更 */
+  var afterSuccessUnfollow = function($alreadyfollowButtonElement,target){
+      $alreadyfollowButtonElement.text('フォローする')
+      $alreadyfollowButtonElement.removeClass('already-follow').addClass('un-follow')
+      $alreadyfollowButtonElement.removeClass('bg-gradient-primary').addClass('btn-outline-primary')
   };
   
+  /* 「フォローする」ボタンを押した後の処理
+      フォローのリクエストをajax通信でpostする処理 */
   $('body').on('click','.un-follow',function(e){
     e.stopPropagation();
-    unfollowButtonElement = $(this)
-    var target = unfollowButtonElement.next().attr('id');
+    var $unfollowButtonElement = $(this)
+    var target = $unfollowButtonElement.next().attr('id');
     var data = new FormData();
     data.append('target',target);
     $.ajax({
@@ -251,81 +291,89 @@ $(function(){
       type:'POST',
       dataType:'json',
       data:data,
-      success:afterSuccessFollow(unfollowButtonElement,target),
+      success:afterSuccessFollow($unfollowButtonElement,target),
       processData:false,
       contentType:false,
     })
   });
   
+  /* 「フォロー」タンを押した後の処理
+     フォロー解除をdeleteメソッドでリクエストする */
   $('body').on('click','.already-follow',function(e){
     e.stopPropagation();
-    alreadyfollowButtonElement = $(this)
-    var target = alreadyfollowButtonElement.next().val();
+    var $alreadyfollowButtonElement = $(this)
+    var target = $alreadyfollowButtonElement.next().val();
     $.ajax({
       url:'http://localhost/account/relation/'+target+'/',
       type:'DELETE',
-      success:afterSuccessUnfollow(alreadyfollowButtonElement),
+      success:afterSuccessUnfollow($alreadyfollowButtonElement),
       processData:false,
       contentType:false,
     })
   });
 
-  var afterSuccessLikeComment = function(not_like_element,comment_id){
+　/*  特定のコメントにいいねをつけてajax通信した後の処理
+  　　いいねボタンが赤色変わり、いいねカウントが１加算される */
+  var afterSuccessLikeComment = function($notLikeElement,commentId){
     return function(data){
-      $('#id_like_comment_'+comment_id).val(data['id'])
-      not_like_element.removeClass('not-like-comment').addClass('already-like-comment')
-      not_like_element.children().css('color','indianred')
-      var now_like_count = $('#id_like_comment_count_'+comment_id).text()
-      if(!now_like_count){
-        now_like_count = "0"
+      $('#id_like_comment_'+commentId).val(data['id'])
+      $notLikeElement.removeClass('not-like-comment').addClass('already-like-comment')
+      $notLikeElement.children().css('color','indianred')
+      var nowLikeCount = $('#id_like_comment_count_'+commentId).text()
+      if(!nowLikeCount){
+        nowLikeCount = "0"
       }
-      now_like_count = parseInt(now_like_count)
-      after_like_count = now_like_count + 1 
-      $('#id_like_comment_count_' + comment_id).text(after_like_count)
+      nowLikeCount = parseInt(nowLikeCount)
+      afterLikeCount = nowLikeCount + 1 
+      $('#id_like_comment_count_' + commentId).text(afterLikeCount)
     }
   }
 
-  var afterSuccessNotLikeComment = function(already_like_element,comment_id){
-    already_like_element.children().css('color','')
-    already_like_element.removeClass('already-like-comment').addClass('not-like-comment')
-    var now_like_count = $('#id_like_comment_count_'+comment_id).text()
-    now_like_count = parseInt(now_like_count)
-    after_like_count = now_like_count -1 
-    if(after_like_count==0){
-      after_like_count = ""
+  /* 特定のコメントのいいねを解除してajax通信した後の処理
+  　　いいねボタンがグレー色に変わり、いいねカウントが１減算される */
+  var afterSuccessNotLikeComment = function($alreadyLikeElement,commentId){
+    $alreadyLikeElement.children().css('color','')
+    $alreadyLikeElement.removeClass('already-like-comment').addClass('not-like-comment')
+    var nowLikeCount = $('#id_like_comment_count_'+commentId).text()
+    nowLikeCount = parseInt(nowLikeCount)
+    afterLikeCount = nowLikeCount -1 
+    if(afterLikeCount==0){
+      afterLikeCount = ""
     }
-    $('#id_like_comment_count_' + comment_id).text(after_like_count)
+    $('#id_like_comment_count_' + commentId).text(afterLikeCount)
   }
 
-  // コメントにいいねをつける機能
+  /* 記事のコメントにいいねをつけた時のアクション
+     コメントに対するいいねをajax通信でpostする */
   $(document).on('click','.not-like-comment',function(e){
     e.stopPropagation();
-    var not_like_element = $(this)
-    comment_id = not_like_element.next().attr('id').replace('id_like_comment_','')
+    var $notLikeElement = $(this)
+    commentId = $notLikeElement.next().attr('id').replace('id_like_comment_','')
       var data = new FormData();
-      data.append('comment',comment_id);
+      data.append('comment',commentId);
         $.ajax({
           url:'http://localhost/article/favoriteComment/',
           type:'POST',
           dataType:'json',
           data:data,
-          success:afterSuccessLikeComment(not_like_element,comment_id),
+          success:afterSuccessLikeComment($notLikeElement,commentId),
           processData:false,
           contentType:false,
         })
       })
 
-  // コメントのいいねを解除する
+  /* 記事のコメントのいいねを解除した時のアクション
+     コメントに対するいいねをajax通信でdeleteする */
   $(document).on('click','.already-like-comment',function(e){
     e.stopPropagation();
-    var already_like_element = $(this)
-    like_id = already_like_element.next().val()
-    comment_id = already_like_element.next().attr('id').replace('id_like_comment_','')
+    var $alreadyLikeElement = $(this)
+    likeId = $alreadyLikeElement.next().val()
+    commentId = $alreadyLikeElement.next().attr('id').replace('id_like_comment_','')
       $.ajax({
-        url:'http://localhost/article/favoriteComment/'+like_id+'/',
+        url:'http://localhost/article/favoriteComment/'+likeId+'/',
         type:'DELETE',
         dataType:'json',
-        success:afterSuccessNotLikeComment(already_like_element,comment_id),
+        success:afterSuccessNotLikeComment($alreadyLikeElement,commentId),
         processData:false,
         contentType:false,
       })
