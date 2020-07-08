@@ -21,6 +21,8 @@
     <script src="{% static 'admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js' %} "></script>
     <script src="{% static 'admin-lte/dist/js/adminlte.min.js' %}"></script>
     <script src="{% static 'admin-lte/dist/js/demo.js' %}"></script>
+    <script src="{% static 'js/base_ajax.js' %}"></script>
+
     <script>
 $(function(){
   /* コメントmodalの表示 */
@@ -56,21 +58,6 @@ $(function(){
   var afterPostCommentForArticle = function(data){
         window.location.reload();
   }
-
-  // httpメソッドがリソースの読み出し->true リソースの編集->false
-  var csrftoken = $('input[name="csrfmiddlewaretoken"]').val();
-    function csrfSafeMethod(method) {
-    // 下記HTTPメソッドはリソース変更しないため、CSRFTokenをヘッダに埋め込まない
-        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-    }
-    // ajax通信の前にリソースを更新するメソッドであればCSRFTOKENをヘッダに埋め込む
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            }
-        }
-    });
 
   /* 記事に対してコメントを送信したときのアクション
      コメントをajaxでpostする */

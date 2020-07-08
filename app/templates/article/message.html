@@ -20,6 +20,7 @@
     <script src="{% static 'admin-lte/dist/js/adminlte.min.js' %}"></script>
     <script src="{% static 'admin-lte/dist/js/demo.js' %}"></script>
     <script src="{% static 'js/content.js' %}"></script>
+    <script src="{% static 'js/base_ajax.js' %}"></script>
   <body>   
   <script>
 $(function(){
@@ -27,22 +28,6 @@ $(function(){
     var obj = document.getElementById('id_chat_body');
     obj.scrollTop = obj.scrollHeight;
     
-    // httpメソッドがリソースの読み出し->true リソースの編集->false
-    var csrftoken = $('input[name="csrfmiddlewaretoken"]').val();
-    // httpメソッドがオブジェクトの読み出し->true オブジェクトの編集->false
-    function csrfSafeMethod(method) {
-        // 下記HTTPメソッドはリソース変更しないため、CSRFTokenをヘッダに埋め込まない
-        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-    }
-    // ajax通信の前にリソースを更新するメソッドであればCSRFTOKENをヘッダに埋め込む
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            }
-        }
-    });
-
     /* トークルームを押すとメッセージを取得するリクエストを送る */
     $('.talk-room').on('click',function(){
      var talkRoomId = $(this).attr('id').replace('id_talk_room_','');

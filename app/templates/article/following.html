@@ -20,6 +20,7 @@
     <script src="{% static 'admin-lte/dist/js/adminlte.min.js' %}"></script>
     <script src="{% static 'admin-lte/dist/js/demo.js' %}"></script>
     <script src="{% static 'js/content.js' %}"></script>
+    <script src="{% static 'js/base_ajax.js' %}"></script>
 <script>
 $(function(){
       /* プロフィール画像のアクション発火(click、pointer) */
@@ -38,19 +39,6 @@ $(function(){
         if(is_follow==1){
         $('.already-follow').css('display','block')
         }
-      // フォローボタンを押すとフォロー状態とする
-      var csrftoken = $('input[name="csrfmiddlewaretoken"]').val();
-      function csrfSafeMethod(method) {
-          // these HTTP methods do not require CSRF protection
-          return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-      }
-      $.ajaxSetup({
-          beforeSend: function(xhr, settings) {
-              if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                  xhr.setRequestHeader("X-CSRFToken", csrftoken);
-              }
-          }
-      });
 
       /* フォローのリクエストをajax通信でpostした後の処理
     　   「フォローする」-> 「フォロー中」にボタンを変更
