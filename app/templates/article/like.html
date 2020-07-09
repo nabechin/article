@@ -116,7 +116,7 @@ $(function(){
     //　ログインユーザのプロフィールを取得するためのajax通信
     $('#id_user_profile').on('click',function(){
       $.ajax({
-        url:'http://localhost/account/profileEdit/',
+        url:'http://localhost/api/profileEdit/',
         type:'GET',
         headers: {csrfmiddlewaretoken: 'Token ' +window.CSRF_TOKEN},
         success: afterSuccessGetProfile,
@@ -163,7 +163,7 @@ $(function(){
         return;
       }
       $.ajax({
-        url:'http://localhost/account/profileEdit/{{user_profile.id}}/',
+        url:'http://localhost/api/profileEdit/{{user_profile.id}}/',
         type:'PATCH',
         dataType:'json',
         data:data,
@@ -197,7 +197,7 @@ $(function(){
       var data = new FormData();
       data.append('target',target);
       $.ajax({
-        url:'http://localhost/account/relation/',
+        url:'http://localhost/api/relation/',
         type:'POST',
         dataType:'json',
         data:data,
@@ -209,7 +209,7 @@ $(function(){
     $('#id_unrelate_button').on('click',function(){
       var relationId = $("#id_relation_id_port").val()
       $.ajax({
-        url:'http://localhost/account/relation/'+relationId+'/',
+        url:'http://localhost/api/relation/'+relationId+'/',
         type:'DELETE',
         success:afterSuccessUnfollow,
         processData:false,

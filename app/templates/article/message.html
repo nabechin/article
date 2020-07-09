@@ -93,7 +93,7 @@ $(function(){
         data.append('body',messageBody);
         data.append('talk_room',talkRoomId);
         $.ajax({
-            url:'http://localhost/messages/message/',
+            url:'http://localhost/api/message/',
             type:'POST',
             dataType:'json',
             data:data,

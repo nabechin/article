@@ -2,14 +2,10 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.shortcuts import redirect, render
-from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, TemplateView
 
-from rest_framework import permissions, viewsets
-
 from .forms import ArticleForm
-from .models import Article, Comment, FavoriteArticle, FavoriteComment
-from .serializers import CommentSerializer, FavoriteArticleSerializer, FavoriteCommentSerializer
+from .models import Article
 from .article_info import ArticleInfo
 
 from account.models import Relation, UserProfile
@@ -59,15 +55,6 @@ class CommentOfArticle(TemplateView):
         return context
 
 
-class CommentForArticle(viewsets.ModelViewSet):
-    serializer_class = CommentSerializer
-    queryset = Comment.objects.all()
-    permission_classes = (permissions.IsAuthenticated,)
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-
 class ArticlePostView(CreateView):
     model = Article
     form_class = ArticleForm
@@ -83,28 +70,3 @@ class ArticlePostView(CreateView):
         article.user = self.request.user
         article.save()
         return redirect(self.get_success_url())
-
-
-class FavoriteArticleView(viewsets.ModelViewSet):
-    queryset = FavoriteArticle.objects.all()
-    serializer_class = FavoriteArticleSerializer
-    permission_class = (permissions.IsAuthenticated)
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-    def get_queryset(self):
-        queryset = self.queryset
-        article_id = self.request.query_params.get('article')
-        if article_id:
-            queryset = queryset.filter(article=article_id)
-        return queryset
-
-
-class FavoriteCommentView(viewsets.ModelViewSet):
-    serializer_class = FavoriteCommentSerializer
-    queryset = FavoriteComment.objects.all()
-    permission_class = (permissions.IsAuthenticated)
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)

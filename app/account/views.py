@@ -8,13 +8,10 @@ from django.db.models import Count
 from django.db.models import Q
 from django.views.generic import TemplateView, CreateView
 
-from rest_framework import viewsets
-from rest_framework import permissions
-from rest_framework.response import Response
-
 from .forms import UserRegisterForm, LoginForm
 from .models import UserProfile, Relation
-from .serializers import UserProfileSerializer, RelationSerializer
+from rest_framework import permissions
+
 
 from article.models import Article, FavoriteArticle
 from article.article_info import ArticleInfo
@@ -34,22 +31,6 @@ class UserRegisterView(CreateView):
         UserProfile.objects.create(user_id=user.id)
         messages.info(self.request, f'ユーザ名{user.name}さんのアカウントを作成しました')
         return redirect(self.get_success_url())
-
-
-class UserProfileEditView(viewsets.ModelViewSet):
-    serializer_class = UserProfileSerializer
-    queryset = UserProfile.objects.all()
-    permission_classes = (permissions.IsAuthenticated,)
-
-    def get_queryset(self):
-        queryset = self.queryset
-        user_id = self.request.user.id
-        if user_id:
-            queryset = queryset.select_related('user').filter(user__id=user_id)
-        return queryset
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
 
 
 class Login(LoginView):
@@ -96,15 +77,6 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
         context['user_profile'] = UserProfile.objects.select_related(
             'user').get(user__id=user_id)
         return render(self.request, self.template_name, context)
-
-
-class RelationView(viewsets.ModelViewSet):
-    serializer_class = RelationSerializer
-    permissions_classes = (permissions.IsAuthenticated)
-    queryset = Relation.objects.all()
-
-    def perform_create(self, serializer):
-        serializer.save(follower=self.request.user)
 
 
 class FollowerView(LoginRequiredMixin, TemplateView):

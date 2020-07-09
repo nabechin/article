@@ -69,7 +69,7 @@ $(function(){
     data.append('content',comment);
     data.append('article',article);
     $.ajax({
-      url:'http://localhost/article/commentForArticle/',
+      url:'http://localhost/api/commentForArticle/',
       type:'POST',
       dataType:'json',
       data:data,
@@ -199,7 +199,7 @@ $(function(){
         var data = new FormData();
         data.append('article',articleId);
         $.ajax({
-          url:'http://localhost/article/favoriteArticle/',
+          url:'http://localhost/api/favoriteArticle/',
           type:'POST',
           dataType:'json',
           data:data,
@@ -217,7 +217,7 @@ $(function(){
     likeId = $alreadyLikeElement.next().val()
     articleId = $alreadyLikeElement.next().attr('id').replace('id_like_article_','')
         $.ajax({
-          url:'http://localhost/article/favoriteArticle/'+likeId+'/',
+          url:'http://localhost/api/favoriteArticle/'+likeId+'/',
           type:'DELETE',
           dataType:'json',
           success:afterSuccessNotLike($alreadyLikeElement,articleId),
@@ -233,7 +233,7 @@ $(function(){
     var articleId = $(this).attr('id').replace('id_liked_article_','');
     $('#modal-like').modal();
         $.ajax({
-          url:'http://localhost/article/favoriteArticle/?article='+articleId,
+          url:'http://localhost/api/favoriteArticle/?article='+articleId,
           type:'GET',
           dataType:'json',
           success:afterSuccessShowLikePeople,
@@ -274,7 +274,7 @@ $(function(){
     var data = new FormData();
     data.append('target',target);
     $.ajax({
-      url:'http://localhost/account/relation/',
+      url:'http://localhost/api/relation/',
       type:'POST',
       dataType:'json',
       data:data,
@@ -291,7 +291,7 @@ $(function(){
     var $alreadyfollowButtonElement = $(this)
     var target = $alreadyfollowButtonElement.next().val();
     $.ajax({
-      url:'http://localhost/account/relation/'+target+'/',
+      url:'http://localhost/api/relation/'+target+'/',
       type:'DELETE',
       success:afterSuccessUnfollow($alreadyfollowButtonElement),
       processData:false,
@@ -339,7 +339,7 @@ $(function(){
       var data = new FormData();
       data.append('comment',commentId);
         $.ajax({
-          url:'http://localhost/article/favoriteComment/',
+          url:'http://localhost/api/favoriteComment/',
           type:'POST',
           dataType:'json',
           data:data,
@@ -357,7 +357,7 @@ $(function(){
     likeId = $alreadyLikeElement.next().val()
     commentId = $alreadyLikeElement.next().attr('id').replace('id_like_comment_','')
       $.ajax({
-        url:'http://localhost/article/favoriteComment/'+likeId+'/',
+        url:'http://localhost/api/favoriteComment/'+likeId+'/',
         type:'DELETE',
         dataType:'json',
         success:afterSuccessNotLikeComment($alreadyLikeElement,commentId),
