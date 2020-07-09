@@ -1,19 +1,14 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from . import views
 
 
 app_name = 'article'
-router = DefaultRouter()
-router.register('commentForArticle', views.CommentForArticle)
-router.register('favoriteArticle', views.FavoriteArticleView)
-router.register('favoriteComment', views.FavoriteCommentView)
-
 
 urlpatterns = [
     path('', views.ArticleList.as_view(), name='article'),
     path('comment/<int:article_id>',
          views.CommentOfArticle.as_view(), name='comment'),
     path('post/', views.ArticlePostView.as_view(), name='post'),
-    path('', include(router.urls)),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

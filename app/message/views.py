@@ -3,11 +3,7 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.views.generic import TemplateView, RedirectView
 from django.contrib.auth.mixins import LoginRequiredMixin
-
-from rest_framework import permissions, viewsets
-
 from .models import TalkRoom, Message, UserOwnTalkRoom
-from .serializers import MessageSerializer
 
 
 class TalkRoomView(LoginRequiredMixin, TemplateView):
@@ -62,19 +58,3 @@ class UserOwnTalkRoomView(LoginRequiredMixin, RedirectView):
         else:
             talk_room = talk_rooms[0]
         return reverse('messages:message', args=(talk_room.id,))
-
-
-class SendMessageView(viewsets.ModelViewSet):
-    queryset = Message.objects.all()
-    serializer_class = MessageSerializer
-    permission_classes = (permissions.IsAuthenticated,)
-
-    def get_queryset(self):
-        queryset = self.queryset
-        talk_room_id = self.request.query_params.get('talkroom')
-        if talk_room_id:
-            queryset = queryset.filter(talk_room=talk_room_id)
-        return queryset
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)

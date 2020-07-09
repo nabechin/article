@@ -53,7 +53,7 @@ $(function(){
             var data = new FormData();
             data.append('target',target);
             $.ajax({
-              url:'http://localhost/account/relation/',
+              url:'http://localhost/api/relation/',
               type:'POST',
               dataType:'json',
               data:data,
@@ -68,7 +68,7 @@ $(function(){
             $alreadyfollowButtonElement = $(this)
             var target = $alreadyfollowButtonElement.next().val();
             $.ajax({
-              url:'http://localhost/account/relation/'+target+'/',
+              url:'http://localhost/api/relation/'+target+'/',
               type:'DELETE',
               success:afterSuccessUnfollow($alreadyfollowButtonElement),
               processData:false,
