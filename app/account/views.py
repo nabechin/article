@@ -58,7 +58,7 @@ class Login(LoginView):
 
 
 class Logout(LoginRequiredMixin, LogoutView):
-    template_name = 'logout.html'
+    template_name = 'login.html'
 
 
 class UserProfileView(LoginRequiredMixin, TemplateView):
