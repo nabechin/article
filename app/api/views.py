@@ -6,11 +6,13 @@ from message.models import TalkRoom, Message, UserOwnTalkRoom
 
 from rest_framework import viewsets
 from rest_framework import permissions
+from rest_framework.authentication import TokenAuthentication
 
 
 class UserProfileEditView(viewsets.ModelViewSet):
     serializer_class = UserProfileSerializer
     queryset = UserProfile.objects.all()
+    authentication_classes = (TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
@@ -26,8 +28,9 @@ class UserProfileEditView(viewsets.ModelViewSet):
 
 class RelationView(viewsets.ModelViewSet):
     serializer_class = RelationSerializer
-    permissions_classes = (permissions.IsAuthenticated)
     queryset = Relation.objects.all()
+    permissions_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
 
     def perform_create(self, serializer):
         serializer.save(follower=self.request.user)
@@ -37,6 +40,7 @@ class CommentForArticle(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -45,7 +49,8 @@ class CommentForArticle(viewsets.ModelViewSet):
 class FavoriteArticleView(viewsets.ModelViewSet):
     queryset = FavoriteArticle.objects.all()
     serializer_class = FavoriteArticleSerializer
-    permission_class = (permissions.IsAuthenticated)
+    authentication_classes = (TokenAuthentication,)
+    permission_class = (permissions.IsAuthenticated,)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -61,7 +66,8 @@ class FavoriteArticleView(viewsets.ModelViewSet):
 class FavoriteCommentView(viewsets.ModelViewSet):
     serializer_class = FavoriteCommentSerializer
     queryset = FavoriteComment.objects.all()
-    permission_class = (permissions.IsAuthenticated)
+    authentication_classes = (TokenAuthentication,)
+    permission_class = (permissions.IsAuthenticated,)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -70,6 +76,7 @@ class FavoriteCommentView(viewsets.ModelViewSet):
 class SendMessageView(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
+    authentication_classes = (TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
