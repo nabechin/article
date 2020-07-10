@@ -1,7 +1,9 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.db.models import Count
@@ -11,6 +13,7 @@ from django.views.generic import TemplateView, CreateView
 from .forms import UserRegisterForm, LoginForm
 from .models import UserProfile, Relation
 from rest_framework import permissions
+from rest_framework.authtoken.models import Token
 
 
 from article.models import Article, FavoriteArticle
@@ -22,7 +25,7 @@ class UserRegisterView(CreateView):
     model = get_user_model()
     form_class = UserRegisterForm
     template_name = 'signup.html'
-    success_url = '/account/login/'
+    success_url = '/article/'
 
     def form_valid(self, form):
         del form.cleaned_data['password2']
@@ -30,7 +33,13 @@ class UserRegisterView(CreateView):
         self.object = user = get_user_model().objects.create_user(**validate_data)
         UserProfile.objects.create(user_id=user.id)
         messages.info(self.request, f'ユーザ名{user.name}さんのアカウントを作成しました')
-        return redirect(self.get_success_url())
+        try:
+            token = Token.objects.get(user=self.request.user)
+        except:
+            token = Token.objects.create(user=self.request.user)
+        response = redirect('/article/')
+        response.set_cookie('token', token)
+        return response
 
 
 class Login(LoginView):
