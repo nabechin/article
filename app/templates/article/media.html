@@ -1,46 +1,50 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="ja">
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-  <head>
-    <meta name="generator" content="Jekyll v3.8.5" />
-    <meta property="og:title" content="Layout" />
-    <meta property="og:locale" content="en_US" />
-    <meta name="description" content="AdminLTE v3 Documentaion" />
-    <meta property="og:description" content="AdminLTE v3 Documentaion" />
-    <meta property="og:site_name" content="AdminLTE v3 Documentaion" />
-    <link rel="stylesheet" href="{% static 'admin-lte/plugins/fontawesome-free/css/all.min.css' %}">
-    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-    <link rel="stylesheet" type="text/css" href="{% static 'admin-lte/dist/css/adminlte.min.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
-    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/contents.css' %}">
-    <script src="{% static 'admin-lte/plugins/jquery/jquery.min.js' %}"></script>
-    <script src="{% static 'admin-lte/plugins/jquery-ui/jquery-ui.min.js' %}"></script>
-    <script src="{% static 'admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js' %} "></script>
-    <script src="{% static 'admin-lte/dist/js/adminlte.min.js' %}"></script>
-    <script src="{% static 'admin-lte/dist/js/demo.js' %}"></script>
-    <script src="{% static 'js/content.js' %}"></script>
-    <script src="{% static 'js/base_ajax.js' %}"></script>
-    <script src="{% static 'js/article_like_ajax.js' %}"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+  integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
-<script>
-  $(function(){
-    toggleFollowButton()
-      function toggleFollowButton(){
-        const UNFOLLOW = 0 
+<head>
+  <meta name="generator" content="Jekyll v3.8.5" />
+  <meta property="og:title" content="Layout" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="description" content="AdminLTE v3 Documentaion" />
+  <meta property="og:description" content="AdminLTE v3 Documentaion" />
+  <meta property="og:site_name" content="AdminLTE v3 Documentaion" />
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/fontawesome-free/css/all.min.css' %}">
+  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+  <link rel="stylesheet" type="text/css" href="{% static 'admin-lte/dist/css/adminlte.min.css' %}">
+  <link rel="stylesheet" type="text/css"
+    href="{% static 'admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/contents.css' %}">
+  <script src="{% static 'admin-lte/plugins/jquery/jquery.min.js' %}"></script>
+  <script src="{% static 'admin-lte/plugins/jquery-ui/jquery-ui.min.js' %}"></script>
+  <script src="{% static 'admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js' %} "></script>
+  <script src="{% static 'admin-lte/dist/js/adminlte.min.js' %}"></script>
+  <script src="{% static 'admin-lte/dist/js/demo.js' %}"></script>
+  <script src="{% static 'js/content.js' %}"></script>
+  <script src="{% static 'js/base_ajax.js' %}"></script>
+  <script src="{% static 'js/article_like_ajax.js' %}"></script>
+
+  <script>
+    $(function () {
+      toggleFollowButton()
+
+      function toggleFollowButton() {
+        const UNFOLLOW = 0
         const FOLLOW = 1
         var isFollow = "{{is_follow}}"
-        if(isFollow == UNFOLLOW){
+        if (isFollow == UNFOLLOW) {
           $('#id_already_follow').hide()
           $('#id_follow').show()
-        }else{
+        } else {
           $('#id_follow').hide()
           $('#id_already_follow').show()
         }
       }
       /* 記事の詳細へ遷移 */
-      $(document).on('click','.article',function(event){
+      $(document).on('click', '.article', function (event) {
         var relation = "{{relation.id}}"
         var url = "{% url 'article:comment' 1000 %}";
         var articleId = $(this).attr('id');
@@ -49,34 +53,34 @@
 
       /* プロフィールの画像編集 */
       // 背景画像クリック後、画像選択 
-      $('#id_background_img').on('click',function(){
+      $('#id_background_img').on('click', function () {
         $('#id_background_img_file').trigger('click');
       });
       // 背景画像にカーソルが当たると矢印から指マークに変わる 
-      $('#id_background_img').hover(function(){
-        $(this).css('cursor','pointer');
+      $('#id_background_img').hover(function () {
+        $(this).css('cursor', 'pointer');
       });
       //プロフィール画面クリック後、画像選択
-      $('#id_profile_img').on('click',function(){
+      $('#id_profile_img').on('click', function () {
         $('#id_profile_img_file').trigger('click');
       });
       // プロフィール画像にカーソルが当たると矢印から指マークに変わる
-      $('#id_profile_img').hover(function(){
-        $(this).css('cursor','pointer');
+      $('#id_profile_img').hover(function () {
+        $(this).css('cursor', 'pointer');
       });
       // 選択したプロフィール画像をimgに貼り付ける 
-      $('#id_profile_img_file').on('change', function(e){
+      $('#id_profile_img_file').on('change', function (e) {
         var reader = new FileReader();
-        reader.onload = function(e){
-            $('#id_profile_img').attr('src',e.target.result)
+        reader.onload = function (e) {
+          $('#id_profile_img').attr('src', e.target.result)
         }
         reader.readAsDataURL(e.target.files[0]);
       })
       // 選択した背景画像をimgに貼り付ける 
-      $('#id_background_img_file').on('change', function(e){
+      $('#id_background_img_file').on('change', function (e) {
         var reader = new FileReader();
-        reader.onload = function(e){
-            $('#id_background_img').attr('src',e.target.result)
+        reader.onload = function (e) {
+          $('#id_background_img').attr('src', e.target.result)
         }
         reader.readAsDataURL(e.target.files[0]);
       })
@@ -84,23 +88,25 @@
 
 
       /* 名前の文字カウント */
-      $('#id_name_text').on('keyup',countNameLength);
-      function countNameLength(){
+      $('#id_name_text').on('keyup', countNameLength);
+
+      function countNameLength() {
         var nameAmount = $('#id_name_text').val().length;
         $('#id_name_count').text(nameAmount);
       }
       /* 自己紹介の文字カウント */
-      $('#id_introduction_text').on('keyup',countIntroductionLength);
-      function countIntroductionLength(){
+      $('#id_introduction_text').on('keyup', countIntroductionLength);
+
+      function countIntroductionLength() {
         var introductionAmount = $('#id_introduction_text').val().length;
         $('#id_introduction_count').text(introductionAmount);
       }
     });
     // ajax通信処理
-    
-    $(function(){
 
-      var afterSuccessGetProfile = function(data){
+    $(function () {
+
+      var afterSuccessGetProfile = function (data) {
         var introduction = data['0']['introduction'];
         var name = data['0']['user']['name']
         $('#id_introduction_count').text(introduction.length);
@@ -109,20 +115,19 @@
         $('#id_name_text').val(name);
       }
       //ユーザのプロフィールをgetするための処理
-      $('#id_user_profile').on('click',function(){
+      $('#id_user_profile').on('click', function () {
         $.ajax({
-          url:'http://localhost/api/profileEdit/',
-          type:'GET',
-          headers: {csrfmiddlewaretoken: 'Token ' +window.CSRF_TOKEN},
+          url: 'http://localhost/api/profileEdit/',
+          type: 'GET',
           success: afterSuccessGetProfile,
         });
       })
-      
-      var afterSuccessEditProfile = function(data){
-            window.location.reload();
+
+      var afterSuccessEditProfile = function (data) {
+        window.location.reload();
       }
       //ユーザのプロフィールを更新するための処理
-      $('#id_updateProfile').on('submit',function(e){
+      $('#id_updateProfile').on('submit', function (e) {
         e.preventDefault()
         var name = $("#id_name_text").val()
         var introduction = $("#id_introduction_text").val()
@@ -131,346 +136,373 @@
         //背景画像のファイルデータ取得
         var backgroundImage = $("#id_background_img_file")[0].files[0];
         var data = new FormData();
-        data.append('user.name',name);
-        data.append('introduction',introduction);
-        if (profileImage){
-        var profileExtension = profileImage.name.split(".").pop()
-          if(profileExtension!="png" && profileExtension!="jpg"){
+        data.append('user.name', name);
+        data.append('introduction', introduction);
+        if (profileImage) {
+          var profileExtension = profileImage.name.split(".").pop()
+          if (profileExtension != "png" && profileExtension != "jpg") {
             alert("プロフィール画像の拡張子はjpegもしくはpngでアップロードしてください")
-            return 
+            return
           }
-          data.append('profile_image',profileImage);
+          data.append('profile_image', profileImage);
         }
-        if(backgroundImage){
+        if (backgroundImage) {
           var backgroundExtension = backgroundImage.name.split(".").pop()
-            if(backgroundExtension!='png'&& backgroundExtension!='jpg'){
-              alert("背景画像の拡張子はjpegもしくはpngでアップロードしてください")
-              return 
+          if (backgroundExtension != 'png' && backgroundExtension != 'jpg') {
+            alert("背景画像の拡張子はjpegもしくはpngでアップロードしてください")
+            return
           }
-          data.append('background_image',backgroundImage);
+          data.append('background_image', backgroundImage);
         }
-        if(!name){
+        if (!name) {
           $("#id_name_text").addClass('is-invalid');
-          $("#id_errorMessage").css('display','block');
+          $("#id_errorMessage").css('display', 'block');
           return;
         }
         $.ajax({
-          url:'http://localhost/api/profileEdit/{{user_profile.id}}/',
-          type:'PATCH',
-          dataType:'json',
-          data:data,
+          url: 'http://localhost/api/profileEdit/{{user_profile.id}}/',
+          type: 'PATCH',
+          dataType: 'json',
+          data: data,
           enctype: 'multipart/form-data',
           success: afterSuccessEditProfile,
-          processData: false,  // tell jQuery not to process the data
-          contentType: false 
+          processData: false, // tell jQuery not to process the data
+          contentType: false
         });
       });
     });
-    $(function(){
-      var afterSuccessFollow = function(data){
+    $(function () {
+      var afterSuccessFollow = function (data) {
         var relationId = data['id']
-        if(relationId){
-        $("#id_relation_id_port").val(relationId)
+        if (relationId) {
+          $("#id_relation_id_port").val(relationId)
         }
         $('#id_follow').hide()
         $('#id_already_follow').show()
         var numberOfFollower = parseInt($('#id_number-of_follower').text())
-        $('#id_number-of_follower').text(numberOfFollower+1)
+        $('#id_number-of_follower').text(numberOfFollower + 1)
       };
-      var afterSuccessUnfollow = function(){
+      var afterSuccessUnfollow = function () {
         $('#id_already_follow').hide()
         $('#id_follow').show()
         $('#modal-action-unfollow').modal('hide')
         var numberOfFollower = parseInt($('#id_number-of_follower').text())
-        $('#id_number-of_follower').text(numberOfFollower-1)
+        $('#id_number-of_follower').text(numberOfFollower - 1)
       };
-      $('#id_follow').on('click',function(){
+      $('#id_follow').on('click', function () {
         var target = "{{user.id}}"
         var data = new FormData();
-        data.append('target',target);
+        data.append('target', target);
         $.ajax({
-          url:'http://localhost/api/relation/',
-          type:'POST',
-          dataType:'json',
-          data:data,
-          success:afterSuccessFollow,
-          processData:false,
-          contentType:false,
+          url: 'http://localhost/api/relation/',
+          type: 'POST',
+          dataType: 'json',
+          data: data,
+          success: afterSuccessFollow,
+          processData: false,
+          contentType: false,
         })
       });
-      $('#id_unrelate_button').on('click',function(){
+      $('#id_unrelate_button').on('click', function () {
         var relationId = $("#id_relation_id_port").val()
         $.ajax({
-          url:'http://localhost/api/relation/'+relationId+'/',
-          type:'DELETE',
-          success:afterSuccessUnfollow,
-          processData:false,
-          contentType:false,
+          url: 'http://localhost/api/relation/' + relationId + '/',
+          type: 'DELETE',
+          success: afterSuccessUnfollow,
+          processData: false,
+          contentType: false,
         })
       });
     });
-    </script>
-  </head>
-  <body>
-    {% csrf_token %} 
-    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-        </ul>
-        <a class="nav-link text-dark" href="{% url 'account:login' %}" tabindex="-1" aria-disabled="true">ログイン</a>
-        <a class="nav-link text-dark" href="{% url 'account:logout' %}" tabindex="-1" aria-disabled="true">ログアウト</a>
+  </script>
+</head>
+
+<body>
+  {% csrf_token %}
+  <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+      </ul>
+      <a class="nav-link text-dark" href="{% url 'account:login' %}" tabindex="-1" aria-disabled="true">ログイン</a>
+      <a class="nav-link text-dark" href="{% url 'account:logout' %}" tabindex="-1" aria-disabled="true">ログアウト</a>
+    </div>
+  </nav>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-1">
       </div>
-    </nav>
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-1">
-          </div>
-          <div class="col-2">
-            <br>
-            <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-              <a class="nav-link" id="v-pills-home-tab" href="{% url 'article:article' %}" role="tab" >Home</a>
-              <a class="nav-link active" id="v-pills-profile-tab" href="{% url 'account:profile' user.id %}" role="tab">Profile</a>
-              <a class="nav-link" id="v-pills-messages-tab" href="{% url 'messages:talkroom' %}" role="tab">Messages</a>
-              <a class="nav-link" id="v-pills-settings-tab" href="#" role="tab">Settings</a>
-            </div>
-          </div>
-          <div class="col-5">
-            <div class="card-deck">
-              <div class="card">
-                {% if user_profile.background_image %}
-                <img class="card-img-top h-50" src="{{user_profile.background_image.url}}">
-                {% else %}
-                <img class="card-img-top h-50" src="/media/default_background.jpg">
-                {% endif %}
-                <div class="card-body" style="height:50px;">
-                  <div class="row">
-                    <div class="col-3">
-                    {% if user_profile.profile_image %}
-                     <img class="rounded-circle" style="width:80px;height:80px;" src="{{user_profile.profile_image.url}}">
-                    {% else %}
-                      <img class="rounded-circle" style="width:80px;height:80px;" src="/media/default_profile.jpg">
-                    {% endif %}
-                     <div>
-                        <p class="card-text">{{user.name}}</p>
-                     </div>
-                    </div>
-                    <div class="col-5">
-                      <!-- フォローとフォロワー数  -->
-                       <div>
-                        <a href="{% url 'account:following' user.id %}" class="text-dark"><strong>{{number_of_follow}}</strong>&nbsp;フォロー中</a>&nbsp;
-                        <a href="{% url 'account:follower' user.id %}" class="text-dark"><strong id='id_number-of_follower'>{{number_of_follower}}</strong>&nbsp;フォロワー</a>
-                      </div>
-                    </div>
-                    <div class="col-4">
-                      <!-- フォローとフォロワー数  -->
-                      {% if user.id == login_user.id %}
-                        <button type="button" class="btn btn-outline-primary float-right" style="display:block;" data-toggle="modal" data-target="#modal-default" id="id_user_profile">プロフィールを編集</button>
-                      {% else %}
-                        <button type="button" class="btn btn-outline-primary float-right" style="display: none;" id="id_follow">フォローする</button>
-                        <button type="button" class="btn bg-gradient-primary float-right" style="display: none;" id="id_already_follow" data-toggle="modal" data-target='#modal-action-unfollow'>フォロー中</button>
-                      {% endif %}
-                      <input type="hidden" value="{{relation.id}}" id="id_relation_id_port">
-
-                      <!-- メッセージボタン -->
-                      {% if user.id != login_user.id %}
-                      <a href="{% url 'messages:talkroom' user.id %}" class="nav-link mail-font">
-                        <i class="far fa-envelope"></i>
-                      </a>
-                      {% endif %}
-                      <!-- メッセージボタン -->
-
-                      <!-- フォロー解除確認画面を出力するmodal -->
-                      <div class="modal fade" id="modal-action-unfollow">
-                        <div class="modal-dialog modal-sm">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                              </button>
-                            </div>
-                            <div class="modal-body rounded">
-                              <h2>{{user.name}}</h2>
-                              <p>さんのフォローを解除しますか</p>
-                            </div>
-                            <div class="modal-footer justify-content-between">
-                              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                              <button type="button" class="btn btn-primary" id="id_unrelate_button">解除</button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <!-- フォロー解除確認画面を出力するmodal -->
-                      <!-- プロフィール編集用modal -->
-                      <div class="modal fade" id="modal-default">
-                        <div class="modal-dialog">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <h4 class="modal-title">プロフィールの編集</h4>
-                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                              </button>
-                            </div>
-                            <div class="modal-body rounded">
-                              <form action="/account/profileEdit/{{user_profile.id}}" id="id_updateProfile" method="patch" enctype="multipart/form-data">
-                                <div class="row">
-                                    <div class="form-group col-md-6">
-                                      <label>プロフィール画像</label>
-                                      <div></div>
-                                      {% if user_profile.profile_image %}
-                                        <img class="rounded-circle img-bordered-sm" name="profile_image" style="height:150px; width:150px;" src="{{user_profile.profile_image.url}}" id="id_profile_img">
-                                      {% else %}
-                                        <img class="rounded-circle img-bordered-sm" name="profile_image" style="height:150px; width:150px;" src="/media/default_profile.jpg" id="id_profile_img">
-                                      {% endif %}
-                                        <input type="file" id="id_profile_img_file" accept="image/*" style="display:none">
-                                      </div>
-                                    <div class="form-group col-md-6">
-                                      <label>背景画像</label>
-                                      <div></div>
-                                      {% if user_profile.background_image %}
-                                      <img class="rounded" src="{{user_profile.background_image.url}}" style="height:200px; width:100%;" id="id_background_img">
-                                      {% else %}
-                                      <img class="rounded" src="/media/default_background.jpg" style="height:200px; width:100%;" id="id_background_img">
-                                      {% endif %}
-                                      <input type="file" id="id_background_img_file" accept="image/*" style="display:none">
-                                    </div>
-                                  </div>
-                                  <div class="form-group">
-                                    <label for="exampleInputEmail1">名前</label>
-                                    <div class="errormessage" style="color: crimson; margin-left: 10px; display:none;" id="id_errorMessage">名前は入力必須です</div>
-                                    <input type="text" class="form-control" placeholder="名前" maxlength="50" id="id_name_text" name="user.name">
-                                    <div class="float-right">
-                                      <span class="info-box-number" id="id_name_count">0</span>&nbsp;/
-                                      <span class="info-box-number">50</span>
-                                    </div>
-                                  </div>
-                                  <div class="form-group">
-                                    <label>自己紹介</label>
-                                    <textarea class="form-control" rows="3" placeholder="自己紹介を追加" maxlength="500" id="id_introduction_text" name="introduction"></textarea>
-                                    <div class="float-right">
-                                      <span class="info-box-number" id="id_introduction_count">0</span>&nbsp;/
-                                      <span class="info-box-number">500</span>
-                                    </div>
-                                  </div>
-                               </form>
-                                <!-- /input-group -->
-                              </div>
-                              <div class="modal-footer justify-content-between">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary" id="id_save_button" onclick="$('#id_updateProfile').submit()">保存</button>
-                              </div>
-                            </div>
-                            <!-- /.modal-content -->
-                          </div>
-                        <!-- /.modal-dialog -->
-                      </div>
-                      <!-- プロフィール編集用modal  -->
-                    </div>
-                  </div>
+      <div class="col-2">
+        <br>
+        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+          <a class="nav-link" id="v-pills-home-tab" href="{% url 'article:article' %}" role="tab">Home</a>
+          <a class="nav-link active" id="v-pills-profile-tab" href="{% url 'account:profile' user.id %}"
+            role="tab">Profile</a>
+          <a class="nav-link" id="v-pills-messages-tab" href="{% url 'messages:talkroom' %}" role="tab">Messages</a>
+          <a class="nav-link" id="v-pills-settings-tab" href="#" role="tab">Settings</a>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="card-deck">
+          <div class="card">
+            {% if user_profile.background_image %}
+            <img class="card-img-top h-50" src="{{user_profile.background_image.url}}">
+            {% else %}
+            <img class="card-img-top h-50" src="/media/default_background.jpg">
+            {% endif %}
+            <div class="card-body" style="height:50px;">
+              <div class="row">
+                <div class="col-3">
+                  {% if user_profile.profile_image %}
+                  <img class="rounded-circle" style="width:80px;height:80px;" src="{{user_profile.profile_image.url}}">
+                  {% else %}
+                  <img class="rounded-circle" style="width:80px;height:80px;" src="/media/default_profile.jpg">
+                  {% endif %}
                   <div>
-                    <p class="card-text" id="id_introduction_profileTop">{{user_profile.introduction}}</p>
+                    <p class="card-text">{{user.name}}</p>
                   </div>
                 </div>
-                    <nav class="nav nav-pills flex-column flex-sm-row">
-                        <a class="flex-sm-fill text-sm-center nav-link" href="{% url 'account:profile'　user.id %}">Article</a>
-                        <a class="flex-sm-fill text-sm-center nav-link active" href="{% url 'account:media'　user.id %}">Media</a>
-                        <a class="flex-sm-fill text-sm-center nav-link" href="{% url 'account:like'　user.id %}">Like</a>
-                    </nav>
-              </div>
-            </div>
-            <div class="card-deck">
-                <div class="card">
-                  {% for article_info in article_info_list %}
-                  <div class="card-body border-bottom article" id="{{article_info.article.id}}">
-                    <div class="tab-content">
-                      <div class="active tab-pane" id="activity">
-                        <!-- Post -->
-                        <div class="post">
-                          <div class="user-block row">
-                            <div class="col-2">
-                              {% if article_info.article.user.user_profile.profile_image %}
-                              <img class="rounded-circle img-bordered-sm" src="{{article_info.article.user.user_profile.profile_image.url}}"  alt="user image" style="width:50px;height:50px;">
-                              {% else %}
-                              <img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg"  alt="user image" style="width:50px;height:50px;">
-                              {% endif %}
-                            </div>
-                            <div class="col-10">
-                            <strong>
-                              {{ article_info.article.user.name }}
-                            </strong><br>
-                            <small class="text-muted">2020/04/15</small>
-                            </div>
-                          </div>
-                          <!-- /.user-block -->
-                          <div class="row mb-3">
-                            <div class="col-2"></div>
-                            <div class="col-10">
-                              <p>
-                                {{ article_info.article.content }}
-                              </p>
-                              {% if article_info.article.article_media %}
-                                  <img class="article-profile-image rounded border border-dark"  src="{{article_info.article.article_media.url}}"  alt="user image" style="width:100%;height:250px;">
-                              {% endif %}
-                           </div>
+                <div class="col-5">
+                  <!-- フォローとフォロワー数  -->
+                  <div>
+                    <a href="{% url 'account:following' user.id %}"
+                      class="text-dark"><strong>{{number_of_follow}}</strong>&nbsp;フォロー中</a>&nbsp;
+                    <a href="{% url 'account:follower' user.id %}" class="text-dark"><strong
+                        id='id_number-of_follower'>{{number_of_follower}}</strong>&nbsp;フォロワー</a>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <!-- フォローとフォロワー数  -->
+                  {% if user.id == login_user.id %}
+                  <button type="button" class="btn btn-outline-primary float-right" style="display:block;"
+                    data-toggle="modal" data-target="#modal-default" id="id_user_profile">プロフィールを編集</button>
+                  {% else %}
+                  <button type="button" class="btn btn-outline-primary float-right" style="display: none;"
+                    id="id_follow">フォローする</button>
+                  <button type="button" class="btn bg-gradient-primary float-right" style="display: none;"
+                    id="id_already_follow" data-toggle="modal" data-target='#modal-action-unfollow'>フォロー中</button>
+                  {% endif %}
+                  <input type="hidden" value="{{relation.id}}" id="id_relation_id_port">
+
+                  <!-- メッセージボタン -->
+                  {% if user.id != login_user.id %}
+                  <a href="{% url 'messages:talkroom' user.id %}" class="nav-link mail-font">
+                    <i class="far fa-envelope"></i>
+                  </a>
+                  {% endif %}
+                  <!-- メッセージボタン -->
+
+                  <!-- フォロー解除確認画面を出力するmodal -->
+                  <div class="modal fade" id="modal-action-unfollow">
+                    <div class="modal-dialog modal-sm">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
                         </div>
-                        <div class="row">
-                          <div class="col-md-4 text-center">
-                            <span class="link-black text-lg mr-2 text-left">
-                              <i class="fas fa-retweet mr-1"></i>
-                            </span>
-                          </div>
-                          <div class="col-md-4 text-center align-bottom"> 
-                            {% if article_info.is_login_user_like %}
-                            <span class="link-black text-lg already-like">
-                              <span class="far fa-thumbs-up" style="color:indianred"></span>
-                            </span>
-                            {% else %}
-                            <span class="text-lg not-like">
-                              <i class="far fa-thumbs-up"></i>
-                            </span>
-                            {% endif %}
-                            <input type="hidden" id="id_like_article_{{article_info.article.id}}" value="{{article_info.login_user_favorite_article_id}}">
-                            {% if article_info.article.favorite_article.all %}
-                              <span id="id_like_count_{{article_info.article.id}}">
-                                {{article_info.article.favorite_article.all.count}}
-                              </span>
-                            {% else %}
-                              <span id="id_like_count_{{article_info.article.id}}"></span>
-                            {% endif %}
-                          </div>
-                          <div class="col-md-4 text-center">
-                            <a class="link-black text-lg">
-                              <i class="far fa-comments mr-1"></i>
-                              {% if article_info.article.comment.all.count != 0 %}
-                              {{ article_info.article.comment.all.count }}
-                              {% endif %}
-                            </a>
-                          </div>
+                        <div class="modal-body rounded">
+                          <h2>{{user.name}}</h2>
+                          <p>さんのフォローを解除しますか</p>
                         </div>
-                        </div>
+                        <div class="modal-footer justify-content-between">
+                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                          <button type="button" class="btn btn-primary" id="id_unrelate_button">解除</button>
                         </div>
                       </div>
-                        <!-- /.post -->
+                    </div>
                   </div>
-                    {% endfor %}
+                  <!-- フォロー解除確認画面を出力するmodal -->
+                  <!-- プロフィール編集用modal -->
+                  <div class="modal fade" id="modal-default">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h4 class="modal-title">プロフィールの編集</h4>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body rounded">
+                          <form action="/account/profileEdit/{{user_profile.id}}" id="id_updateProfile" method="patch"
+                            enctype="multipart/form-data">
+                            <div class="row">
+                              <div class="form-group col-md-6">
+                                <label>プロフィール画像</label>
+                                <div></div>
+                                {% if user_profile.profile_image %}
+                                <img class="rounded-circle img-bordered-sm" name="profile_image"
+                                  style="height:150px; width:150px;" src="{{user_profile.profile_image.url}}"
+                                  id="id_profile_img">
+                                {% else %}
+                                <img class="rounded-circle img-bordered-sm" name="profile_image"
+                                  style="height:150px; width:150px;" src="/media/default_profile.jpg"
+                                  id="id_profile_img">
+                                {% endif %}
+                                <input type="file" id="id_profile_img_file" accept="image/*" style="display:none">
+                              </div>
+                              <div class="form-group col-md-6">
+                                <label>背景画像</label>
+                                <div></div>
+                                {% if user_profile.background_image %}
+                                <img class="rounded" src="{{user_profile.background_image.url}}"
+                                  style="height:200px; width:100%;" id="id_background_img">
+                                {% else %}
+                                <img class="rounded" src="/media/default_background.jpg"
+                                  style="height:200px; width:100%;" id="id_background_img">
+                                {% endif %}
+                                <input type="file" id="id_background_img_file" accept="image/*" style="display:none">
+                              </div>
+                            </div>
+                            <div class="form-group">
+                              <label for="exampleInputEmail1">名前</label>
+                              <div class="errormessage" style="color: crimson; margin-left: 10px; display:none;"
+                                id="id_errorMessage">名前は入力必須です</div>
+                              <input type="text" class="form-control" placeholder="名前" maxlength="50" id="id_name_text"
+                                name="user.name">
+                              <div class="float-right">
+                                <span class="info-box-number" id="id_name_count">0</span>&nbsp;/
+                                <span class="info-box-number">50</span>
+                              </div>
+                            </div>
+                            <div class="form-group">
+                              <label>自己紹介</label>
+                              <textarea class="form-control" rows="3" placeholder="自己紹介を追加" maxlength="500"
+                                id="id_introduction_text" name="introduction"></textarea>
+                              <div class="float-right">
+                                <span class="info-box-number" id="id_introduction_count">0</span>&nbsp;/
+                                <span class="info-box-number">500</span>
+                              </div>
+                            </div>
+                          </form>
+                          <!-- /input-group -->
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                          <button type="button" class="btn btn-primary" id="id_save_button"
+                            onclick="$('#id_updateProfile').submit()">保存</button>
+                        </div>
+                      </div>
+                      <!-- /.modal-content -->
+                    </div>
+                    <!-- /.modal-dialog -->
+                  </div>
+                  <!-- プロフィール編集用modal  -->
                 </div>
-            </div>
-          </div>
-          <div class="col-3">
-            <br>
-            <div class="input-group mb-2">
-              <input type="text" class="form-control" placeholder="Find Friends" aria-label="Recipient's username" aria-describedby="basic-addon2">
-              <div class="input-group-append">
-                <span class="input-group-text" id="basic-addon2"><i class="fas fa-search" style="font-size: 24px;"></i></span>
+              </div>
+              <div>
+                <p class="card-text" id="id_introduction_profileTop">{{user_profile.introduction}}</p>
               </div>
             </div>
-          </div>
-          <div class="col-1">
+            <nav class="nav nav-pills flex-column flex-sm-row">
+              <a class="flex-sm-fill text-sm-center nav-link" href="{% url 'account:profile'　user.id %}">Article</a>
+              <a class="flex-sm-fill text-sm-center nav-link active" href="{% url 'account:media'　user.id %}">Media</a>
+              <a class="flex-sm-fill text-sm-center nav-link" href="{% url 'account:like'　user.id %}">Like</a>
+            </nav>
           </div>
         </div>
+        <div class="card-deck">
+          <div class="card">
+            {% for article_info in article_info_list %}
+            <div class="card-body border-bottom article" id="{{article_info.article.id}}">
+              <div class="tab-content">
+                <div class="active tab-pane" id="activity">
+                  <!-- Post -->
+                  <div class="post">
+                    <div class="user-block row">
+                      <div class="col-2">
+                        {% if article_info.article.user.user_profile.profile_image %}
+                        <img class="rounded-circle img-bordered-sm"
+                          src="{{article_info.article.user.user_profile.profile_image.url}}" alt="user image"
+                          style="width:50px;height:50px;">
+                        {% else %}
+                        <img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg" alt="user image"
+                          style="width:50px;height:50px;">
+                        {% endif %}
+                      </div>
+                      <div class="col-10">
+                        <strong>
+                          {{ article_info.article.user.name }}
+                        </strong><br>
+                        <small class="text-muted">2020/04/15</small>
+                      </div>
+                    </div>
+                    <!-- /.user-block -->
+                    <div class="row mb-3">
+                      <div class="col-2"></div>
+                      <div class="col-10">
+                        <p>
+                          {{ article_info.article.content }}
+                        </p>
+                        {% if article_info.article.article_media %}
+                        <img class="article-profile-image rounded border border-dark"
+                          src="{{article_info.article.article_media.url}}" alt="user image"
+                          style="width:100%;height:250px;">
+                        {% endif %}
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-4 text-center">
+                        <span class="link-black text-lg mr-2 text-left">
+                          <i class="fas fa-retweet mr-1"></i>
+                        </span>
+                      </div>
+                      <div class="col-md-4 text-center align-bottom">
+                        {% if article_info.is_login_user_like %}
+                        <span class="link-black text-lg already-like">
+                          <span class="far fa-thumbs-up" style="color:indianred"></span>
+                        </span>
+                        {% else %}
+                        <span class="text-lg not-like">
+                          <i class="far fa-thumbs-up"></i>
+                        </span>
+                        {% endif %}
+                        <input type="hidden" id="id_like_article_{{article_info.article.id}}"
+                          value="{{article_info.login_user_favorite_article_id}}">
+                        {% if article_info.article.favorite_article.all %}
+                        <span id="id_like_count_{{article_info.article.id}}">
+                          {{article_info.article.favorite_article.all.count}}
+                        </span>
+                        {% else %}
+                        <span id="id_like_count_{{article_info.article.id}}"></span>
+                        {% endif %}
+                      </div>
+                      <div class="col-md-4 text-center">
+                        <a class="link-black text-lg">
+                          <i class="far fa-comments mr-1"></i>
+                          {% if article_info.article.comment.all.count != 0 %}
+                          {{ article_info.article.comment.all.count }}
+                          {% endif %}
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- /.post -->
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="col-3">
+        <br>
+        <div class="input-group mb-2">
+          <input type="text" class="form-control" placeholder="Find Friends" aria-label="Recipient's username"
+            aria-describedby="basic-addon2">
+          <div class="input-group-append">
+            <span class="input-group-text" id="basic-addon2"><i class="fas fa-search"
+                style="font-size: 24px;"></i></span>
+          </div>
+        </div>
+      </div>
+      <div class="col-1">
+      </div>
     </div>
-    </div>
-  </body>
+  </div>
+</body>
+
 </html>
