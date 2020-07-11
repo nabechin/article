@@ -3,3 +3,4 @@ __pycache__/
 memo/
 settings.py
 env.dev
+test.rest

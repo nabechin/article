@@ -1,6 +1,9 @@
 from django.conf import settings
+from django.utils.decorators import method_decorator
+from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.contrib.auth import (logout as auth_logout, login as auth_login,)
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.sites.shortcuts import get_current_site
@@ -9,6 +12,7 @@ from django.shortcuts import redirect
 from django.db.models import Count
 from django.db.models import Q
 from django.views.generic import TemplateView, CreateView
+from django.views.decorators.cache import never_cache
 
 from .forms import UserRegisterForm, LoginForm
 from .models import UserProfile, Relation
@@ -46,9 +50,30 @@ class Login(LoginView):
     form_class = LoginForm
     template_name = 'login.html'
 
+    def form_valid(self, form):
+        auth_login(self.request, form.get_user())
+        try:
+            token = Token.objects.get(user=form.get_user())
+        except:
+            token = Token.objects.create(user=form.get_user())
+        response = HttpResponseRedirect(self.get_success_url())
+        response.set_cookie('token', token)
+        return response
+
 
 class Logout(LoginRequiredMixin, LogoutView):
-    template_name = 'login.html'
+
+    @method_decorator(never_cache)
+    def dispatch(self, request, *args, **kwargs):
+        Token.objects.get(user=self.request.user).delete()
+        auth_logout(request)
+        next_page = self.get_next_page()
+        if next_page:
+            # Redirect to this page until the session has been cleared.
+            response = HttpResponseRedirect(next_page)
+            response.delete_cookie('token')
+            return response
+        return super().dispatch(request, *args, **kwargs)
 
 
 class UserProfileView(LoginRequiredMixin, TemplateView):
