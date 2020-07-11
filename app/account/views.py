@@ -34,9 +34,9 @@ class UserRegisterView(CreateView):
         UserProfile.objects.create(user_id=user.id)
         messages.info(self.request, f'ユーザ名{user.name}さんのアカウントを作成しました')
         try:
-            token = Token.objects.get(user=self.request.user)
+            token = Token.objects.get(user=user)
         except:
-            token = Token.objects.create(user=self.request.user)
+            token = Token.objects.create(user=user)
         response = redirect('/article/')
         response.set_cookie('token', token)
         return response
