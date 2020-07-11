@@ -15,7 +15,7 @@ def profile_image_save_path(instance, fileName):
 def introduction_image_save_path(instance, fileName):
     extension = fileName.split('.')[-1]
     filename = f'{uuid.uuid4()}.{extension}'
-    return os.path.join('introduction_image/', filename)
+    return os.path.join('background_image/', filename)
 
 
 class UserManager(BaseUserManager):
