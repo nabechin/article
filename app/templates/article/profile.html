@@ -26,6 +26,7 @@
   <script src="{% static 'js/content.js' %}"></script>
   <script src="{% static 'js/base_ajax.js' %}"></script>
   <script src="{% static 'js/article_like_ajax.js' %}"></script>
+  <script src="{% static 'js/test.js' %}"></script>
   <script>
     $(function () {
       toggleFollowButton()
@@ -260,7 +261,7 @@
           <a class="nav-link active" id="v-pills-profile-tab" href="{% url 'account:profile' user.id %}"
             role="tab">Profile</a>
           <a class="nav-link" id="v-pills-messages-tab" href="{% url 'messages:talkroom' %}" role="tab">Messages</a>
-          <a class="nav-link" id="v-pills-settings-tab" href="#" role="tab">Settings</a>
+          <a class="nav-link on-implementing" id="v-pills-settings-tab" href="#" role="tab">Settings</a>
         </div>
       </div>
       <div class="col-5">
@@ -465,7 +466,7 @@
                     </div>
                     <div class="row">
                       <div class="col-md-4 text-center">
-                        <span class="link-black text-lg mr-2 text-left">
+                        <span class="link-black text-lg mr-2 text-left on-implementing">
                           <i class="fas fa-retweet mr-1"></i>
                         </span>
                       </div>
@@ -490,7 +491,7 @@
                         {% endif %}
                       </div>
                       <div class="col-md-4 text-center">
-                        <a class="link-black text-lg">
+                        <a class="link-black text-lg on-implementing">
                           <i class="far fa-comments mr-1"></i>
                           {% if article_info.article.comment.all.count != 0 %}
                           {{ article_info.article.comment.all.count }}
@@ -513,7 +514,7 @@
           <input type="text" class="form-control" placeholder="Find Friends" aria-label="Recipient's username"
             aria-describedby="basic-addon2">
           <div class="input-group-append">
-            <span class="input-group-text" id="basic-addon2"><i class="fas fa-search"
+            <span class="input-group-text on-implementing" id="basic-addon2"><i class="fas fa-search"
                 style="font-size: 24px;"></i></span>
           </div>
         </div>

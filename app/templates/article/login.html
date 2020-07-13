@@ -23,6 +23,7 @@
   <script src="{% static 'admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js' %} "></script>
   <script src="{% static 'admin-lte/dist/js/adminlte.min.js' %}"></script>
   <script src="{% static 'admin-lte/dist/js/demo.js' %}"></script>
+  <script src="{% static 'js/test.js' %}"></script>
   <script>
     $(function () {
       $("#id_loginButton").on("click", function () {
@@ -70,12 +71,6 @@
           {% endfor %}
           <div class="row">
             <div class="col-8">
-              <div class="icheck-primary">
-                <input type="checkbox" id="remember" />
-                <label for="remember">
-                  Remember Me
-                </label>
-              </div>
             </div>
             <!-- /.col -->
             <div class="col-4">
@@ -88,17 +83,17 @@
         </form>
         <div class="social-auth-links text-center mb-3">
           <br />
-          <a href="#" class="btn btn-block btn-outline-primary">
+          <a href="#" class="btn btn-block btn-outline-primary on-implementing">
             <i class="fab fa-facebook mr-2"></i>Facebookアカウントでログイン
           </a>
-          <a href="#" class="btn btn-block btn-outline-danger">
+          <a href="#" class="btn btn-block btn-outline-danger on-implementing">
             <i class="fab fa-google-plus mr-2"></i>Googleアカウントでログイン
           </a>
         </div>
         <!-- /.social-auth-links -->
 
         <p class="mb-1">
-          <a href="forgot-password.html">パスワードを忘れた場合</a>
+          <a class="on-implementing" href="#">パスワードを忘れた場合</a>
         </p>
         <p class="mb-0">
           <a href="{% url 'account:signup' %}" class="text-center">アカウントを作成</a>

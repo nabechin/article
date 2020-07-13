@@ -27,6 +27,7 @@
   <script src="{% static 'js/content.js' %}"></script>
   <script src="{% static 'js/base_ajax.js' %}"></script>
   <script src="{% static 'js/article_like_ajax.js' %}"></script>
+  <script src="{% static 'js/test.js' %}"></script>
 
   <script>
     $(function () {
@@ -135,8 +136,7 @@
             aria-controls="v-pills-profile" aria-selected="false">Profile</a>
           <a class="nav-link" id="v-pills-messages-tab" href="{% url 'messages:talkroom' %}" role="tab"
             aria-controls="v-pills-messages" aria-selected="false">Messages</a>
-          <a class="nav-link" id="v-pills-settings-tab" data-toggle="pill" href="#v-pills-settings" role="tab"
-            aria-controls="v-pills-settings" aria-selected="false">Settings</a>
+          <a class="nav-link on-implementing" id="v-pills-settings-tab">Settings</a>
         </div>
       </div>
       <div class="col-5">
@@ -237,7 +237,7 @@
                     </div>
                     <div class="row mt-3">
                       <div class="col-md-4 text-center">
-                        <span class="dot-retweet text-lg"><span class="fas fa-retweet"
+                        <span class="dot-retweet text-lg on-implementing"><span class="fas fa-retweet"
                             style="color:rgb(70, 98, 107);"></span></span>
                       </div>
                       <div class="col-md-4 text-center align-bottom">
@@ -284,7 +284,7 @@
         <div class="input-group mb-2">
           <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username"
             aria-describedby="basic-addon2">
-          <div class="input-group-append">
+          <div class="input-group-append on-implementing">
             <span class="input-group-text" id="basic-addon2"><i class="fas fa-search"
                 style="font-size: 24px;"></i></span>
           </div>
