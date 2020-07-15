@@ -124,7 +124,7 @@
       //　ログインユーザのプロフィールを取得するためのajax通信
       $('#id_user_profile').on('click', function () {
         $.ajax({
-          url: 'http://localhost/api/profileEdit/',
+          url: '/api/profileEdit/',
           type: 'GET',
           success: afterSuccessGetProfile,
         });
@@ -170,7 +170,7 @@
           return;
         }
         $.ajax({
-          url: 'http://localhost/api/profileEdit/{{user_profile.id}}/',
+          url: '/api/profileEdit/{{user_profile.id}}/',
           type: 'PATCH',
           dataType: 'json',
           data: data,
@@ -204,7 +204,7 @@
         var data = new FormData();
         data.append('target', target);
         $.ajax({
-          url: 'http://localhost/api/relation/',
+          url: '/api/relation/',
           type: 'POST',
           dataType: 'json',
           data: data,
@@ -216,7 +216,7 @@
       $('#id_unrelate_button').on('click', function () {
         var relationId = $("#id_relation_id_port").val()
         $.ajax({
-          url: 'http://localhost/api/relation/' + relationId + '/',
+          url: '/api/relation/' + relationId + '/',
           type: 'DELETE',
           success: afterSuccessUnfollow,
           processData: false,

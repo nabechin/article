@@ -75,7 +75,7 @@
         var data = new FormData();
         data.append('target', target);
         $.ajax({
-          url: 'http://localhost/api/relation/',
+          url: '/api/relation/',
           type: 'POST',
           dataType: 'json',
           data: data,
@@ -91,7 +91,7 @@
         var $alreadyfollowButtonElement = $(this)
         var target = $alreadyfollowButtonElement.next().val();
         $.ajax({
-          url: 'http://localhost/api/relation/' + target + '/',
+          url: '/api/relation/' + target + '/',
           type: 'DELETE',
           success: afterSuccessUnfollow($alreadyfollowButtonElement),
           processData: false,
