@@ -29,8 +29,8 @@ class UserProfileEditView(viewsets.ModelViewSet):
 class RelationView(viewsets.ModelViewSet):
     serializer_class = RelationSerializer
     queryset = Relation.objects.all()
-    permissions_classes = (permissions.IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
 
     def perform_create(self, serializer):
         serializer.save(follower=self.request.user)
