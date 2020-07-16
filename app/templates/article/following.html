@@ -22,84 +22,10 @@
   <script src="{% static 'admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js' %} "></script>
   <script src="{% static 'admin-lte/dist/js/adminlte.min.js' %}"></script>
   <script src="{% static 'admin-lte/dist/js/demo.js' %}"></script>
-  <script src="{% static 'js/content.js' %}"></script>
   <script src="{% static 'js/base_ajax.js' %}"></script>
+  <script src="{% static 'js/base_article.js' %}"></script>
+  <script src="{% static 'js/base_relation.js' %}"></script>
   <script src="{% static 'js/test.js' %}"></script>
-  <script>
-    $(function () {
-      /* プロフィール画像のアクション発火(click、pointer) */
-      $('.following_profile_image').hover(function () {
-        $(this).css('cursor', 'pointer');
-        $(this).css('opacity', '0.7');
-      });
-      $('.following_profile_image').mouseout(function () {
-        $(this).css('opacity', '1');
-      });
-      // is_follow -> 0 フォローボタン表示　is_follow -> 1 フォロー中ボタン表示
-      var is_follow = $('.judge_relation').val()
-      if (is_follow == 0) {
-        $('.un-follow').css('display', 'block')
-      }
-      if (is_follow == 1) {
-        $('.already-follow').css('display', 'block')
-      }
-
-      /* フォローのリクエストをajax通信でpostした後の処理
-    　   「フォローする」-> 「フォロー中」にボタンを変更
-    　　  後にフォロー解除ができるように、relationIdを埋め込む */
-      var afterSuccessFollow = function ($unfollowButtonElement, target) {
-        return function (data) {
-          $unfollowButtonElement.text('フォロー中')
-          $unfollowButtonElement.removeClass('un-follow').addClass('already-follow')
-          $unfollowButtonElement.removeClass('btn-outline-primary').addClass('bg-gradient-primary')
-          relationId = data['id']
-          if (relationId) {
-            $('#' + target).val(data['id']);
-          }
-        }
-      };
-
-      /* フォロー解除をdeleteメソッドでリクエストをした後の処理
-        「フォロー中」-> 「フォローする」にボタンを変更 */
-      var afterSuccessUnfollow = function ($alreadyfollowButtonElement, target) {
-        $alreadyfollowButtonElement.text('フォローする')
-        $alreadyfollowButtonElement.removeClass('already-follow').addClass('un-follow')
-        $alreadyfollowButtonElement.removeClass('bg-gradient-primary').addClass('btn-outline-primary')
-      };
-
-      /* 「フォローする」ボタンを押した後の処理
-          フォローのリクエストをajax通信でpostする処理 */
-      $('body').on('click', '.un-follow', function () {
-        var $unfollowButtonElement = $(this)
-        var target = $unfollowButtonElement.next().attr('id');
-        var data = new FormData();
-        data.append('target', target);
-        $.ajax({
-          url: '/api/relation/',
-          type: 'POST',
-          dataType: 'json',
-          data: data,
-          success: afterSuccessFollow($unfollowButtonElement, target),
-          processData: false,
-          contentType: false,
-        })
-      });
-
-      /* 「フォロー」タンを押した後の処理
-          フォロー解除をdeleteメソッドでリクエストする */
-      $('body').on('click', '.already-follow', function () {
-        var $alreadyfollowButtonElement = $(this)
-        var target = $alreadyfollowButtonElement.next().val();
-        $.ajax({
-          url: '/api/relation/' + target + '/',
-          type: 'DELETE',
-          success: afterSuccessUnfollow($alreadyfollowButtonElement),
-          processData: false,
-          contentType: false,
-        })
-      });
-    });
-  </script>
 </head>
 
 <body>
@@ -152,14 +78,14 @@
                         {% if following_info.relation_profile.profile_image %}
                         <a href="{% url 'account:profile' following_info.relation_profile.user.id %}" class="text-dark"
                           style="font-weight: bold;">
-                          <img class="rounded-circle img-bordered-sm following_profile_image"
+                          <img class="rounded-circle img-bordered-sm relation-profile-image"
                             src="{{following_info.relation_profile.profile_image.url}}" alt="user image"
                             style="width:60px;height:60px;">
                         </a>
                         {% else %}
                         <a href="{% url 'account:profile' following_info.relation_profile.user.id %}" class="text-dark"
                           style="font-weight: bold;">
-                          <img class="rounded-circle img-bordered-sm following_profile_image"
+                          <img class="rounded-circle img-bordered-sm relation-profile-image"
                             src="/media/default_profile.jpg" alt="user image" style="width:60px;height:60px;">
                         </a>
                         {% endif %}
