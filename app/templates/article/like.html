@@ -23,16 +23,23 @@
   <script src="{% static 'admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js' %} "></script>
   <script src="{% static 'admin-lte/dist/js/adminlte.min.js' %}"></script>
   <script src="{% static 'admin-lte/dist/js/demo.js' %}"></script>
-  <script src="{% static 'js/content.js' %}"></script>
+  <script src="{% static 'js/base_article.js' %}"></script>
   <script src="{% static 'js/base_ajax.js' %}"></script>
   <script src="{% static 'js/article_like_ajax.js' %}"></script>
   <script src="{% static 'js/test.js' %}"></script>
-
+  <script src="{% static 'js/base_profile.js'%}"></script>
   <script>
     $(function () {
+
+      /* 記事をクリックすると、記事詳細に遷移 */
+      $(document).on('click', '.article', function (event) {
+        var url = "{% url 'article:comment' 1000 %}";
+        var articleId = $(this).attr('id');
+        document.location.href = url.replace('1000', articleId);
+      });
       /* プロフィール画面のフォローボタンの初期化
-      フォローしている場合 -> 「フォロー中」
-      フォローしていない場合 -> 「フォローする」 */
+         フォローしている場合 -> 「フォロー中」
+         フォローしていない場合 -> 「フォローする」 */
       toggleFollowButton()
 
       function toggleFollowButton() {
@@ -47,96 +54,17 @@
           $('#id_already_follow').show()
         }
       }
-
-      /* 記事をクリックすると、記事詳細に遷移 */
-      $(document).on('click', '.article', function (event) {
-        var relation = "{{relation.id}}"
-        var url = "{% url 'article:comment' 1000 %}";
-        var articleId = $(this).attr('id');
-        document.location.href = url.replace('1000', articleId);
-      });
-
-
-      /* プロフィールの画像編集 */
-      // 背景画像クリック後、画像選択 
-      $('#id_background_img').on('click', function () {
-        $('#id_background_img_file').trigger('click');
-      });
-      // 背景画像にカーソルが当たると矢印から指マークに変わる
-      $('#id_background_img').hover(function () {
-        $(this).css('cursor', 'pointer');
-      });
-      //プロフィール画面クリック後、画像選択
-      $('#id_profile_img').on('click', function () {
-        $('#id_profile_img_file').trigger('click');
-      });
-      // プロフィール画像にカーソルが当たると矢印から指マークに変わる
-      $('#id_profile_img').hover(function () {
-        $(this).css('cursor', 'pointer');
-      });
-      // 選択したプロフィール画像をimgに貼り付ける 
-      $('#id_profile_img_file').on('change', function (e) {
-        var reader = new FileReader();
-        reader.onload = function (e) {
-          $('#id_profile_img').attr('src', e.target.result)
-        }
-        reader.readAsDataURL(e.target.files[0]);
-      })
-      // 選択した背景画像をimgに貼り付ける 
-      $('#id_background_img_file').on('change', function (e) {
-        var reader = new FileReader();
-        reader.onload = function (e) {
-          $('#id_background_img').attr('src', e.target.result)
-        }
-        reader.readAsDataURL(e.target.files[0]);
-      })
-      /* プロフィールの画像編集 */
-
-
-      /* 名前の文字カウント */
-      $('#id_name_text').on('keyup', countNameLength);
-
-      function countNameLength() {
-        var nameAmount = $('#id_name_text').val().length;
-        $('#id_name_count').text(nameAmount);
-      }
-      /* 自己紹介の文字カウント */
-      $('#id_introduction_text').on('keyup', countIntroductionLength);
-
-      function countIntroductionLength() {
-        var introductionAmount = $('#id_introduction_text').val().length;
-        $('#id_introduction_count').text(introductionAmount);
-      }
     });
 
+    //ajax通信と通信成功後の処理をready関数で分離した
     $(function () {
-
-      //ログインユーザのプロフィール画像を取得後、プロフィール編集フォームに表示する
-      var afterSuccessGetProfile = function (data) {
-        var introduction = data['0']['introduction'];
-        var name = data['0']['user']['name']
-        $('#id_introduction_count').text(introduction.length);
-        $('#id_introduction_text').val(introduction);
-        $('#id_name_count').text(name.length);
-        $('#id_name_text').val(name);
-      }
-
-      //　ログインユーザのプロフィールを取得するためのajax通信
-      $('#id_user_profile').on('click', function () {
-        $.ajax({
-          url: '/api/profileEdit/',
-          type: 'GET',
-          success: afterSuccessGetProfile,
-        });
-      })
-
       // プロフィール編集後にページを更新する
       var afterSuccessEditProfile = function (data) {
         window.location.reload();
       }
 
       /* ユーザのプロフィールを更新するためにフォームから編集情報を取得する
-      　編集したプロフィール情報をhttpのpatchメソッドでajax通信 */
+    　編集したプロフィール情報をhttpのpatchメソッドでajax通信 */
       $('#id_updateProfile').on('submit', function (e) {
         e.preventDefault()
         var name = $("#id_name_text").val()
@@ -180,10 +108,9 @@
           contentType: false
         });
       });
-    });
-    $(function () {
+
       var afterSuccessFollow = function (data) {
-        relationId = data['id']
+        var relationId = data['id']
         if (relationId) {
           $("#id_relation_id_port").val(relationId)
         }
@@ -192,13 +119,7 @@
         var numberOfFollower = parseInt($('#id_number-of_follower').text())
         $('#id_number-of_follower').text(numberOfFollower + 1)
       };
-      var afterSuccessUnfollow = function () {
-        $('#id_already_follow').hide()
-        $('#id_follow').show()
-        $('#modal-action-unfollow').modal('hide')
-        var numberOfFollower = parseInt($('#id_number-of_follower').text())
-        $('#id_number-of_follower').text(numberOfFollower - 1)
-      };
+
       $('#id_follow').on('click', function () {
         var target = "{{user.id}}"
         var data = new FormData();
@@ -213,17 +134,7 @@
           contentType: false,
         })
       });
-      $('#id_unrelate_button').on('click', function () {
-        var relationId = $("#id_relation_id_port").val()
-        $.ajax({
-          url: '/api/relation/' + relationId + '/',
-          type: 'DELETE',
-          success: afterSuccessUnfollow,
-          processData: false,
-          contentType: false,
-        })
-      });
-    });
+    })
   </script>
 </head>
 
@@ -426,14 +337,14 @@
                       <div class="col-2">
                         {% if article_info.article.user.user_profile.profile_image %}
                         <a href="{% url 'account:profile' article_info.article.user.id %}">
-                          <img class="rounded-circle img-bordered-sm"
+                          <img class="rounded-circle img-bordered-sm article-profile-image"
                             src="{{article_info.article.user.user_profile.profile_image.url}}" alt="user image"
                             style="width:50px;height:50px;">
                         </a>
                         {% else %}
                         <a href="{% url 'account:profile' article_info.article.user.id %}">
-                          <img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg" alt="user image"
-                            style="width:50px;height:50px;">
+                          <img class="rounded-circle img-bordered-sm article-profile-image"
+                            src="/media/default_profile.jpg" alt="user image" style="width:50px;height:50px;">
                         </a>
                         {% endif %}
                       </div>

@@ -22,65 +22,10 @@
   <script src="{% static 'admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js' %} "></script>
   <script src="{% static 'admin-lte/dist/js/adminlte.min.js' %}"></script>
   <script src="{% static 'admin-lte/dist/js/demo.js' %}"></script>
-  <script src="{% static 'js/content.js' %}"></script>
   <script src="{% static 'js/base_ajax.js' %}"></script>
+  <script src="{% static 'js/base_relation.js' %}"></script>
+  <script src="{% static 'js/base_article.js' %}"></script>
   <script src="{% static 'js/test.js' %}"></script>
-  <script>
-    $(function () {
-
-      /* フォローのリクエストをajax通信でpostした後の処理
-      　 「フォローする」-> 「フォロー中」にボタンを変更
-      　  後にフォロー解除ができるように、relationIdを埋め込む */
-      var afterSuccessFollow = function ($unfollowButtonElement, target) {
-        return function (data) {
-          $unfollowButtonElement.text('フォロー中')
-          $unfollowButtonElement.removeClass('un-follow').addClass('already-follow')
-          $unfollowButtonElement.removeClass('btn-outline-primary').addClass('bg-gradient-primary')
-          relationId = data['id']
-          if (relationId) {
-            $('#' + target).val(data['id']);
-          }
-        }
-      };
-      /* フォロー解除をdeleteメソッドでリクエストをした後の処理
-        「フォロー中」-> 「フォローする」にボタンを変更 */
-      var afterSuccessUnfollow = function ($alreadyfollowButtonElement, target) {
-        $alreadyfollowButtonElement.text('フォローする')
-        $alreadyfollowButtonElement.removeClass('already-follow').addClass('un-follow')
-        $alreadyfollowButtonElement.removeClass('bg-gradient-primary').addClass('btn-outline-primary')
-      };
-      /* 「フォローする」ボタンを押した後の処理
-          フォローのリクエストをajax通信でpostする処理 */
-      $('body').on('click', '.un-follow', function () {
-        $unfollowButtonElement = $(this)
-        var target = $unfollowButtonElement.next().attr('id');
-        var data = new FormData();
-        data.append('target', target);
-        $.ajax({
-          url: '/api/relation/',
-          type: 'POST',
-          dataType: 'json',
-          data: data,
-          success: afterSuccessFollow($unfollowButtonElement, target),
-          processData: false,
-          contentType: false,
-        })
-      });
-      /* 「フォロー」タンを押した後の処理
-          フォロー解除をdeleteメソッドでリクエストする */
-      $('body').on('click', '.already-follow', function () {
-        $alreadyfollowButtonElement = $(this)
-        var target = $alreadyfollowButtonElement.next().val();
-        $.ajax({
-          url: '/api/relation/' + target + '/',
-          type: 'DELETE',
-          success: afterSuccessUnfollow($alreadyfollowButtonElement),
-          processData: false,
-          contentType: false,
-        })
-      });
-    });
-  </script>
 </head>
 
 <body>
@@ -131,12 +76,12 @@
                     <tr style="cursor: pointer;">
                       <td>
                         {% if follower_info.relation_profile.profile_image %}
-                        <img class="rounded-circle img-bordered-sm"
+                        <img class="rounded-circle img-bordered-sm relation-profile-image"
                           src="{{follower_info.relation_profile.profile_image.url}}" alt="user image"
                           style="width:60px;height:60px;">
                         {% else %}
-                        <img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg" alt="user image"
-                          style="width:60px;height:60px;">
+                        <img class="rounded-circle img-bordered-sm relation-profile-image"
+                          src="/media/default_profile.jpg" alt="user image" style="width:60px;height:60px;">
                         {% endif %}
                       </td>
                       <td>

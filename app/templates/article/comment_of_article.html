@@ -18,12 +18,13 @@
     href="{% static 'admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 </head>
-<script src="{% static 'js/content.js' %}"></script>
 <script src="{% static 'admin-lte/plugins/jquery/jquery.min.js' %}"></script>
 <script src="{% static 'admin-lte/plugins/jquery-ui/jquery-ui.min.js' %}"></script>
 <script src="{% static 'admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js' %} "></script>
 <script src="{% static 'admin-lte/dist/js/adminlte.min.js' %}"></script>
 <script src="{% static 'admin-lte/dist/js/demo.js' %}"></script>
+<script src="{% static 'js/base_article.js' %}"></script>
+<script src="{% static 'js/base_relation.js' %}"></script>
 <script src="{% static 'js/base_ajax.js' %}"></script>
 <script src="{% static 'js/test.js' %}"></script>
 
@@ -33,24 +34,6 @@
     $('#id_comment').on('click', function () {
       $('#modal-comment').modal();
     })
-
-    /* 記事に付随するプロフィール画像にカーソルが当たると矢印から指マークに変わる
-　　　写真の明るさが暗くなる　*/
-    $(document).on("hover", ".article-profile-image", function () {
-      $(this).css('cursor', 'pointer');
-      $(this).css('opacity', '0.7');
-    });
-
-    /* 記事に付随するプロフィール画像にカーソルから外れると
-　　　写真の明るさがデフォルトに戻る　*/
-    $(document).on("mouseout", ".article-profile-image", function () {
-      $(this).css('opacity', '1');
-    });
-
-    /* 記事ににカーソルが当たると矢印から指マークに変わる　*/
-    $(document).on("hover", ".article", function () {
-      $(this).css('cursor', 'pointer');
-    });
 
     $(document).on('click', '.people-like-list', function () {
       userId = $(this).attr('id').replace('id_profile_', '');
@@ -98,11 +81,11 @@
         /* プロフィール画像の要素を設定 */
         var $childElementForImage = $('<td></td>');
         if (data.user_profile.profile_image) {
-          var $imageElement = $('<img class="rounded-circle img-bordered-sm article-profile-image" src=' +
+          var $imageElement = $('<img class="rounded-circle img-bordered-sm relation-profile-image" src=' +
             data.user_profile.profile_image + ' alt="user image" style="width:60px;height:60px;">');
         } else {
           var $imageElement = $(
-            '<img class="rounded-circle img-bordered-sm article-profile-image" src="/media/default_profile.jpg" alt="user image" style="width:60px;height:60px;">'
+            '<img class="rounded-circle img-bordered-sm relation-profile-image" src="/media/default_profile.jpg" alt="user image" style="width:60px;height:60px;">'
           );
         }
 
@@ -202,7 +185,7 @@
     }
 
     /* 特定の記事にいいねを押した時のアクション
-    記事に対するいいねをajax通信でpostする */
+    記事に対するいいねIdをajax通信でpostする */
     $(document).on('click', '.not-like', function (e) {
       e.stopPropagation();
       $('.article').off('click')
@@ -222,7 +205,7 @@
     })
 
     /* 記事いいねを解除した時のアクション
-       記事に対するいいねをajax通信でdeleteする */
+       記事に対するいいねIdをajax通信でdeleteする */
     $(document).on('click', '.already-like', function (e) {
       e.stopPropagation();
       var $alreadyLikeElement = $(this)
@@ -254,62 +237,7 @@
       })
     });
 
-    /* フォローのリクエストをajax通信でpostした後の処理
-      「フォローする」-> 「フォロー中」にボタンを変更
-    　後にフォロー解除ができるように、relationIdを埋め込む */
-    var afterSuccessFollow = function ($unfollowButtonElement, target) {
-      return function (data) {
-        $unfollowButtonElement.text('フォロー中')
-        $unfollowButtonElement.removeClass('un-follow').addClass('already-follow')
-        $unfollowButtonElement.removeClass('btn-outline-primary').addClass('bg-gradient-primary')
-        relationId = data['id']
-        if (relationId) {
-          $('#' + target).val(data['id']);
-        }
-      }
-    };
 
-    /* フォロー解除をdeleteメソッドでリクエストをした後の処理
-       「フォロー中」-> 「フォローする」にボタンを変更 */
-    var afterSuccessUnfollow = function ($alreadyfollowButtonElement, target) {
-      $alreadyfollowButtonElement.text('フォローする')
-      $alreadyfollowButtonElement.removeClass('already-follow').addClass('un-follow')
-      $alreadyfollowButtonElement.removeClass('bg-gradient-primary').addClass('btn-outline-primary')
-    };
-
-    /* 「フォローする」ボタンを押した後の処理
-        フォローのリクエストをajax通信でpostする処理 */
-    $('body').on('click', '.un-follow', function (e) {
-      e.stopPropagation();
-      var $unfollowButtonElement = $(this)
-      var target = $unfollowButtonElement.next().attr('id');
-      var data = new FormData();
-      data.append('target', target);
-      $.ajax({
-        url: '/api/relation/',
-        type: 'POST',
-        dataType: 'json',
-        data: data,
-        success: afterSuccessFollow($unfollowButtonElement, target),
-        processData: false,
-        contentType: false,
-      })
-    });
-
-    /* 「フォロー」タンを押した後の処理
-       フォロー解除をdeleteメソッドでリクエストする */
-    $('body').on('click', '.already-follow', function (e) {
-      e.stopPropagation();
-      var $alreadyfollowButtonElement = $(this)
-      var target = $alreadyfollowButtonElement.next().val();
-      $.ajax({
-        url: '/api/relation/' + target + '/',
-        type: 'DELETE',
-        success: afterSuccessUnfollow($alreadyfollowButtonElement),
-        processData: false,
-        contentType: false,
-      })
-    });
 
     /*  特定のコメントにいいねをつけてajax通信した後の処理
   　　いいねボタンが赤色変わり、いいねカウントが１加算される */
