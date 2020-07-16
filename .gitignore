@@ -4,3 +4,5 @@ __pycache__/
 memo/
 env.dev
 test.rest
+static/package-lock.json
+package.json
