@@ -9,7 +9,7 @@ from rest_framework import permissions
 from rest_framework.authentication import TokenAuthentication
 
 
-class UserProfileEditView(viewsets.ModelViewSet):
+class UserProfileView(viewsets.ModelViewSet):
     serializer_class = UserProfileSerializer
     queryset = UserProfile.objects.all()
     authentication_classes = (TokenAuthentication,)
@@ -29,14 +29,14 @@ class UserProfileEditView(viewsets.ModelViewSet):
 class RelationView(viewsets.ModelViewSet):
     serializer_class = RelationSerializer
     queryset = Relation.objects.all()
-    permissions_classes = (permissions.IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
 
     def perform_create(self, serializer):
         serializer.save(follower=self.request.user)
 
 
-class CommentForArticle(viewsets.ModelViewSet):
+class CommentView(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
@@ -50,7 +50,7 @@ class FavoriteArticleView(viewsets.ModelViewSet):
     queryset = FavoriteArticle.objects.all()
     serializer_class = FavoriteArticleSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_class = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated,)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -67,13 +67,13 @@ class FavoriteCommentView(viewsets.ModelViewSet):
     serializer_class = FavoriteCommentSerializer
     queryset = FavoriteComment.objects.all()
     authentication_classes = (TokenAuthentication,)
-    permission_class = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated,)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
 
-class SendMessageView(viewsets.ModelViewSet):
+class MessageView(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
     authentication_classes = (TokenAuthentication,)

@@ -43,7 +43,7 @@ $(function () {
     var data = new FormData();
     data.append("article", articleId);
     $.ajax({
-      url: "/api/favoriteArticle/",
+      url: "/api/favorite_article/",
       type: "POST",
       dataType: "json",
       data: data,
@@ -64,7 +64,7 @@ $(function () {
       .attr("id")
       .replace("id_like_article_", "");
     $.ajax({
-      url: "/api/favoriteArticle/" + likeId + "/",
+      url: "/api/favorite_article/" + likeId + "/",
       type: "DELETE",
       dataType: "json",
       success: afterSuccessNotLike($alreadyLikeElement, articleId),

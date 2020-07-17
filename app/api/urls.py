@@ -9,12 +9,12 @@ app_name = 'api'
 
 
 router = DefaultRouter()
-router.register('profileEdit', views.UserProfileEditView)
+router.register('user_profile', views.UserProfileView)
 router.register('relation', views.RelationView)
-router.register('commentForArticle', views.CommentForArticle)
-router.register('favoriteArticle', views.FavoriteArticleView)
-router.register('favoriteComment', views.FavoriteCommentView)
-router.register('message', views.SendMessageView)
+router.register('comment', views.CommentView)
+router.register('favorite_article', views.FavoriteArticleView)
+router.register('favorite_comment', views.FavoriteCommentView)
+router.register('message', views.MessageView)
 
 urlpatterns = [
     path('', include(router.urls))
