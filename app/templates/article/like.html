@@ -98,7 +98,7 @@
           return;
         }
         $.ajax({
-          url: '/api/profileEdit/{{user_profile.id}}/',
+          url: '/api/user_profile/{{user_profile.id}}/',
           type: 'PATCH',
           dataType: 'json',
           data: data,
@@ -248,7 +248,7 @@
                           </button>
                         </div>
                         <div class="modal-body rounded">
-                          <form action="/account/profileEdit/{{user_profile.id}}" id="id_updateProfile" method="patch"
+                          <form action="/account/user_profile/{{user_profile.id}}" id="id_updateProfile" method="patch"
                             enctype="multipart/form-data">
                             <div class="row">
                               <div class="form-group col-md-6">

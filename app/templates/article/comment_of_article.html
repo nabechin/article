@@ -56,7 +56,7 @@
       data.append('content', comment);
       data.append('article', article);
       $.ajax({
-        url: '/api/commentForArticle/',
+        url: '/api/comment/',
         type: 'POST',
         dataType: 'json',
         data: data,
@@ -194,7 +194,7 @@
       var data = new FormData();
       data.append('article', articleId);
       $.ajax({
-        url: '/api/favoriteArticle/',
+        url: '/api/favorite_article/',
         type: 'POST',
         dataType: 'json',
         data: data,
@@ -212,7 +212,7 @@
       likeId = $alreadyLikeElement.next().val()
       articleId = $alreadyLikeElement.next().attr('id').replace('id_like_article_', '')
       $.ajax({
-        url: '/api/favoriteArticle/' + likeId + '/',
+        url: '/api/favorite_article/' + likeId + '/',
         type: 'DELETE',
         dataType: 'json',
         success: afterSuccessNotLike($alreadyLikeElement, articleId),
@@ -228,7 +228,7 @@
       var articleId = $(this).attr('id').replace('id_liked_article_', '');
       $('#modal-like').modal();
       $.ajax({
-        url: '/api/favoriteArticle/?article=' + articleId,
+        url: '/api/favorite_article/?article=' + articleId,
         type: 'GET',
         dataType: 'json',
         success: afterSuccessShowLikePeople,
@@ -279,7 +279,7 @@
       var data = new FormData();
       data.append('comment', commentId);
       $.ajax({
-        url: '/api/favoriteComment/',
+        url: '/api/favorite_comment/',
         type: 'POST',
         dataType: 'json',
         data: data,
@@ -297,7 +297,7 @@
       likeId = $alreadyLikeElement.next().val()
       commentId = $alreadyLikeElement.next().attr('id').replace('id_like_comment_', '')
       $.ajax({
-        url: '/api/favoriteComment/' + likeId + '/',
+        url: '/api/favorite_comment/' + likeId + '/',
         type: 'DELETE',
         dataType: 'json',
         success: afterSuccessNotLikeComment($alreadyLikeElement, commentId),
@@ -510,7 +510,7 @@
                       </div>
                     </div>
                     <hr>
-                    <form action="article/commentForArticle" method="POST" id="id_submit_comment">
+                    <form action="article/comment" method="POST" id="id_submit_comment">
                       <div class="row">
                         <div class="col-2">
                           <!-- ログインユーザーの画像を貼り付ける -->

@@ -67,7 +67,7 @@ $(function () {
     //　ログインユーザのプロフィールを取得するためのajax通信
     $('#id_user_profile').on('click', function () {
         $.ajax({
-            url: '/api/profileEdit/',
+            url: '/api/user_profile/',
             type: 'GET',
             success: afterSuccessGetProfile,
         });
