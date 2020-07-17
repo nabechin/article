@@ -21,27 +21,24 @@ def create_image_to_user_profile():
     return tmp_file
 
 
-# defaultのユーザ情報をdbに登録
+# defaultでユーザ情報をdbに登録
 def create_user(user):
     return get_user_model().objects.create(**user)
 
-# defaultのユーザのプロフィール情報をdbに登録
-
-
+# defaultでユーザのプロフィール情報をdbに登録
 def create_user_profile(user):
     return UserProfile.objects.create(user=user,
                                       introduction='自己紹介テスト')
 
-
-# defaultの記事をdbに登録
+# defaultで記事をdbに登録
 def create_article(user):
     return Article.objects.create(content='記事コンテンツテスト', user=user)
 
-
+# defaultでコメントをdbに登録
 def create_comment(user):
     return Comment.objects.create(user=user, article=create_article(user), content='コメントコンテンツテスト')
 
-
+# defaultでTalkRoomをdbに登録
 def create_talk_room(last_message):
     return TalkRoom.objects.create(last_message=last_message)
 
@@ -201,7 +198,9 @@ class PublicCommentApiTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
+""" ログイン時にCommentAPIにアクセスするテスト """
 class PrivateCommentApiTest(TestCase):
+
     def setUp(self):
         user_info = {'name': 'テスト１', 'email': 'test1@gmail.com',
                      'username': 'test1', 'password': 'testtest'
@@ -211,6 +210,7 @@ class PrivateCommentApiTest(TestCase):
         self.article = create_article(self.user)
         self.client.force_authenticate(self.user)
 
+    #Commentテーブルからレコードをhttpのgetメソッドで取得できることをテスト
     def test_retrieve_comment(self):
         comment = Comment.objects.create(
             article=self.article, user=self.user, content='コメントテスト')
@@ -218,6 +218,7 @@ class PrivateCommentApiTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
+    #httpのpostメソッドでCommentテーブルにレコードを登録できることをテスト
     def test_post_comment(self):
         comment_info = {"article": self.article.id,
                         "user": self.user.id, "content": "テスト用コメント"}
@@ -228,16 +229,21 @@ class PrivateCommentApiTest(TestCase):
         self.assertTrue(is_exists)
 
 
+""" 未ログイン時にFavoriteArticleAPIにアクセスするテスト """
 class PublicFavoriteArticleApiTest(TestCase):
+
     def setUp(self):
         self.client = APIClient()
 
+    # 権限のないユーザはアクセスできないことをテスト
     def test_favorite_article_api_need_authenticate(self):
         response = self.client.get('/api/favorite_article/')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
+""" 未ログイン時にFavoriteArticleAPIにアクセスするテスト """
 class PrivateFavoriteArticleApiTest(TestCase):
+
     def setUp(self):
         self.client = APIClient()
         user_info = {'name': 'テスト１', 'email': 'test1@gmail.com',
@@ -247,6 +253,7 @@ class PrivateFavoriteArticleApiTest(TestCase):
         self.article = create_article(self.user)
         self.client.force_authenticate(self.user)
 
+    #FavoriteArticleテーブルからレコードをhttpのgetメソッドで取得できることをテスト
     def test_retrieve_favorite_article(self):
         favorite_article = FavoriteArticle.objects.create(
             article=self.article, user=self.user
@@ -255,6 +262,7 @@ class PrivateFavoriteArticleApiTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
+    #httpのpostメソッドでFavoriteArticleテーブルにレコードを登録できることをテスト
     def test_post_favorite_article(self):
         favorite_article_info = {"article": self.article.id,
                                  "user": self.user.id
@@ -267,6 +275,8 @@ class PrivateFavoriteArticleApiTest(TestCase):
         self.assertTrue(is_exists)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+    #httpのdeleteメソッドでFavoriteArticleテーブルから指定した
+    #PrimaryKeyのレコードを削除できることをテスト
     def test_delete_favorite_article(self):
         favorite_article = FavoriteArticle.objects.create(
             article=self.article, user=self.user
@@ -278,16 +288,19 @@ class PrivateFavoriteArticleApiTest(TestCase):
         self.assertFalse(is_exists)
 
 
+""" 未ログイン時にFavoriteCommentAPIにアクセスするテスト """
 class PublicFavoriteCommentApiTest(TestCase):
     def setUp(self):
         self.client = APIClient()
 
+    #権限のないユーザはアクセスできないことをテスト
     def test_favorite_comment_api_need_authenticate(self):
         response = self.client.get('/api/favorite_comment/')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-
+""" ログイン時にFavoriteCommentAPIにアクセスするテスト """    
 class PrivateFavoriteCommentApiTest(TestCase):
+
     def setUp(self):
         self.client = APIClient()
         user_info = {'name': 'テスト１', 'email': 'test1@gmail.com',
@@ -297,12 +310,14 @@ class PrivateFavoriteCommentApiTest(TestCase):
         self.comment = create_comment(self.user)
         self.client.force_authenticate(self.user)
 
+    #FavoriteCommentテーブルからレコードをhttpのgetメソッドで取得できることをテスト
     def test_retrieve_favorite_comment(self):
         FavoriteComment.objects.create(user=self.user, comment=self.comment)
         response = self.client.get('/api/favorite_comment/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
+    #httpのpostメソッドでFavoriteCommentテーブルにレコードを登録できることをテスト
     def test_post_favorite_comment(self):
         favorite_comment_info = {"user": self.user.id, "comment": self.comment.id
                                  }
@@ -314,6 +329,8 @@ class PrivateFavoriteCommentApiTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(is_exists)
 
+    #httpのdeleteメソッドでFavoriteCommentテーブルから指定した
+    #PrimaryKeyのレコードを削除できることをテスト
     def test_delete_favorite_comment(self):
         favorite_comment = FavoriteComment.objects.create(
             user=self.user, comment=self.comment)
@@ -324,16 +341,20 @@ class PrivateFavoriteCommentApiTest(TestCase):
         self.assertFalse(is_exists)
 
 
+""" 未ログイン時にMessageAPIにアクセスするテスト """
 class PublicMessageApiTest(TestCase):
+
     def setUp(self):
         self.client = APIClient()
 
+    # 権限のないユーザはアクセスできないことをテスト
     def test_message_api_need_authenticate(self):
         response = self.client.get('/api/message/')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-
+""" ログイン時にMessageAPIにアクセスするテスト """
 class PrivateMessageApiTest(TestCase):
+
     def setUp(self):
         self.client = APIClient()
         user_info = {'name': 'テスト１', 'email': 'test1@gmail.com',
@@ -343,6 +364,7 @@ class PrivateMessageApiTest(TestCase):
         self.talk_room = create_talk_room('テストラストメッセージ')
         self.client.force_authenticate(self.user)
 
+    #Messageテーブルからレコードをhttpのgetメソッドで取得できることをテスト
     def test_retrieve_message(self):
         Message.objects.create(talk_room=self.talk_room,
                                sender=self.user, body='テストボディー')
@@ -350,7 +372,7 @@ class PrivateMessageApiTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
-
+    #httpのpostメソッドでMessageテーブルにレコードを登録できることをテスト
     def test_post_message(self):
         message_info = {"talk_room":self.talk_room.id,"sender":self.user.id,"body":"テストメッセージ"}
         response = self.client.post('/api/message/',message_info)
