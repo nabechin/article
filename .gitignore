@@ -6,3 +6,4 @@ env.dev
 test.rest
 static/package-lock.json
 package.json
+.DS_STORE

@@ -10,19 +10,11 @@
 {% for following_info in following_info_list %}
 <tr style="cursor: pointer;">
   <td>
-    {% if following_info.relation_profile.profile_image %}
     <a href="{% url 'account:profile' following_info.relation_profile.user.id %}" class="text-dark"
       style="font-weight: bold;">
       <img class="rounded-circle img-bordered-sm relation-profile-image"
         src="{{following_info.relation_profile.profile_image.url}}" alt="user image" style="width:60px;height:60px;">
     </a>
-    {% else %}
-    <a href="{% url 'account:profile' following_info.relation_profile.user.id %}" class="text-dark"
-      style="font-weight: bold;">
-      <img class="rounded-circle img-bordered-sm relation-profile-image" src="/media/default_profile.jpg"
-        alt="user image" style="width:60px;height:60px;">
-    </a>
-    {% endif %}
   </td>
   <td>
     <a href="{% url 'account:profile' following_info.relation_profile.user.id %}" class="text-dark"
