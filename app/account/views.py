@@ -36,7 +36,6 @@ class UserRegisterView(CreateView):
         validate_data = form.cleaned_data
         self.object = user = get_user_model().objects.create_user(**validate_data)
         UserProfile.objects.create(user_id=user.id)
-        messages.info(self.request, f'ユーザ名{user.name}さんのアカウントを作成しました')
         try:
             token = Token.objects.get(user=user)
         except:

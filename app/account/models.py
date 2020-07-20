@@ -54,9 +54,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 class UserProfile(models.Model):
     introduction = models.TextField(blank=True, null=True, default="")
     profile_image = models.ImageField(
-        null=True, upload_to=profile_image_save_path, default="")
+        null=True, upload_to=profile_image_save_path, default="default_profile.jpg")
     background_image = models.ImageField(
-        null=True, upload_to=introduction_image_save_path, default="")
+        null=True, upload_to=introduction_image_save_path, default="default_background.jpg")
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

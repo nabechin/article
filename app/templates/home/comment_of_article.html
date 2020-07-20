@@ -301,18 +301,11 @@
             <div class="tab-content">
                 <div class="row">
                     <div class="col-2">
-                        {% if article_info.article.user.user_profile.profile_image %}
                         <a href="{% url 'account:profile' article_info.article.user.id %}">
                             <img class="rounded-circle img-bordered-sm article-profile-image"
                                 src="{{article_info.article.user.user_profile.profile_image.url}}" alt="user image"
                                 style="width:50px;height:50px;">
                         </a>
-                        {% else %}
-                        <a href="{% url 'account:profile' article_info.article.user.id %}">
-                            <img class="rounded-circle img-bordered-sm article-profile-image"
-                                src="/media/default_profile.jpg" alt="user image" style="width:50px;height:50px;">
-                        </a>
-                        {% endif %}
                     </div>
                     <div class="col-10">
                         <a href="{% url 'account:profile' article_info.article.user.id %}" class="text-dark"
@@ -443,14 +436,9 @@
                     <div class="modal-body rounded">
                         <div class="row">
                             <div class="col-2">
-                                {% if article_info.article.user.user_profile.profile_image %}
                                 <img class="rounded-circle img-bordered-sm"
                                     src="{{article_info.article.user.user_profile.profile_image.url}}" alt="user image"
                                     style="width:50px;height:50px;">
-                                {% else %}
-                                <img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg"
-                                    alt="user image" style="width:50px;height:50px;">
-                                {% endif %}
                             </div>
                             <div class="col-10">
                                 <div class="mb-2">
@@ -466,14 +454,9 @@
                             <div class="row">
                                 <div class="col-2">
                                     <!-- ログインユーザーの画像を貼り付ける -->
-                                    {% if user.user_profile.profile_image %}
                                     <img class="rounded-circle img-bordered-sm"
                                         src="{{user.user_profile.profile_image.url}}" alt="user image"
                                         style="width:50px;height:50px;">
-                                    {% else %}
-                                    <img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg"
-                                        alt="user image" style="width:50px;height:50px;">
-                                    {% endif %}
                                     <!-- ログインユーザーの画像を貼り付ける -->
                                 </div>
                                 <div class="col-10">
@@ -510,14 +493,9 @@
                     <div class="post">
                         <div class="user-block row">
                             <div class="col-2">
-                                {% if comment_dto.comment.user.user_profile.profile_image %}
                                 <img class="rounded-circle img-bordered-sm"
                                     src="{{comment_dto.comment.user.user_profile.profile_image.url}}" alt="user image"
                                     style="width:50px;height:50px;">
-                                {% else %}
-                                <img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg"
-                                    alt="user image" style="width:50px;height:50px;">
-                                {% endif %}
                             </div>
                             <div class="col-10">
                                 <strong>

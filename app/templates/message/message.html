@@ -167,16 +167,10 @@
 										{% if talk_rooms %} {% for talk_room in talk_rooms %}
 										<tr id="id_talk_room_{{talk_room.talk_room.id}}" class="talk-room">
 											<td>
-												{% if talk_room.participant.user_profile.profile_image %}
 												<img class="rounded-circle img-bordered-sm" name="profile_image"
 													style="width: 60px; height: 60px;"
 													src="{{talk_room.participant.user_profile.profile_image.url}}"
 													id="id_profile_img" />
-												{% else %}
-												<img class="rounded-circle img-bordered-sm" name="profile_image"
-													style="width: 60px; height: 60px;" src="/media/default_profile.jpg"
-													id="id_profile_img" />
-												{% endif %}
 											</td>
 											<td>
 												<strong
@@ -209,13 +203,8 @@
 								<div class="direct-chat-light clearfix">
 									<small class="text-muted float-right">{{message.sender.name}}</small>
 								</div>
-								{% if message.sender.user_profile.profile_image %}
 								<img class="direct-chat-img" src="{{message.sender.user_profile.profile_image.url}}"
 									alt="message user image" />
-								{% else %}
-								<img class="direct-chat-img" src="/media/default_profile.jpg"
-									alt="message user image" />
-								{% endif %}
 								<div class="direct-chat-text w-50 float-right mr-2">
 									{{ message.body }}
 								</div>
@@ -227,13 +216,8 @@
 								<div class="direct-chat-light clearfix">
 									<small class="text-muted float-left">{{message.sender.name}}</small>
 								</div>
-								{% if message.sender.user_profile.profile_image %}
 								<img class="direct-chat-img" src="{{message.sender.user_profile.profile_image.url}}"
 									alt="message user image" />
-								{% else %}
-								<img class="direct-chat-img" src="/media/default_profile.jpg"
-									alt="message user image" />
-								{% endif %}
 								<div class="direct-chat-text w-50 float-left ml-2">
 									{{ message.body }}
 								</div>

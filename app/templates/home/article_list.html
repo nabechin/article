@@ -70,15 +70,11 @@
 <div class="card">
     <div class="card-body shadow-sm">
         <form action="{% url 'article:post' %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
             <div class="row">
                 <div class="form-group col-2">
-                    {% if user_profile.profile_image %}
                     <img class="rounded-circle img-bordered-sm" src="{{user_profile.profile_image.url}}"
                         alt="user image" style="width:50px;height:50px;">
-                    {% else %}
-                    <img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg" alt="user image"
-                        style="width:50px;height:50px;">
-                    {% endif %}
                 </div>
                 <div class="form-group col-7">
                     <textarea class="form-control h-100" id="inputDescription" name="content" placeholder="つぶやく"
@@ -123,19 +119,11 @@
                     <div class="post">
                         <div class="user-block row">
                             <div class="col-2">
-                                {% if article_info.article.user.user_profile.profile_image %}
                                 <a href="{% url 'account:profile' article_info.article.user.id %}">
                                     <img class="rounded-circle img-bordered-sm article-profile-image"
                                         src="{{article_info.article.user.user_profile.profile_image.url}}"
                                         alt="user image" style="width:50px;height:50px;">
                                 </a>
-                                {% else %}
-                                <a href="{% url 'account:profile' article_info.article.user.id %}">
-                                    <img class="rounded-circle img-bordered-sm article-profile-image"
-                                        src="/media/default_profile.jpg" alt="user image"
-                                        style="width:50px;height:50px;">
-                                </a>
-                                {% endif %}
                             </div>
                             <div class="col-10">
                                 <a href="{% url 'account:profile' article_info.article.user.id %}" class="text-dark"
