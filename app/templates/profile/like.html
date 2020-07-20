@@ -1,0 +1,17 @@
+{% extends "base_profile.html" %}
+{% load static %}
+
+{% block article_kind_header %}
+<a class="flex-sm-fill text-sm-center nav-link" href="{% url 'account:profile' user.id %}">Article</a>
+<a class="flex-sm-fill text-sm-center nav-link" href="{% url 'account:media' user.id %}">Media</a>
+<a class="flex-sm-fill text-sm-center nav-link active" href="{% url 'account:like' user.id %}">Like</a>
+{% endblock %}
+
+{% block article_like_widget %}
+<span class=" link-black text-lg already-like">
+  <i class="far fa-thumbs-up" style="color:indianred"></i>
+</span>
+<input type="hidden" id="id_like_article_{{article_info.article.id}}"
+  value="{{article_info.login_user_favorite_article_id}}">
+<span id="id_like_count_{{article_info.article.id}}">{{ article_info.article.favorite_article.all.count }}</span>
+{% endblock %}
