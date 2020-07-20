@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['app']
 
@@ -79,7 +79,13 @@ ROOT_URLCONF = 'app.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates/article')],
+        'DIRS': [os.path.join(BASE_DIR, 'templates'),
+                 os.path.join(BASE_DIR, 'templates/home'),
+                 os.path.join(BASE_DIR, 'templates/message'),
+                 os.path.join(BASE_DIR, 'templates/profile'),
+                 os.path.join(BASE_DIR, 'templates/relation'),
+                 os.path.join(BASE_DIR, 'templates/account'), ],
+
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

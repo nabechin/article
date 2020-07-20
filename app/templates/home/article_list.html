@@ -1,0 +1,207 @@
+{% extends 'base_home.html' %}
+{% load static %}
+{% block extra_js %}
+<script src="{% static 'js/article_like_ajax.js' %}"></script>
+<script>
+    $(function () {
+
+        /* 記事をクリックすると、記事詳細に遷移 */
+        $(document).on('click', '.article', function (event) {
+            var url = "{% url 'article:comment' 1000 %}";
+            var articleId = $(this).attr('id');
+            document.location.href = url.replace('1000', articleId);
+        });
+
+        /* カメラマーククリック後、ファイル選択を映す */
+        $('#id_post_media').on('click', function () {
+            $('#id_post_media_file').trigger('click');
+        })
+
+        /* 選択した画像を表示する。 */
+        $('#id_post_media_file').on('change', function (e) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#id_show_post_image').parent().css('display', 'block');
+                $('#id_show_post_image').attr('src', e.target.result);
+                isTweetButtonValid();
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        })
+
+        /* 投稿用に選択したimgを削除する */
+        $('#id_close_media').on('click', function () {
+            $('#id_show_post_image').removeAttr('src');
+            $('#id_show_post_image').parent().css('display', 'none');
+            $('#id_post_media_file').val('');
+            isTweetButtonValid();
+        })
+
+        /* ツイートの文字カウント */
+        $('#inputDescription').on('keyup', countTweetLength);
+
+        function countTweetLength() {
+            var countTweetLength = $('#inputDescription').val().length;
+            $('#id_tweet_count').text(countTweetLength);
+        }
+
+        // ツイートボタンの有効無効をツイートまたは投稿画像の有無で判断し、ツイートボタンに反映
+        isTweetButtonValid()
+        /* ツイート文字数が０の場合,submitボタンを向こうにする */
+        $('#inputDescription').on('keyup', isTweetButtonValid);
+
+        function isTweetButtonValid() {
+            var countTweetLength = $('#inputDescription').val().length;
+            var image_value = $('#id_post_media_file').val()
+            if (image_value) {
+                $("#id_tweet").prop("disabled", false);
+                return
+            }
+            if (countTweetLength == 0) {
+                $("#id_tweet").prop("disabled", true);
+            } else {
+                $("#id_tweet").prop("disabled", false);
+            }
+        }
+    });
+</script>
+{% endblock %}
+{% block article_content %}
+<!-- ツイートフォーム -->
+<div class="card">
+    <div class="card-body shadow-sm">
+        <form action="{% url 'article:post' %}" method="POST" enctype="multipart/form-data">
+            <div class="row">
+                <div class="form-group col-2">
+                    {% if user_profile.profile_image %}
+                    <img class="rounded-circle img-bordered-sm" src="{{user_profile.profile_image.url}}"
+                        alt="user image" style="width:50px;height:50px;">
+                    {% else %}
+                    <img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg" alt="user image"
+                        style="width:50px;height:50px;">
+                    {% endif %}
+                </div>
+                <div class="form-group col-7">
+                    <textarea class="form-control h-100" id="inputDescription" name="content" placeholder="つぶやく"
+                        style="margin-right:0px;"></textarea>
+                    <div>
+                        <span class="info-box-number" id="id_tweet_count">0</span>&nbsp;/
+                        <span class="info-box-number">1000</span>
+                    </div>
+                </div>
+                <div class="form-group col-3">
+                    <input type="file" id="id_post_media_file" name="article_media" style="display:none">
+                    <button type="submit" class="btn btn-primary" id="id_tweet">投稿する</button>
+                    <div class="mt-2">
+                        <i class="fa fa-camera-retro fa-lg" style="color:grey; cursor: pointer;" id="id_post_media"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="form-group col-2">
+                </div>
+                <div class="col-7">
+                    <figure style="display: none;">
+                        <img id="id_show_post_image"></img>
+                        <figcaption id="id_close_media"><i class="fas fa-times text-lg"></i></figcaption>
+                    </figure>
+                </div>
+                <div class="col-3">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- ツイートフォーム -->
+<!-- 記事一覧 -->
+<div class="card-deck">
+    <div class="card shadow-sm bg-white rounded">
+        {% for article_info in article_info_list %}
+        <div class="card-body border-bottom article" id="{{article_info.article.id}}">
+            <div class="tab-content">
+                <div class="active tab-pane" id="activity">
+                    <!-- Post -->
+                    <div class="post">
+                        <div class="user-block row">
+                            <div class="col-2">
+                                {% if article_info.article.user.user_profile.profile_image %}
+                                <a href="{% url 'account:profile' article_info.article.user.id %}">
+                                    <img class="rounded-circle img-bordered-sm article-profile-image"
+                                        src="{{article_info.article.user.user_profile.profile_image.url}}"
+                                        alt="user image" style="width:50px;height:50px;">
+                                </a>
+                                {% else %}
+                                <a href="{% url 'account:profile' article_info.article.user.id %}">
+                                    <img class="rounded-circle img-bordered-sm article-profile-image"
+                                        src="/media/default_profile.jpg" alt="user image"
+                                        style="width:50px;height:50px;">
+                                </a>
+                                {% endif %}
+                            </div>
+                            <div class="col-10">
+                                <a href="{% url 'account:profile' article_info.article.user.id %}" class="text-dark"
+                                    style="font-weight: bold;">
+                                    {{article_info.article.user.name}}
+                                </a><br>
+                                <small class="text-muted">2020/04/15</small>
+                            </div>
+                        </div>
+                        <!-- /.user-block -->
+                        <div class="row">
+                            <div class="col-2"></div>
+                            <div class="col-10">
+                                <a href="{% url 'article:comment' article_info.article.id %}"
+                                    id="id_{{article_info.article.id}}"></a>
+                                <p>
+                                    {{ article_info.article.content }}
+                                </p>
+                                {% if article_info.article.article_media %}
+                                <img class="article-profile-image rounded border border-dark"
+                                    src="{{article_info.article.article_media.url}}" alt="user image"
+                                    style="width:100%;height:250px;">
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-4 text-center">
+                                <span class="dot-retweet text-lg on-implementing"><span class="fas fa-retweet"
+                                        style="color:rgb(70, 98, 107);"></span></span>
+                            </div>
+                            <div class="col-md-4 text-center align-bottom">
+                                {% if article_info.is_login_user_like %}
+                                <span class="link-black text-lg already-like">
+                                    <span class="far fa-thumbs-up" style="color:indianred"></span>
+                                </span>
+                                {% else %}
+                                <span class="text-lg not-like">
+                                    <i class="far fa-thumbs-up"></i>
+                                </span>
+                                {% endif %}
+                                <input type="hidden" id="id_like_article_{{article_info.article.id}}"
+                                    value="{{article_info.login_user_favorite_article_id}}">
+                                {% if article_info.article.favorite_article.all %}
+                                <span id="id_like_count_{{article_info.article.id}}">
+                                    {{article_info.article.favorite_article.all.count}}
+                                </span>
+                                {% else %}
+                                <span id="id_like_count_{{article_info.article.id}}"></span>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 text-center align-bottom">
+                                <span class="text-lg">
+                                    <i class="far fa-comments" style="color:seagreen"></i>
+                                    {% if article_info.article.comment.all.count != 0 %}
+                                    {{article_info.article.comment.all.count}}
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.post -->
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<!-- 記事一覧 -->
+{% endblock %}

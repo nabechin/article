@@ -1,0 +1,39 @@
+{% extends "base_relation.html" %}
+{% load static %}
+
+{% block relation_list_header %}
+<a class="flex-sm-fill text-sm-center nav-link" href="{% url 'account:following' user_id %}">フォロー中</a>
+<a class="flex-sm-fill text-sm-center nav-link active" href="{% url 'account:follower' user_id %}">フォロワー</a>
+{% endblock %}
+
+{% block relation_list %}
+{% for follower_info in follower_info_list %}
+<tr style="cursor: pointer;">
+  <td>
+    {% if follower_info.relation_profile.profile_image %}
+    <img class="rounded-circle img-bordered-sm relation-profile-image"
+      src="{{follower_info.relation_profile.profile_image.url}}" alt="user image" style="width:60px;height:60px;">
+    {% else %}
+    <img class="rounded-circle img-bordered-sm relation-profile-image" src="/media/default_profile.jpg" alt="user image"
+      style="width:60px;height:60px;">
+    {% endif %}
+  </td>
+  <td>
+    <a href="{% url 'account:profile' follower_info.relation_profile.user.id %}" class="text-dark"
+      style="font-weight: bold;">
+      {{follower_info.relation_profile.user.name}}
+    </a>
+    <p class="text-muted">{{follower_info.relation_profile.introduction}}</p>
+  </td>
+  <td class="text-center align-middle">
+    {% if follower_info.relation_profile.user.id == login_user.id %}
+    {% elif follower_info.is_follow == 0 %}
+    <button type="button" class="btn btn-outline-primary float-right un-follow">フォローする</button>
+    {% elif follower_info.is_follow == 1 %}
+    <button type="button" class="btn bg-gradient-primary float-right already-follow">フォロー中</button>
+    {% endif %}
+    <input type='hidden' value="{{follower_info.relation.id}}" id="{{follower_info.relation_profile.user.id}}">
+  </td>
+</tr>
+{% endfor %}
+{% endblock %}

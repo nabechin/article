@@ -1,0 +1,578 @@
+{% extends 'base_home.html' %}
+{% load static %}
+{% block extra_js %}
+<script src="{% static 'js/base_relation.js' %}"></script>
+<script>
+    $(function () {
+        /* コメントmodalの表示 */
+        $('#id_comment').on('click', function () {
+            $('#modal-comment').modal();
+        })
+
+        $(document).on('click', '.people-like-list', function () {
+            userId = $(this).attr('id').replace('id_profile_', '');
+            var url = "{% url 'account:profile' 1000 %}";
+            document.location.href = url.replace('1000', userId);
+        })
+
+        //　記事に対するコメントをajax通信でpostした後にページを更新する
+        var afterPostCommentForArticle = function (data) {
+            window.location.reload();
+        }
+
+        /* 記事に対してコメントを送信したときのアクション
+           コメントをajaxでpostする */
+        $('#id_submit_comment').on('submit', function (e) {
+            e.preventDefault()
+            var article = $('#id_article').val()
+            var comment = $('#id_comment_for_submit').val()
+            var data = new FormData();
+            data.append('content', comment);
+            data.append('article', article);
+            $.ajax({
+                url: '/api/comment/',
+                type: 'POST',
+                dataType: 'json',
+                data: data,
+                success: afterPostCommentForArticle,
+                processData: false,
+                contentType: false
+            })
+        })
+
+        /* いいねをした人の情報をmodalに表示する */
+        var afterSuccessShowLikePeople = function (data_array) {
+            $.each(data_array, function (i) {
+
+                /* indexごとにユーザ情報をキャッシュしておく変数を設定 */
+                var data = data_array[i];
+
+                /* ここのいいねしたユーザ情報をブロックでまとめる要素を設定 */
+                var $parentElement = $('<tr></tr>');
+                $parentElement.attr('id', 'id_profile_' + data.user)
+                $parentElement.addClass('people-like-list')
+
+                /* プロフィール画像の要素を設定 */
+                var $childElementForImage = $('<td></td>');
+                if (data.user_profile.profile_image) {
+                    var $imageElement = $(
+                        '<img class="rounded-circle img-bordered-sm relation-profile-image" src=' +
+                        data.user_profile.profile_image +
+                        ' alt="user image" style="width:60px;height:60px;">');
+                } else {
+                    var $imageElement = $(
+                        '<img class="rounded-circle img-bordered-sm relation-profile-image" src="/media/default_profile.jpg" alt="user image" style="width:60px;height:60px;">'
+                    );
+                }
+
+                // プロフィール画像を親要素にeppend
+                $childElementForImage.append($imageElement)
+                $parentElement.append($childElementForImage)
+
+                /* いいねユーザ名と自己紹介をブロックでまとめる要素を設定 */
+                var $childElementForProfile = $('<td></td>');
+
+                // ユーザ名にプロフィールへのリンクを持たせる
+                var $userNameElement = $('<a class="text-dark" style="font-weight: bold";></a>')
+                var url = "{% url 'account:profile' 0 %}";
+                $userNameElement.attr('href', url.replace('0', data.user));
+                $userNameElement.text(data.user_profile.user.name)
+
+                // ユーザの自己紹介を要素に入れ込む
+                var $userIntroductionElement = $('<p class="text-muted">' + data.user_profile
+                    .introduction +
+                    '</p>');
+
+                // リンクを貼ったユーザ名と自己紹介を親の要素にappend
+                $childElementForProfile.append($userNameElement)
+                $childElementForProfile.append($userIntroductionElement)
+                $parentElement.append($childElementForProfile)
+
+                // ログインユーザといいねユーザのフォロー関係を調べて、フォローボタン or フォローするボタンの要素を設定 
+                var $childElementForRelation = $('<td class="text-center align-middle"></td>');
+
+                /*  ログインユーザ自身 -> 処理しない
+                    ログインユーザがフォローしている場合 -> 「フォロー」ボタンを表示。後にフォロー解除できるように、relationIdとフォローユーザIdを要素に入れ込む
+                    ログインユーザがフォローしていない場合 -> 「フォローする」ボタンを表示。後にフォローできるように、ユーザId要素に埋め込む*/
+                if (data.user_profile.user.id == '{{user.id}}') {
+
+                } else if (data.relation && data.relation.length) {
+                    var $relationElement = $(
+                        '<button type="button" class="btn bg-gradient-primary float-right already-follow">フォロー中</button>'
+                    );
+                    var $elementForRelationInformation = $('<input type="hidden" value=' + data
+                        .relation[0].id +
+                        ' id=' + data.user_profile.user.id + '>')
+                    $relationElement.append($elementForRelationInformation);
+                } else {
+                    var $relationElement = $(
+                        '<button type="button" class="btn btn-outline-primary float-right un-follow">フォローする</button>'
+                    );
+                    var $elementForRelationInformation = $('<input type="hidden" value="" id=' +
+                        data.user_profile
+                        .user
+                        .id + '>')
+                }
+
+                // ログインユーザといいねした人のフォロー情報を親の要素にappend
+                $childElementForRelation.append($relationElement)
+                $childElementForRelation.append($elementForRelationInformation)
+                $parentElement.append($childElementForRelation)
+
+                $("tbody").append($parentElement);
+            })
+        }
+        /* modalが消えた時にいいねした人リストを削除する */
+        $('#modal-like').on('hidden.bs.modal', function () {
+            $("tbody").empty()
+        })
+
+        /* 特定の記事にいいねを押してajax通信した後の処理
+        　　いいねボタンが赤色変わり、いいねカウントが１加算される */
+        var afterSuccessLike = function ($notLikeElement, articleId) {
+            return function (data) {
+                $('#id_like_article_' + articleId).val(data['id'])
+                $notLikeElement.removeClass('not-like').addClass('already-like')
+                $notLikeElement.children().css('color', 'indianred')
+                var nowLikeCount = $('#id_like_count_' + articleId).text()
+                if (!nowLikeCount) {
+                    nowLikeCount = "0"
+                    // defaultの記事のいいね数が０の場合、いいねカウントを表示するよう変更する
+                    var parent = $('.show-like-people').parent()
+                    parent.css('display', 'block');
+                }
+                nowLikeCount = parseInt(nowLikeCount)
+                afterLikeCount = nowLikeCount + 1
+                $('.like-count').text(afterLikeCount);
+                $('#id_like_count_' + articleId).text(afterLikeCount)
+            }
+        }
+
+        /* 特定の記事のいいねを解除してajax通信した後の処理
+        　　いいねボタンがグレー色に変わり、いいねカウントが１減算される */
+        var afterSuccessNotLike = function ($alreadyLikeElement, articleId) {
+            $alreadyLikeElement.children().css('color', '')
+            $alreadyLikeElement.removeClass('already-like').addClass('not-like')
+            var nowLikeCount = $('#id_like_count_' + articleId).text()
+            nowLikeCount = parseInt(nowLikeCount)
+            afterLikeCount = nowLikeCount - 1
+            if (afterLikeCount == 0) {
+                afterLikeCount = ""
+                // いいねを解除した結果、いいねカウントが0になった場合、いいねカウントを非表示にする
+                var parent = $('.show-like-people').parent()
+                parent.css('display', 'none');
+            }
+            $('.like-count').text(afterLikeCount);
+            $('#id_like_count_' + articleId).text(afterLikeCount)
+        }
+
+        /* 特定の記事にいいねを押した時のアクション
+        記事に対するいいねIdをajax通信でpostする */
+        $(document).on('click', '.not-like', function (e) {
+            e.stopPropagation();
+            $('.article').off('click')
+            var $notLikeElement = $(this)
+            articleId = $notLikeElement.next().attr('id').replace('id_like_article_', '')
+            var data = new FormData();
+            data.append('article', articleId);
+            $.ajax({
+                url: '/api/favorite_article/',
+                type: 'POST',
+                dataType: 'json',
+                data: data,
+                success: afterSuccessLike($notLikeElement, articleId),
+                processData: false,
+                contentType: false,
+            })
+        })
+
+        /* 記事いいねを解除した時のアクション
+           記事に対するいいねIdをajax通信でdeleteする */
+        $(document).on('click', '.already-like', function (e) {
+            e.stopPropagation();
+            var $alreadyLikeElement = $(this)
+            likeId = $alreadyLikeElement.next().val()
+            articleId = $alreadyLikeElement.next().attr('id').replace('id_like_article_', '')
+            $.ajax({
+                url: '/api/favorite_article/' + likeId + '/',
+                type: 'DELETE',
+                dataType: 'json',
+                success: afterSuccessNotLike($alreadyLikeElement, articleId),
+                processData: false,
+                contentType: false,
+            })
+        })
+
+        /* いいねカウントをクリックした後に発火するアクション
+           記事にいいねをした人の情報を取得する　*/
+        $(document).on('click', '.show-like-people', function (e) {
+            e.preventDefault()
+            var articleId = $(this).attr('id').replace('id_liked_article_', '');
+            $('#modal-like').modal();
+            $.ajax({
+                url: '/api/favorite_article/?article=' + articleId,
+                type: 'GET',
+                dataType: 'json',
+                success: afterSuccessShowLikePeople,
+                processData: false,
+                contentType: false,
+            })
+        });
+
+
+
+        /*  特定のコメントにいいねをつけてajax通信した後の処理
+  　　いいねボタンが赤色変わり、いいねカウントが１加算される */
+        var afterSuccessLikeComment = function ($notLikeElement, commentId) {
+            return function (data) {
+                $('#id_like_comment_' + commentId).val(data['id'])
+                $notLikeElement.removeClass('not-like-comment').addClass('already-like-comment')
+                $notLikeElement.children().css('color', 'indianred')
+                var nowLikeCount = $('#id_like_comment_count_' + commentId).text()
+                if (!nowLikeCount) {
+                    nowLikeCount = "0"
+                }
+                nowLikeCount = parseInt(nowLikeCount)
+                afterLikeCount = nowLikeCount + 1
+                $('#id_like_comment_count_' + commentId).text(afterLikeCount)
+            }
+        }
+
+        /* 特定のコメントのいいねを解除してajax通信した後の処理
+        　　いいねボタンがグレー色に変わり、いいねカウントが１減算される */
+        var afterSuccessNotLikeComment = function ($alreadyLikeElement, commentId) {
+            $alreadyLikeElement.children().css('color', '')
+            $alreadyLikeElement.removeClass('already-like-comment').addClass('not-like-comment')
+            var nowLikeCount = $('#id_like_comment_count_' + commentId).text()
+            nowLikeCount = parseInt(nowLikeCount)
+            afterLikeCount = nowLikeCount - 1
+            if (afterLikeCount == 0) {
+                afterLikeCount = ""
+            }
+            $('#id_like_comment_count_' + commentId).text(afterLikeCount)
+        }
+
+        /* 記事のコメントにいいねをつけた時のアクション
+           コメントに対するいいねをajax通信でpostする */
+        $(document).on('click', '.not-like-comment', function (e) {
+            e.stopPropagation();
+            var $notLikeElement = $(this)
+            commentId = $notLikeElement.next().attr('id').replace('id_like_comment_', '')
+            var data = new FormData();
+            data.append('comment', commentId);
+            $.ajax({
+                url: '/api/favorite_comment/',
+                type: 'POST',
+                dataType: 'json',
+                data: data,
+                success: afterSuccessLikeComment($notLikeElement, commentId),
+                processData: false,
+                contentType: false,
+            })
+        })
+
+        /* 記事のコメントのいいねを解除した時のアクション
+           コメントに対するいいねをajax通信でdeleteする */
+        $(document).on('click', '.already-like-comment', function (e) {
+            e.stopPropagation();
+            var $alreadyLikeElement = $(this)
+            likeId = $alreadyLikeElement.next().val()
+            commentId = $alreadyLikeElement.next().attr('id').replace('id_like_comment_', '')
+            $.ajax({
+                url: '/api/favorite_comment/' + likeId + '/',
+                type: 'DELETE',
+                dataType: 'json',
+                success: afterSuccessNotLikeComment($alreadyLikeElement, commentId),
+                processData: false,
+                contentType: false,
+            })
+        })
+    })
+</script>
+{% endblock%}
+{% block article_content %}
+<div class="card-deck">
+    <div class="card">
+        <div class="card-header d-flex p-0">
+            <h3 class="card-title p-3"></h3>
+        </div>
+        <!-- article -->
+        <div class="card-body">
+            <div class="tab-content">
+                <div class="row">
+                    <div class="col-2">
+                        {% if article_info.article.user.user_profile.profile_image %}
+                        <a href="{% url 'account:profile' article_info.article.user.id %}">
+                            <img class="rounded-circle img-bordered-sm article-profile-image"
+                                src="{{article_info.article.user.user_profile.profile_image.url}}" alt="user image"
+                                style="width:50px;height:50px;">
+                        </a>
+                        {% else %}
+                        <a href="{% url 'account:profile' article_info.article.user.id %}">
+                            <img class="rounded-circle img-bordered-sm article-profile-image"
+                                src="/media/default_profile.jpg" alt="user image" style="width:50px;height:50px;">
+                        </a>
+                        {% endif %}
+                    </div>
+                    <div class="col-10">
+                        <a href="{% url 'account:profile' article_info.article.user.id %}" class="text-dark"
+                            style="font-weight: bold;">
+                            {{ article_info.article.user.name }}
+                        </a><br>
+                        <small class="text-muted">2020/04/15</small>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-2"></div>
+                    <div class="col-10">
+                        <p>
+                            {{ article_info.article.content }}
+                        </p>
+                        {% if article_info.article.article_media %}
+                        <img class="article-profile-image rounded border border-dark"
+                            src="{{article_info.article.article_media.url}}" alt="user image"
+                            style="width:100%;height:250px;">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- article -->
+        <!-- リツイート数とライク数 -->
+        <div class="card-body border">
+            <div class="row h-25">
+                <div class="col-md-6 text-center on-implementing">
+                    <a href="#" class="link-black">3 retweets</a>
+                </div>
+                {% if article_info.article.favorite_article.all %}
+                <div class="col-6 text-center">
+                    <a class="link-black show-like-people" href="" id="id_liked_article_{{article_info.article.id}}">
+                        <span class="like-count">{{article_info.article.favorite_article.all.count}}</span>
+                        likes
+                    </a>
+                </div>
+                {% else %}
+                <div class="col-6 text-center link-black" style="display: none;">
+                    <a class="link-black show-like-people" href="" id="id_liked_article_{{article_info.article.id}}">
+                        <span class="like-count">{{article_info.article.favorite_article.all.count}}</span>
+                        likes
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    <span class="text-lg on-implementing" style="cursor: pointer;"><i class="fas fa-retweet"></i></span>
+                </div>
+                <div class="col-md-4 text-center">
+                    {% if article_info.is_login_user_like %}
+                    <span class="text-lg already-like" style="cursor: pointer;">
+                        <span class="far fa-thumbs-up" style="color:indianred"></span>
+                    </span>
+                    {% else %}
+                    <span class="text-lg not-like" style="cursor: pointer;">
+                        <i class="far fa-thumbs-up"></i>
+                    </span>
+                    {% endif %}
+                    <input type="hidden" id="id_like_article_{{article_info.article.id}}"
+                        value="{{article_info.login_user_favorite_article_id}}">
+                    {% if article_info.article.favorite_article.all %}
+                    <span
+                        id="id_like_count_{{article_info.article.id}}">{{article_info.article.favorite_article.all.count}}</span>
+                    {% else %}
+                    <span id="id_like_count_{{article_info.article.id}}"></span>
+                    {% endif %}
+                </div>
+                <div class="col-md-4 text-center" style="cursor: pointer;">
+                    <span class="text-lg">
+                        <i class="far fa-comments" id="id_comment"></i>
+                        {% if article_info.article.comment.all %}
+                        {{article_info.article.comment.all.count}}
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <!-- リツイート数とライク数 -->
+
+        <!-- likeした人のリストmodal -->
+        <div class="modal fade" id="modal-like">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">いいねをしたユーザ</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body rounded">
+                        <!-- /.card -->
+                        <div class="card">
+                            <!-- /.card-body -->
+                            <div class="card-body p-0">
+                                <table class="table table-hover">
+                                    <col width="20%">
+                                    <col width="50%">
+                                    <col width="30%">
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+        </div>
+        <!-- likeした人のリストmodal  -->
+
+        <!-- リツイート、ライク、コメントのアクション -->
+        <!-- modal -->
+        <div class="modal fade" id="modal-comment">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body rounded">
+                        <div class="row">
+                            <div class="col-2">
+                                {% if article_info.article.user.user_profile.profile_image %}
+                                <img class="rounded-circle img-bordered-sm"
+                                    src="{{article_info.article.user.user_profile.profile_image.url}}" alt="user image"
+                                    style="width:50px;height:50px;">
+                                {% else %}
+                                <img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg"
+                                    alt="user image" style="width:50px;height:50px;">
+                                {% endif %}
+                            </div>
+                            <div class="col-10">
+                                <div class="mb-2">
+                                    <strong>{{ article_info.article.user.name }}</strong>
+                                </div>
+                                <div>
+                                    {{ article_info.article.content }}
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <form action="article/comment" method="POST" id="id_submit_comment">
+                            <div class="row">
+                                <div class="col-2">
+                                    <!-- ログインユーザーの画像を貼り付ける -->
+                                    {% if user.user_profile.profile_image %}
+                                    <img class="rounded-circle img-bordered-sm"
+                                        src="{{user.user_profile.profile_image.url}}" alt="user image"
+                                        style="width:50px;height:50px;">
+                                    {% else %}
+                                    <img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg"
+                                        alt="user image" style="width:50px;height:50px;">
+                                    {% endif %}
+                                    <!-- ログインユーザーの画像を貼り付ける -->
+                                </div>
+                                <div class="col-10">
+                                    <div class="mb-2">
+                                        <strong>{{ user.name }}</strong>
+                                    </div>
+                                    <div>
+                                        <textarea class="form-control" rows="3" placeholder="コメントを書く"
+                                            id="id_comment_for_submit"></textarea>
+                                        <input type="hidden" name="article" value="{{article_info.article.id}}"
+                                            id="id_article">
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="id_save_button"
+                            onclick="$('#id_submit_comment').submit()">返信</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+        <!-- リツイート、ライク、コメントのアクション -->
+        {% for comment_dto in article_info.comment_list %}
+        <div class="card-body article border-bottom">
+            <div class="tab-content">
+                <div class="active tab-pane" id="activity">
+                    <!-- Post -->
+                    <div class="post">
+                        <div class="user-block row">
+                            <div class="col-2">
+                                {% if comment_dto.comment.user.user_profile.profile_image %}
+                                <img class="rounded-circle img-bordered-sm"
+                                    src="{{comment_dto.comment.user.user_profile.profile_image.url}}" alt="user image"
+                                    style="width:50px;height:50px;">
+                                {% else %}
+                                <img class="rounded-circle img-bordered-sm" src="/media/default_profile.jpg"
+                                    alt="user image" style="width:50px;height:50px;">
+                                {% endif %}
+                            </div>
+                            <div class="col-10">
+                                <strong>
+                                    {{comment_dto.comment.user.name}}
+                                </strong><br>
+                                <small class="text-muted">2020/04/15</small>
+                            </div>
+                        </div>
+                        <!-- /.user-block -->
+                        <div class="row">
+                            <div class="col-2"></div>
+                            <div class="col-10">
+                                <p>
+                                    {{ comment_dto.comment.content }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row" style='margin:0;'>
+                            <div class="col-md-4 text-center">
+                                <span class="link-black text-lg on-implementing"><i class="fas fa-retweet"></i></span>
+                            </div>
+                            <!-- コメントへのいいね表示 -->
+                            <div class="col-md-4 text-center align-bottom">
+                                {% if comment_dto.is_login_user_like_comment %}
+                                <span class="link-black text-lg already-like-comment">
+                                    <span class="far fa-thumbs-up" style="color:indianred"></span>
+                                </span>
+                                {% else %}
+                                <span class="text-lg not-like-comment">
+                                    <i class="far fa-thumbs-up"></i>
+                                </span>
+                                {% endif %}
+                                <input type="hidden" id="id_like_comment_{{comment_dto.comment.id}}"
+                                    value="{{comment_dto.login_user_favorite_comment_id}}">
+                                {% if comment_dto.comment.favorite_comment.all %}
+                                <span id="id_like_comment_count_{{comment_dto.comment.id}}">
+                                    {{comment_dto.comment.favorite_comment.all.count}}
+                                </span>
+                                {% else %}
+                                <span id="id_like_comment_count_{{comment_dto.comment.id}}"></span>
+                                {% endif %}
+                            </div>
+                            <!-- コメントへのいいね表示 -->
+                            <div class="col-md-4 text-center">
+                                <span class="link-black text-lg on-implementing">
+                                    <i class="far fa-comments"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.post -->
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

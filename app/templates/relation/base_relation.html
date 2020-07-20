@@ -1,0 +1,107 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
+
+<head>
+    <meta name="generator" content="Jekyll v3.8.5" />
+    <meta property="og:title" content="Layout" />
+    <meta property="og:locale" content="en_US" />
+    <meta name="description" content="AdminLTE v3 Documentaion" />
+    <meta property="og:description" content="AdminLTE v3 Documentaion" />
+    <meta property="og:site_name" content="AdminLTE v3 Documentaion" />
+    <link rel="stylesheet" href="{% static 'admin-lte/plugins/fontawesome-free/css/all.min.css' %}" />
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" />
+    <link rel="stylesheet" type="text/css" href="{% static 'admin-lte/dist/css/adminlte.min.css' %}" />
+    <link rel="stylesheet" type="text/css"
+        href="{% static 'admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}" />
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet" />
+
+    <script src="{% static 'admin-lte/plugins/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'admin-lte/plugins/jquery-ui/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js' %} "></script>
+    <script src="{% static 'admin-lte/dist/js/adminlte.min.js' %}"></script>
+    <script src="{% static 'admin-lte/dist/js/demo.js' %}"></script>
+    <script src="{% static 'js/base_ajax.js' %}"></script>
+    <script src="{% static 'js/test.js' %}"></script>
+    <script src="{% static 'js/base_article.js' %}"></script>
+    <script src="{% static 'js/base_relation.js' %}"></script>
+</head>
+
+<body>
+    {% csrf_token %}
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+            </ul>
+            <a class="nav-link text-dark" href="{% url 'account:login' %}" tabindex="-1" aria-disabled="true">ログイン</a>
+            <a class="nav-link text-dark" href="{% url 'account:logout' %}" tabindex="-1" aria-disabled="true">ログアウト</a>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-1">
+            </div>
+            <div class="col-2">
+                <br>
+                <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                    <a class="nav-link" id="v-pills-home-tab" href="{% url 'article:article' %}" role="tab">Home</a>
+                    <a class="nav-link active" id="v-pills-profile-tab" href="#v-pills-profile" role="tab">Profile</a>
+                    <a class="nav-link" id="v-pills-messages-tab" href="{% url 'messages:talkroom' %}"
+                        role="tab">Messages</a>
+                    <a class="nav-link on-implementing" id="v-pills-settings-tab" href="#v-pills-settings"
+                        role="tab">Settings</a>
+                </div>
+            </div>
+            <div class="col-5">
+                <!-- /.row -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <nav class="nav nav-pills flex-column flex-sm-row">
+                                {% block relation_list_header %}
+                                {% endblock %}
+                            </nav>
+                            <!-- /.card-header -->
+                            <div class="card-body p-0">
+                                <table class="table table-hover">
+                                    <col width="20%">
+                                    <col width="50%">
+                                    <col width="30%">
+                                    <tbody>
+                                        {% block relation_list %}
+                                        {% endblock %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                </div>
+                <!-- /.row -->
+            </div>
+            <div class="col-3">
+                <br>
+                <div class="input-group mb-2">
+                    <input type="text" class="form-control" placeholder="Find Friends" aria-label="Recipient's username"
+                        aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                        <span class="input-group-text on-implementing" id="basic-addon2"><i class="fas fa-search"
+                                style="font-size: 24px;"></i></span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-1">
+            </div>
+        </div>
+    </div>
+    </div>
+</body>
+
+</html>
