@@ -4,6 +4,6 @@ __pycache__/
 memo/
 env.dev
 test.rest
-static/package-lock.json
+package-lock.json
 package.json
-.DS_STORE
+.DS_Store

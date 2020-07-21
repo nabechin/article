@@ -168,11 +168,7 @@
             <div class="col-5">
                 <div class="card-deck">
                     <div class="card">
-                        {% if user_profile.background_image %}
                         <img class="card-img-top h-50" src="{{user_profile.background_image.url}}">
-                        {% else %}
-                        <img class="card-img-top h-50" src="/media/default_background.jpg">
-                        {% endif %}
                         <div class="card-body" style="height:50px;">
                             <div class="row">
                                 <div class="col-3">
@@ -268,16 +264,10 @@
                                                             <div class="form-group col-md-6">
                                                                 <label>背景画像</label>
                                                                 <div></div>
-                                                                {% if user_profile.background_image %}
                                                                 <img class="rounded"
                                                                     src="{{user_profile.background_image.url}}"
                                                                     style="height:200px; width:100%;"
                                                                     id="id_background_img">
-                                                                {% else %}
-                                                                <img class="rounded" src="/media/default_background.jpg"
-                                                                    style="height:200px; width:100%;"
-                                                                    id="id_background_img">
-                                                                {% endif %}
                                                                 <input type="file" id="id_background_img_file"
                                                                     accept="image/*" style="display:none">
                                                             </div>

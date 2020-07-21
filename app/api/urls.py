@@ -9,8 +9,8 @@ app_name = 'api'
 
 
 router = DefaultRouter()
-router.register('user_profile', views.UserProfileView)
 router.register('relation', views.RelationView)
+router.register('user_profile', views.UserProfileView)
 router.register('comment', views.CommentView)
 router.register('favorite_article', views.FavoriteArticleView)
 router.register('favorite_comment', views.FavoriteCommentView)
@@ -18,4 +18,4 @@ router.register('message', views.MessageView)
 
 urlpatterns = [
     path('', include(router.urls))
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]

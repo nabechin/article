@@ -1,5 +1,4 @@
 $(function () {
-
     /* プロフィールの画像編集 */
     // 背景画像クリック後、画像選択 
     $('#id_background_img').on('click', function () {
@@ -58,10 +57,15 @@ $(function () {
     var afterSuccessGetProfile = function (data) {
         var introduction = data['0']['introduction'];
         var name = data['0']['user']['name']
+        var profile_image = data['0']['profile_image']
+        var background_image = data['0']['background_image']
         $('#id_introduction_count').text(introduction.length);
         $('#id_introduction_text').val(introduction);
         $('#id_name_count').text(name.length);
         $('#id_name_text').val(name);
+        $('#id_profile_img').attr('src', profile_image)
+        $('#id_background_img').attr('src', background_image)
+
     }
 
     //　ログインユーザのプロフィールを取得するためのajax通信
@@ -70,6 +74,8 @@ $(function () {
             url: '/api/user_profile/',
             type: 'GET',
             success: afterSuccessGetProfile,
+            processData: false,
+            contentType: false,
         });
     })
     var afterSuccessUnfollow = function () {
