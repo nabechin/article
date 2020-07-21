@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'adminlte3',
     'corsheaders',
+    'storages',
     'article',
     'account',
     'message',
@@ -153,13 +154,61 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
+
+# AWS
+###########################
+#       static file       #
+###########################
+
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_URL = '/static/'
 STATIC_ROOT = '/home/app/web/static'
+
+############################
+#       media_file     #
+############################
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+############################
+#           AWS            #
+############################
+
+if DEBUG == False:
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+    AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+
+    AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+    AWS_S3_OBJECT_PARAMETERS = {
+        'CacheControl': 'max-age=86400',
+    }
+    AWS_S3_URL = AWS_S3_URL = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+    AWS_LOCATION = 'static'
+    AWS_DEFAULT_ACL = None
+    STATIC_URL = 'https://%s/%s/' % (AWS_S3_URL, 'static')
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+    MEDIA_URL = 'https://%s/%s/' % (AWS_S3_URL, 'media')
+
+    AWS_S3_URL = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+    AWS_DEFAULT_ACL = 'public-read'
+    PUBLIC_MEDIA_LOCATION = 'media'
+    DEFAULT_FILE_STORAGE = 'app.storage_backends.MediaStorage'
+    AWS_QUERYSTRING_AUTH = False
+
+############################
+#       user_setting       #
+############################
+
 AUTH_USER_MODEL = 'account.User'
+
+
+############################
+#       login/logout       #
+############################
 
 LOGIN_URL = '/account/login'
 LOGIN_REDIRECT_URL = '/article'

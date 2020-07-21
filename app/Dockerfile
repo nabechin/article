@@ -11,6 +11,8 @@ RUN apk update \
 RUN pip install --upgrade pip
 RUN pip install django-cors-headers
 RUN pip install django-adminlte3
+RUN pip install boto3
+RUN pip install django-storages
 
 COPY ./requirements.txt $APP_PATH/
 RUN pip install --no-cache-dir -r $APP_PATH/requirements.txt

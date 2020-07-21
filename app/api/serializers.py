@@ -40,6 +40,15 @@ class UserProfileSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+    def to_representation(self, instance):
+        response = super(UserProfileSerializer,
+                         self).to_representation(instance)
+        if instance.profile_image:
+            response['profile_image'] = instance.profile_image.url
+        if instance.background_image:
+            response['background_image'] = instance.background_image.url
+        return response
+
 
 class RelationSerializer(serializers.ModelSerializer):
     class Meta:

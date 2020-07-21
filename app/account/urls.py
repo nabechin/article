@@ -16,4 +16,4 @@ urlpatterns = [
          views.FollowingView.as_view(), name='following'),
     path('like/<int:user_id>', views.LikeArticleView.as_view(), name='like'),
     path('media/<int:user_id>', views.ArticleMedia.as_view(), name='media'),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
