@@ -155,7 +155,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 
-# AWS
 ###########################
 #       static file       #
 ###########################
@@ -165,7 +164,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = '/home/app/web/static'
 
 ############################
-#       media_file     #
+#       media_file         #
 ############################
 
 MEDIA_URL = '/media/'
@@ -185,16 +184,11 @@ if DEBUG == False:
     AWS_S3_OBJECT_PARAMETERS = {
         'CacheControl': 'max-age=86400',
     }
-    AWS_S3_URL = AWS_S3_URL = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
-    AWS_LOCATION = 'static'
-    AWS_DEFAULT_ACL = None
-    STATIC_URL = 'https://%s/%s/' % (AWS_S3_URL, 'static')
-    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    AWS_S3_URL = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+    AWS_DEFAULT_ACL = 'public-read'
 
     MEDIA_URL = 'https://%s/%s/' % (AWS_S3_URL, 'media')
 
-    AWS_S3_URL = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
-    AWS_DEFAULT_ACL = 'public-read'
     PUBLIC_MEDIA_LOCATION = 'media'
     DEFAULT_FILE_STORAGE = 'app.storage_backends.MediaStorage'
     AWS_QUERYSTRING_AUTH = False
