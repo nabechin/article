@@ -129,9 +129,13 @@
                                 <a href="{% url 'account:profile' article_info.article.user.id %}" class="text-dark"
                                     style="font-weight: bold;">
                                     {{article_info.article.user.name}}
-                                </a><br>
+                                </a><br />
+                                <a href="{% url 'account:profile' article_info.article.user.id %}" class="user-name">
+                                    {{article_info.article.user.username}}
+                                </a><br />
                                 <small class="text-muted">2020/04/15</small>
                             </div>
+
                         </div>
                         <!-- /.user-block -->
                         <div class="row">
@@ -143,9 +147,9 @@
                                     {{ article_info.article.content }}
                                 </p>
                                 {% if article_info.article.article_media %}
-                                <img class="article-profile-image rounded border border-light"
+                                <img class="article-profile-image rounded border border-gray"
                                     src="{{article_info.article.article_media.url}}" alt="user image"
-                                    style="width:80%;height:300px;">
+                                    style="width:80%;height:250px;">
                                 {% endif %}
                             </div>
                         </div>
@@ -160,7 +164,7 @@
                                     <span class="far fa-thumbs-up" style="color:indianred"></span>
                                 </span>
                                 {% else %}
-                                <span class="text-lg not-like">
+                                <span class="text-lg not-like tools dropdown">
                                     <i class="far fa-thumbs-up"></i>
                                 </span>
                                 {% endif %}

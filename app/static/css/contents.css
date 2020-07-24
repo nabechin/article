@@ -27,7 +27,17 @@ figure figcaption {
 }
 
 .scroll {
-  height: 900px;
+  height: 700px;
   overflow: auto;
-  overscroll-behavior-y: contain;
+  overflow-y: scroll;
+}
+
+.user-name {
+  color: gray;
+  text-decoration: none;
+}
+
+.user-name:hover {
+  color: #333;
+  text-decoration: none;
 }

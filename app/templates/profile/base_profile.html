@@ -176,7 +176,13 @@
                                     <img class="rounded-circle" style="width:80px;height:80px;"
                                         src="{{user_profile.profile_image.url}}">
                                     <div>
-                                        <p class="card-text">{{user.name}}</p>
+                                        <span class="card-text">{{user.name}}</span><br>
+                                        <span class="text-muted">{{user.username}}</span>
+
+                                    </div>
+                                    <div>
+                                        <p class="card-text" id="id_introduction_profileTop">
+                                            {{user_profile.introduction}}</p>
                                     </div>
                                 </div>
                                 <div class="col-5">
@@ -187,13 +193,13 @@
                                         <a href="{% url 'account:follower' user.id %}" class="text-dark"><strong
                                                 id='id_number-of_follower'>{{number_of_follower}}</strong>&nbsp;フォロワー</a>
                                     </div>
+                                    <!-- フォローとフォロワー数  -->
                                 </div>
                                 <div class="col-4">
-                                    <!-- フォローとフォロワー数  -->
                                     {% if user.id == login_user.id %}
                                     <button type="button" class="btn btn-outline-primary float-right"
-                                        style="display:block;" data-toggle="modal" data-target="#modal-default"
-                                        id="id_user_profile">プロフィールを編集</button>
+                                    style="display:block;" data-toggle="modal" data-target="#modal-default"
+                                    id="id_user_profile">プロフィールを編集</button>
                                     {% else %}
                                     <button type="button" class="btn btn-outline-primary float-right"
                                         style="display: none;" id="id_follow">フォローする</button>
@@ -210,114 +216,104 @@
                                     </a>
                                     {% endif %}
                                     <!-- メッセージボタン -->
-
-                                    <!-- フォロー解除確認画面を出力するmodal -->
-                                    <div class="modal fade" id="modal-action-unfollow">
-                                        <div class="modal-dialog modal-sm">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <button type="button" class="close" data-dismiss="modal"
-                                                        aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                                <div class="modal-body rounded">
-                                                    <h2>{{user.name}}</h2>
-                                                    <p>さんのフォローを解除しますか</p>
-                                                </div>
-                                                <div class="modal-footer justify-content-between">
-                                                    <button type="button" class="btn btn-default"
-                                                        data-dismiss="modal">Close</button>
-                                                    <button type="button" class="btn btn-primary"
-                                                        id="id_unrelate_button">解除</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- フォロー解除確認画面を出力するmodal -->
-                                    <!-- プロフィール編集用modal -->
-                                    <div class="modal fade" id="modal-default">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h4 class="modal-title">プロフィールの編集</h4>
-                                                    <button type="button" class="close" data-dismiss="modal"
-                                                        aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                                <div class="modal-body rounded">
-                                                    <form action="/account/user_profile/{{user_profile.id}}"
-                                                        id="id_updateProfile" method="patch"
-                                                        enctype="multipart/form-data">
-                                                        <div class="row">
-                                                            <div class="form-group col-md-6">
-                                                                <label>プロフィール画像</label>
-                                                                <div></div>
-                                                                <img class="rounded-circle img-bordered-sm"
-                                                                    name="profile_image"
-                                                                    style="height:150px; width:150px;"
-                                                                    src="{{user_profile.profile_image.url}}"
-                                                                    id="id_profile_img">
-                                                                <input type="file" id="id_profile_img_file"
-                                                                    accept="image/*" style="display:none">
-                                                            </div>
-                                                            <div class="form-group col-md-6">
-                                                                <label>背景画像</label>
-                                                                <div></div>
-                                                                <img class="rounded"
-                                                                    src="{{user_profile.background_image.url}}"
-                                                                    style="height:200px; width:100%;"
-                                                                    id="id_background_img">
-                                                                <input type="file" id="id_background_img_file"
-                                                                    accept="image/*" style="display:none">
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="exampleInputEmail1">名前</label>
-                                                            <div class="errormessage"
-                                                                style="color: crimson; margin-left: 10px; display:none;"
-                                                                id="id_errorMessage">名前は入力必須です</div>
-                                                            <input type="text" class="form-control" placeholder="名前"
-                                                                maxlength="50" id="id_name_text" name="user.name">
-                                                            <div class="float-right">
-                                                                <span class="info-box-number"
-                                                                    id="id_name_count">0</span>&nbsp;/
-                                                                <span class="info-box-number">50</span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label>自己紹介</label>
-                                                            <textarea class="form-control" rows="3"
-                                                                placeholder="自己紹介を追加" maxlength="500"
-                                                                id="id_introduction_text"
-                                                                name="introduction"></textarea>
-                                                            <div class="float-right">
-                                                                <span class="info-box-number"
-                                                                    id="id_introduction_count">0</span>&nbsp;/
-                                                                <span class="info-box-number">500</span>
-                                                            </div>
-                                                        </div>
-                                                    </form>
-                                                    <!-- /input-group -->
-                                                </div>
-                                                <div class="modal-footer justify-content-between">
-                                                    <button type="button" class="btn btn-default"
-                                                        data-dismiss="modal">Close</button>
-                                                    <button type="button" class="btn btn-primary" id="id_save_button"
-                                                        onclick="$('#id_updateProfile').submit()">保存</button>
-                                                </div>
-                                            </div>
-                                            <!-- /.modal-content -->
-                                        </div>
-                                        <!-- /.modal-dialog -->
-                                    </div>
-                                    <!-- プロフィール編集用modal  -->
                                 </div>
                             </div>
-                            <div>
-                                <p class="card-text" id="id_introduction_profileTop">{{user_profile.introduction}}</p>
+
+                            <!-- フォロー解除確認画面を出力するmodal -->
+                            <div class="modal fade" id="modal-action-unfollow">
+                                <div class="modal-dialog modal-sm">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body rounded">
+                                            <h2>{{user.name}}</h2>
+                                            <p>さんのフォローを解除しますか</p>
+                                        </div>
+                                        <div class="modal-footer justify-content-between">
+                                            <button type="button" class="btn btn-default"
+                                                data-dismiss="modal">Close</button>
+                                            <button type="button" class="btn btn-primary"
+                                                id="id_unrelate_button">解除</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                            <!-- フォロー解除確認画面を出力するmodal -->
+                            <!-- プロフィール編集用modal -->
+                            <div class="modal fade" id="modal-default">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title">プロフィールの編集</h4>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body rounded">
+                                            <form action="/account/user_profile/{{user_profile.id}}"
+                                                id="id_updateProfile" method="patch" enctype="multipart/form-data">
+                                                <div class="row">
+                                                    <div class="form-group col-md-6">
+                                                        <label>プロフィール画像</label>
+                                                        <div></div>
+                                                        <img class="rounded-circle img-bordered-sm" name="profile_image"
+                                                            style="height:150px; width:150px;"
+                                                            src="{{user_profile.profile_image.url}}"
+                                                            id="id_profile_img">
+                                                        <input type="file" id="id_profile_img_file" accept="image/*"
+                                                            style="display:none">
+                                                    </div>
+                                                    <div class="form-group col-md-6">
+                                                        <label>背景画像</label>
+                                                        <div></div>
+                                                        <img class="rounded" src="{{user_profile.background_image.url}}"
+                                                            style="height:200px; width:100%;" id="id_background_img">
+                                                        <input type="file" id="id_background_img_file" accept="image/*"
+                                                            style="display:none">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="exampleInputEmail1">名前</label>
+                                                    <div class="errormessage"
+                                                        style="color: crimson; margin-left: 10px; display:none;"
+                                                        id="id_errorMessage">名前は入力必須です</div>
+                                                    <input type="text" class="form-control" placeholder="名前"
+                                                        maxlength="50" id="id_name_text" name="user.name">
+                                                    <div class="float-right">
+                                                        <span class="info-box-number" id="id_name_count">0</span>&nbsp;/
+                                                        <span class="info-box-number">50</span>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>自己紹介</label>
+                                                    <textarea class="form-control" rows="3" placeholder="自己紹介を追加"
+                                                        maxlength="500" id="id_introduction_text"
+                                                        name="introduction"></textarea>
+                                                    <div class="float-right">
+                                                        <span class="info-box-number"
+                                                            id="id_introduction_count">0</span>&nbsp;/
+                                                        <span class="info-box-number">500</span>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                            <!-- /input-group -->
+                                        </div>
+                                        <div class="modal-footer justify-content-between">
+                                            <button type="button" class="btn btn-default"
+                                                data-dismiss="modal">Close</button>
+                                            <button type="button" class="btn btn-primary" id="id_save_button"
+                                                onclick="$('#id_updateProfile').submit()">保存</button>
+                                        </div>
+                                    </div>
+                                    <!-- /.modal-content -->
+                                </div>
+                                <!-- /.modal-dialog -->
+                            </div>
+                            <!-- プロフィール編集用modal  -->
+
                         </div>
                         <nav class="nav nav-pills flex-column flex-sm-row">
                             {% block article_kind_header %}
@@ -345,7 +341,11 @@
                                                 <a href="{% url 'account:profile' article_info.article.user.id %}"
                                                     class="text-dark" style="font-weight: bold;">
                                                     {{article_info.article.user.name}}
-                                                </a><br>
+                                                </a><br />
+                                                <a href="{% url 'account:profile' article_info.article.user.id %}"
+                                                    class="user-name">
+                                                    {{article_info.article.user.username}}
+                                                </a><br />
                                                 <small class="text-muted">2020/04/15</small>
                                             </div>
                                         </div>
@@ -357,7 +357,7 @@
                                                     {{ article_info.article.content }}
                                                 </p>
                                                 {% if article_info.article.article_media %}
-                                                <img class="article-profile-image rounded border border-light"
+                                                <img class="article-profile-image rounded border border-gray"
                                                     src="{{article_info.article.article_media.url}}" alt="user image"
                                                     style="width:80%;height:300px;">
                                                 {% endif %}
