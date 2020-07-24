@@ -25,3 +25,9 @@ figure figcaption {
   float: right;
   cursor: pointer;
 }
+
+.scroll {
+  height: 900px;
+  overflow: auto;
+  overscroll-behavior-y: contain;
+}
