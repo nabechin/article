@@ -129,11 +129,12 @@
                                 <a href="{% url 'account:profile' article_info.article.user.id %}" class="text-dark"
                                     style="font-weight: bold;">
                                     {{article_info.article.user.name}}
-                                </a><br />
+                                </a>&nbsp;&nbsp;
                                 <a href="{% url 'account:profile' article_info.article.user.id %}" class="user-name">
                                     {{article_info.article.user.username}}
-                                </a><br />
-                                <small class="text-muted">2020/04/15</small>
+                                </a>
+                                <br />
+                                <small class="text-muted">{{article_info.article.posted_at|date:"H:i"}}</small>
                             </div>
 
                         </div>

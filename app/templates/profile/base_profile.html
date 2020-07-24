@@ -198,8 +198,8 @@
                                 <div class="col-4">
                                     {% if user.id == login_user.id %}
                                     <button type="button" class="btn btn-outline-primary float-right"
-                                    style="display:block;" data-toggle="modal" data-target="#modal-default"
-                                    id="id_user_profile">プロフィールを編集</button>
+                                        style="display:block;" data-toggle="modal" data-target="#modal-default"
+                                        id="id_user_profile">プロフィールを編集</button>
                                     {% else %}
                                     <button type="button" class="btn btn-outline-primary float-right"
                                         style="display: none;" id="id_follow">フォローする</button>
@@ -346,7 +346,8 @@
                                                     class="user-name">
                                                     {{article_info.article.user.username}}
                                                 </a><br />
-                                                <small class="text-muted">2020/04/15</small>
+                                                <small
+                                                    class="text-muted">{{article_info.article.posted_at|date:"H:m"}}</small>
                                             </div>
                                         </div>
                                         <!-- /.user-block -->
