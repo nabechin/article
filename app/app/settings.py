@@ -204,7 +204,7 @@ AUTH_USER_MODEL = 'account.User'
 #       login/logout       #
 ############################
 
-LOGIN_URL = '/account/login'
+LOGIN_URL = '/'
 LOGIN_REDIRECT_URL = '/article'
 LOGOUT_URL = '/account/logout'
-LOGOUT_REDIRECT_URL = '/account/login'
+LOGOUT_REDIRECT_URL = '/'
