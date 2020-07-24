@@ -16,6 +16,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'admin-lte/dist/css/adminlte.min.css' %}" />
     <link rel="stylesheet" type="text/css"
         href="{% static 'admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/contents.css' %}" />
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet" />
     <script src="{% static 'admin-lte/plugins/jquery/jquery.min.js' %}"></script>
     <script src="{% static 'admin-lte/plugins/jquery-ui/jquery-ui.min.js' %}"></script>
@@ -165,7 +166,7 @@
                     <a class="nav-link on-implementing" id="v-pills-settings-tab" href="#" role="tab">Settings</a>
                 </div>
             </div>
-            <div class="col-5">
+            <div class="col-5 scroll">
                 <div class="card-deck">
                     <div class="card">
                         <img class="card-img-top h-50" src="{{user_profile.background_image.url}}">
@@ -356,9 +357,9 @@
                                                     {{ article_info.article.content }}
                                                 </p>
                                                 {% if article_info.article.article_media %}
-                                                <img class="article-profile-image rounded border border-dark"
+                                                <img class="article-profile-image rounded border border-light"
                                                     src="{{article_info.article.article_media.url}}" alt="user image"
-                                                    style="width:100%;height:250px;">
+                                                    style="width:80%;height:300px;">
                                                 {% endif %}
                                             </div>
                                         </div>
