@@ -27,7 +27,47 @@ figure figcaption {
 }
 
 .scroll {
-  height: 900px;
+  height: 100vh;
   overflow: auto;
-  overscroll-behavior-y: contain;
+  overflow-y: scroll;
+}
+
+
+
+@media screen and (min-width: 980px) {
+  .message-scroll {
+    height: 100vh;
+    overflow: auto;
+    overflow-y: scroll;
+  }
+}
+
+@media screen and (min-width: 480px) and (max-width: 767px) {
+  .message-scroll {
+    height: 300px;
+    overflow: auto;
+    overflow-y: scroll;
+  }
+}
+
+.user-name {
+  color: gray;
+  text-decoration: none;
+}
+
+.user-name:hover {
+  color: #333;
+  text-decoration: none;
+}
+
+@media screen and (max-width: 973px) {
+  .user-search {
+    display: none
+  }
+}
+
+@media screen and (max-width: 973px) {
+  .side-bar-content {
+    display: none
+  }
 }

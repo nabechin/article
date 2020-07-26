@@ -19,6 +19,10 @@ class Article(models.Model):
     )
     article_media = models.ImageField(
         null=True, upload_to=article_media_save_path, default="")
+    posted_at = models.DateTimeField(
+        auto_now_add=True,
+        blank=True,
+    )
 
 
 class Comment(models.Model):

@@ -2,8 +2,8 @@
 {% load static %}
 
 {% block relation_list_header %}
-<a class="flex-sm-fill text-sm-center nav-link" href="{% url 'account:following' user_id %}">フォロー中</a>
-<a class="flex-sm-fill text-sm-center nav-link active" href="{% url 'account:follower' user_id %}">フォロワー</a>
+<a class="nav-item nav-link" href="{% url 'account:following' user_id %}">フォロー中</a>
+<a class="nav-item nav-link active" href="{% url 'account:follower' user_id %}">フォロワー</a>
 {% endblock %}
 
 {% block relation_list %}

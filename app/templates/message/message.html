@@ -14,6 +14,7 @@
 	<link rel="stylesheet" href="{% static 'admin-lte/plugins/fontawesome-free/css/all.min.css' %}" />
 	<link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" />
 	<link rel="stylesheet" type="text/css" href="{% static 'admin-lte/dist/css/adminlte.min.css' %}" />
+	<link rel="stylesheet" type="text/css" href="{% static 'css/contents.css' %}" />
 	<link rel="stylesheet" type="text/css"
 		href="{% static 'admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}" />
 	<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet" />
@@ -124,38 +125,34 @@
 <body>
 	{% csrf_token %}
 	<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
-		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-			aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-			<span class="navbar-toggler-icon"></span>
-		</button>
-		<div class="collapse navbar-collapse" id="navbarSupportedContent">
-			<ul class="navbar-nav mr-auto"></ul>
-			<a class="nav-link text-dark" href="{% url 'account:login' %}" tabindex="-1" aria-disabled="true">ログイン</a>
-			<a class="nav-link text-dark" href="{% url 'account:logout' %}" tabindex="-1" aria-disabled="true">ログアウト</a>
-		</div>
+		<ul class="navbar-nav mr-auto">
+		</ul>
+		<a class="nav-link text-dark" href="{% url 'account:login' %}" tabindex="-1" aria-disabled="true">ログイン</a>
+		<a class="nav-link text-dark" href="{% url 'account:logout' %}" tabindex="-1" aria-disabled="true">ログアウト</a>
 	</nav>
-	<div class="container-fluid">
+	<div class="container-fluid" style="min-height: 100vh;">
 		<div class="row">
-			<div class="col-1"></div>
-			<div class="col-2">
-				<br />
-				<div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-					<a class="nav-link" id="v-pills-home-tab" href="{% url 'article:article' %}" role="tab">Home</a>
-					<a class="nav-link" id="v-pills-profile-tab" href="{% url 'account:profile' login_user_id %}"
-						role="tab">Profile</a>
-					<a class="nav-link active" id="v-pills-messages-tab" href="{% url 'messages:talkroom' %}"
-						role="tab">Messages</a>
-					<a class="nav-link on-implementing" id="v-pills-settings-tab" href="#v-pills-settings"
-						role="tab">Settings</a>
+			<div class="col-lg-3 col-3 mt-3">
+				<div class="flex-column nav-pills container w-75">
+					<a class="nav-link" id="v-pills-home-tab" href="{% url 'article:article' %}" role="tab">
+						<i class="fa fa-home text-lg mr-3"></i><span class="side-bar-content">Home</span></a>
+					<a class="nav-link" id="v-pills-profile-tab" href="{% url 'account:profile' user.id %}" role="tab"
+						aria-controls="v-pills-profile" aria-selected="false">
+						<i class="fa fa-user-circle text-lg mr-3"></i><span class="side-bar-content">Profile</span></a>
+					<a class="nav-link active" id="v-pills-messages-tab" href="{% url 'messages:talkroom' %}" role="tab"
+						aria-controls="v-pills-messages" aria-selected="false">
+						<i class="fa fa-envelope text-lg mr-3"></i><span class="side-bar-content">Message</span></a>
+					<a class="nav-link on-implementing" id="v-pills-settings-tab">
+						<i class="fa fa-cog text-lg mr-3"></i><span class="side-bar-content">Setting</span></a>
 				</div>
 			</div>
-			<div class="col-4">
+			<div class="col-lg-4 col-9 message-scroll">
 				<!-- /.row -->
 				<div class="row">
 					<div class="col-12">
 						<div class="card">
 							<div class="card-header d-flex p-0">
-								<h3 class="card-title p-3">メッセージ</h3>
+								<h3 class="card-title p-3"></h3>
 							</div>
 							<!-- /.card-body -->
 							<div class="card-body p-0">
@@ -191,8 +188,8 @@
 				</div>
 				<!-- /.row -->
 			</div>
-			<div class="col-5">
-				<div class="card direct-chat direct-chat-primary" style="height: 600px;">
+			<div class="col-lg-5">
+				<div class="card direct-chat direct-chat-primary" style="max-height: 550px;">
 					<div class="card-header">
 						<h3 class="card-title font-weight-bold" id="id_header_name"></h3>
 					</div>
@@ -241,7 +238,6 @@
 						</form>
 					</div>
 				</div>
-				<div class="col-1"></div>
 			</div>
 		</div>
 	</div>

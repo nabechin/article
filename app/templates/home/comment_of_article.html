@@ -310,9 +310,13 @@
                     <div class="col-10">
                         <a href="{% url 'account:profile' article_info.article.user.id %}" class="text-dark"
                             style="font-weight: bold;">
-                            {{ article_info.article.user.name }}
-                        </a><br>
-                        <small class="text-muted">2020/04/15</small>
+                            {{article_info.article.user.name}}
+                        </a>&nbsp;&nbsp;
+                        <a href="{% url 'account:profile' article_info.article.user.id %}" class="user-name">
+                            {{article_info.article.user.username}}
+                        </a>
+                        <br />
+                        <small class="text-muted">{{article_info.article.posted_at|date:"H:i"}}</small>
                     </div>
                 </div>
                 <div class="row">
@@ -322,9 +326,9 @@
                             {{ article_info.article.content }}
                         </p>
                         {% if article_info.article.article_media %}
-                        <img class="article-profile-image rounded border border-light"
+                        <img class="article-profile-image rounded border border-gray"
                             src="{{article_info.article.article_media.url}}" alt="user image"
-                            style="width:80%;height:300px;">
+                            style="width:80%;height:250px;">
                         {% endif %}
                     </div>
                 </div>
@@ -334,7 +338,7 @@
         <!-- リツイート数とライク数 -->
         <div class="card-body border">
             <div class="row h-25">
-                <div class="col-md-6 text-center on-implementing">
+                <div class="col-6 text-center on-implementing">
                     <a href="#" class="link-black">3 retweets</a>
                 </div>
                 {% if article_info.article.favorite_article.all %}
@@ -355,10 +359,10 @@
             </div>
             <hr>
             <div class="row">
-                <div class="col-md-4 text-center">
+                <div class="col-4 text-center">
                     <span class="text-lg on-implementing" style="cursor: pointer;"><i class="fas fa-retweet"></i></span>
                 </div>
-                <div class="col-md-4 text-center">
+                <div class="col-4 text-center">
                     {% if article_info.is_login_user_like %}
                     <span class="text-lg already-like" style="cursor: pointer;">
                         <span class="far fa-thumbs-up" style="color:indianred"></span>
@@ -377,7 +381,7 @@
                     <span id="id_like_count_{{article_info.article.id}}"></span>
                     {% endif %}
                 </div>
-                <div class="col-md-4 text-center" style="cursor: pointer;">
+                <div class="col-4 text-center" style="cursor: pointer;">
                     <span class="text-lg">
                         <i class="far fa-comments" id="id_comment"></i>
                         {% if article_info.article.comment.all %}
