@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.db.models import Q
 from .serializers import UserProfileSerializer, RelationSerializer, CommentSerializer, FavoriteArticleSerializer, FavoriteCommentSerializer, MessageSerializer
 from account.models import UserProfile, Relation
 from article.models import Article, Comment, FavoriteArticle, FavoriteComment
@@ -24,6 +25,18 @@ class UserProfileView(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class UserSearchView(UserProfileView):
+    def get_queryset(self):
+        queryset = self.queryset
+        keyword = self.request.query_params.get('keyword', None)
+        if keyword:
+            queryset = queryset.select_related('user').filter(
+                Q(user__name__istartswith=keyword) | Q(user__username__istartswith=keyword))
+        else:
+            queryset = None
+        return queryset
 
 
 class RelationView(viewsets.ModelViewSet):

@@ -28,6 +28,80 @@
     <script src="{% static 'js/base_ajax.js' %}"></script>
     <script src="{% static 'js/test.js' %}"></script>
     {% block extra_js %}{% endblock %}
+    <script>
+        $(function () {
+            //////////////////////////////////////////////
+            ///////      　　ユーザ検索機能           ///////
+            //////////////////////////////////////////////
+            
+            // 戻るボタンを押した際、ユーザ検索フォームの値を空にする
+            deleteKeyword()
+            function deleteKeyword() {
+                $('#id_user_keyword').val("");
+            }
+            $("#id_user_keyword").on('focus', function () {
+                $('#id_user_info').css('display', 'block')
+            })
+            /* キーワードに合致したユーザ情報を表示する */
+            var afterSuccessGetUserInfo = function (data_array) {
+                $("#id_user_search_list").empty()
+                $.each(data_array, function (i) {
+                    /* indexごとにユーザ情報をキャッシュしておく変数を設定 */
+                    var data = data_array[i];
+
+                    /* ユーザ情報を1行分のもっとも親要素を設定 */
+                    var $parentElement = $('<tr></tr>');
+
+                    /* プロフィール画像の要素を設定 */
+                    var $childElementForImage = $('<td></td>');
+
+                    // プロフィール画像クリック時にプロフィール画面への遷移のためリンクを仕込む
+                    var $imageAnkerElement = $('<a></a>');
+                    var url = "{% url 'account:profile' 0 %}";
+                    $imageAnkerElement.attr('href', url.replace('0', data.user.id));
+
+                    var $imageElement = $(
+                        '<img class = "rounded-circle img-bordered-sm relation-profile-image" alt = "user image"' +
+                        ' style = "width:40px;height:40px;" > '
+                    );
+                    $imageElement.attr('src', data.profile_image);
+                    $imageAnkerElement.append($imageElement);
+                    $childElementForImage.append($imageAnkerElement);
+
+                    /* ユーザの名前とユーザネームの要素を設定 */
+                    var $childElementForUserName = $('<td></td>');
+                    var $nameElement = $(
+                        '<a class="text-dark" style="font-weight: bold;"></a>');
+                    $nameElement.attr('href', url.replace('0', data.user.id));
+                    $nameElement.text(data.user.name)
+                    var $usernameElement = $('<div class="text-muted"></div>')
+                    $usernameElement.text(data.user.username);
+                    $childElementForUserName.append($nameElement);
+                    $childElementForUserName.append($usernameElement);
+
+                    $parentElement.append($childElementForImage);
+                    $parentElement.append($childElementForUserName);
+                    $('#id_user_search_list').append($parentElement)
+                })
+                if (data_array.length != 0) {
+                    $('#id_user_info').css('display', 'block')
+                } else {
+                    $('#id_user_info').css('display', 'none')
+                }
+            }
+            // ユーザ検索アクション
+            $("#id_user_keyword").on('input', function () {
+                var keyword = $(this).val()
+                $.ajax({
+                    url: '/api/user/?keyword=' + keyword,
+                    dataType: 'json',
+                    type: 'GET',
+                    success: afterSuccessGetUserInfo,
+                })
+            });
+        })
+    </script>
+
 </head>
 
 <body>
@@ -66,10 +140,22 @@
                     <br>
                     <div class="input-group mb-2 w-75 container">
                         <input type="text" class="form-control" placeholder="キーワードで検索" aria-label="Recipient's username"
-                            aria-describedby="basic-addon2">
-                        <div class="input-group-append on-implementing">
+                            aria-describedby="basic-addon2" id="id_user_keyword">
+                        <div class="input-group-append">
                             <span class="input-group-text" id="basic-addon2"><i class="fas fa-search"
                                     style="font-size: 24px;"></i></span>
+                        </div>
+                    </div>
+                    <div class="w-75 container scroll" id="id_user_info" style="display: none;">
+                        <div class="card">
+                            <div class="card-body p-0">
+                                <table class="table table-hover">
+                                    <col width="20%">
+                                    <col width="80%">
+                                    <tbody id="id_user_search_list">
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>

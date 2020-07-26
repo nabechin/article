@@ -27,5 +27,4 @@ $(function () {
     $('.article').on('mouseout', function () {
         $(this).css('background-color', '');
     });
-
 });
