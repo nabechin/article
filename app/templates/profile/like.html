@@ -2,9 +2,9 @@
 {% load static %}
 
 {% block article_kind_header %}
-<a class="flex-sm-fill text-sm-center nav-link" href="{% url 'account:profile' user.id %}">Article</a>
-<a class="flex-sm-fill text-sm-center nav-link" href="{% url 'account:media' user.id %}">Media</a>
-<a class="flex-sm-fill text-sm-center nav-link active" href="{% url 'account:like' user.id %}">Like</a>
+<a class="nav-item nav-link" href="{% url 'account:profile' user.id %}">Article</a>
+<a class="nav-item nav-link" href="{% url 'account:media' user.id %}">Media</a>
+<a class="nav-item nav-link active" href="{% url 'account:like' user.id %}">Like</a>
 {% endblock %}
 
 {% block article_like_widget %}

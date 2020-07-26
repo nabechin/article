@@ -68,40 +68,42 @@
 {% block article_content %}
 <!-- ツイートフォーム -->
 <div class="card">
-    <div class="card-body shadow-sm">
+    <div class="card-body shadow-sm" style="min-width: 400px;">
         <form action="{% url 'article:post' %}" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="row">
-                <div class="form-group col-2">
+                <div class="col-2">
                     <img class="rounded-circle img-bordered-sm" src="{{user_profile.profile_image.url}}"
                         alt="user image" style="width:50px;height:50px;">
                 </div>
-                <div class="form-group col-7">
-                    <textarea class="form-control h-100" id="inputDescription" name="content" placeholder="つぶやく"
+                <div class="col-8">
+                    <textarea class="form-control" id="inputDescription" name="content" placeholder="つぶやく"
                         style="margin-right:0px;"></textarea>
                     <div>
                         <span class="info-box-number" id="id_tweet_count">0</span>&nbsp;/
                         <span class="info-box-number">1000</span>
+                        <span class="float-right mt-1">
+                            <i class="fa fa-camera-retro fa-lg mr-3" style="color:grey; cursor: pointer;"
+                                id="id_post_media"></i>
+                            <button type="submit" class="btn btn-primary" id="id_tweet">投稿する</button>
+                        </span>
                     </div>
                 </div>
-                <div class="form-group col-3">
+                <div class="col-2">
                     <input type="file" id="id_post_media_file" name="article_media" style="display:none">
-                    <button type="submit" class="btn btn-primary" id="id_tweet">投稿する</button>
-                    <div class="mt-2">
-                        <i class="fa fa-camera-retro fa-lg" style="color:grey; cursor: pointer;" id="id_post_media"></i>
-                    </div>
                 </div>
             </div>
             <div class="row mt-3">
                 <div class="form-group col-2">
                 </div>
-                <div class="col-7">
+                <div class="col-6">
                     <figure style="display: none;">
                         <img id="id_show_post_image"></img>
                         <figcaption id="id_close_media"><i class="fas fa-times text-lg"></i></figcaption>
                     </figure>
                 </div>
-                <div class="col-3">
+                <div class="col-4">
+
                 </div>
             </div>
         </form>
@@ -155,11 +157,11 @@
                             </div>
                         </div>
                         <div class="row mt-3">
-                            <div class="col-md-4 text-center">
+                            <div class="col-4 text-center">
                                 <span class="dot-retweet text-lg on-implementing"><span class="fas fa-retweet"
                                         style="color:rgb(70, 98, 107);"></span></span>
                             </div>
-                            <div class="col-md-4 text-center align-bottom">
+                            <div class="col-4 text-center align-bottom">
                                 {% if article_info.is_login_user_like %}
                                 <span class="link-black text-lg already-like">
                                     <span class="far fa-thumbs-up" style="color:indianred"></span>
@@ -179,7 +181,7 @@
                                 <span id="id_like_count_{{article_info.article.id}}"></span>
                                 {% endif %}
                             </div>
-                            <div class="col-md-4 text-center align-bottom">
+                            <div class="col-4 text-center align-bottom">
                                 <span class="text-lg">
                                     <i class="far fa-comments"></i>
                                     {% if article_info.article.comment.all.count != 0 %}
