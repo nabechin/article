@@ -189,12 +189,12 @@
 				<!-- /.row -->
 			</div>
 			<div class="col-lg-5">
-				<div class="card direct-chat direct-chat-primary" style="max-height: 550px;">
+				<div class="card direct-chat direct-chat-primary" style="height: 550px;">
 					<div class="card-header">
 						<h3 class="card-title font-weight-bold" id="id_header_name"></h3>
 					</div>
 					<div class="card-body">
-						<div class="direct-chat-messages chat-body" id="id_chat_body" style="height: 500px;">
+						<div class="direct-chat-messages chat-body" id="id_chat_body" style="height: 450px;">
 							{% for message in messages %} {% if message.sender.id == login_user_id %}
 							<div class="direct-chat-msg right">
 								<div class="direct-chat-light clearfix">

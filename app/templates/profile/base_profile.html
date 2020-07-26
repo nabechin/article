@@ -200,7 +200,8 @@
 
                                     <!-- メッセージボタン -->
                                     {% if user.id != login_user.id %}
-                                    <a href="{% url 'messages:talkroom' user.id %}" class="nav-link mail-font">
+                                    <a href="{% url 'messages:talkroom' user.id %}"
+                                        class="nav-link mail-font float-right">
                                         <i class="far fa-envelope"></i>
                                     </a>
                                     {% endif %}
