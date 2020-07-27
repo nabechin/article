@@ -15,6 +15,7 @@ router.register('comment', views.CommentView)
 router.register('favorite_article', views.FavoriteArticleView)
 router.register('favorite_comment', views.FavoriteCommentView)
 router.register('message', views.MessageView)
+router.register('user', views.UserSearchView)
 
 urlpatterns = [
     path('', include(router.urls))

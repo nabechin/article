@@ -15,7 +15,7 @@ from message.models import Message, TalkRoom
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ('id', 'name',)
+        fields = ('id', 'name','username',)
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
