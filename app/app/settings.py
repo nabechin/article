@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'adminlte3',
     'corsheaders',
     'storages',
+    'channels',
     'article',
     'account',
     'message',
@@ -100,6 +101,21 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'app.wsgi.application'
+ASGI_APPLICATION = 'app.routing.application'
+
+
+##################
+####  REDIS   ####
+##################
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [('redis', 6379)]
+        }
+    }
+}
 
 
 # Database

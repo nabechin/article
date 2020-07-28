@@ -11,7 +11,7 @@ services:
       - "3031"
     depends_on:
       - postgres
-    command: sh -c "python manage.py migrate && gunicorn app.wsgi -b 0.0.0.0:3031"
+    command: sh -c "python manage.py migrate && gunicorn app.wsgi -b 0.0.0.0:3031 && --module app.wsgi & daphne -b 0.0.0.0 -p 3001 --ping-interval 10 --ping-timeout 120 app.asgi:application"
     env_file:
       - ./env.dev
   nginx:
@@ -34,6 +34,10 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_DB=article
+  redis:
+    image: redis:alpine
+    expose:
+      - "6379"
 
 volumes:
   dbdata:

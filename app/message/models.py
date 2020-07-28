@@ -40,6 +40,6 @@ class Message(models.Model):
         related_name='sender',
     )
     create_at = models.DateTimeField(
-        auto_now_add=True,
+        auto_now_add=False,
         blank=True,
     )
