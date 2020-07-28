@@ -25,8 +25,6 @@
 	<script src="{% static 'admin-lte/dist/js/demo.js' %}"></script>
 	<script src="{% static 'js/base_ajax.js' %}"></script>
 	<script src="{% static 'js/test.js' %}"></script>
-
-
 	<script>
 		$(function () {
 			// メッセージを最新のbodyまでスクロール
@@ -39,87 +37,9 @@
 				var url = "{% url 'messages:message' 0 %}";
 				document.location.href = url.replace("0", talkRoomId);
 			});
-
-			/* メッセージをajax通信で送信後の処理
-       postで送ったメッセージや送信者情報を取得し、最新メッセージの後にappendする */
-			var afterSuccessSendMessage = function (talkRoomId) {
-				return function (data) {
-					// メッセージやプロフィール情報をプロックでまとめるための要素を設定
-					var $body = $('<div class="direct-chat-msg"></div>');
-					$body.addClass("right");
-
-					// プロフィール情報をブロックでまとめるための要素を設定
-					var $profileBody = $(
-						'<div class="direct-chat-light clearfix"></div>'
-					);
-
-					// プロフィール名を表示する要素を設定
-					var $profileName = $('<small class="text-muted"></small>');
-					$profileName.addClass("float-right");
-					$profileName.text(data.user_profile.user.name);
-
-					// プロフィール名を親要素にappend
-					$profileBody.append($profileName);
-
-					// プロフィール画像が設定されていない場合defaultの画像を表示
-					if (data.user_profile.profile_image) {
-						var $profileImage = $(
-							'<img class="direct-chat-img" src=' +
-							data.user_profile.profile_image +
-							' alt="message user image"/>'
-						);
-					} else {
-						var $profileImage = $(
-							'<img class="direct-chat-img" src="/media/default_profile.jpg" alt="message user image"/>'
-						);
-					}
-
-					// メッセージ情報をブロックでまとめるための要素を設定
-					var $messageBody = $(
-						'<div class="direct-chat-text w-50 float-right mr-2"></div>'
-					);
-					$messageBody.text(data.body);
-					var $createDate = $(
-						'<span class="direct-chat-timestamp float-right mr-2"></span>'
-					);
-					// timestamp -> HH:mmに変換
-					var createTime = data.create_at.match(/\d+:\d+/);
-					$createDate.text(createTime);
-
-					// メッセージとプロフィール情報を親ブロックにappend
-					$body.append($profileBody);
-					$body.append($profileImage);
-					$body.append($messageBody);
-					$body.append($createDate);
-					$(".chat-body").append($body);
-					$("#id_talk_room_" + talkRoomId + " .text-muted").text(data.body);
-
-					// 一番最新のメッセージへスクロールする
-					var obj = document.getElementById("id_chat_body");
-					obj.scrollTop = obj.scrollHeight;
-				};
-			}; // メッセージ送信をクリックした後、メッセージをajax通信でpostする
-
-			$("#id_submit_message").on("click", function () {
-				var messageBody = $('input[name="message"]').val();
-				var talkRoomId = $('input[name="talkRoom"]').val();
-				var sender = "{{login_user_id}}";
-				var data = new FormData();
-				data.append("sender", sender);
-				data.append("body", messageBody);
-				data.append("talk_room", talkRoomId);
-				$.ajax({
-					url: "/api/message/",
-					type: "POST",
-					dataType: "json",
-					data: data,
-					success: afterSuccessSendMessage(talkRoomId),
-					processData: false,
-					contentType: false,
-				});
-			});
 		});
 	</script>
+
 </head>
 
 <body>
@@ -242,5 +162,101 @@
 		</div>
 	</div>
 </body>
+<script>
+	$(function () {
+		// websocketをオープンにする
+		const url = 'ws://exyoupress.com/ws/' + '{{talkroom}}'
+		var ws = new WebSocket(url)
+
+		$("#id_submit_message").on("click", function () {
+			var sendData = {
+				sender: "{{login_user_id}}",
+				body: $('input[name="message"]').val(),
+				create_at: new Date(),
+			}
+			ws.send(JSON.stringify(sendData))
+		});
+
+		// サーバーに送信したメッセージやuser情報を受け取り、templateに表示
+		ws.onmessage = e => {
+			var receiveData = JSON.parse(e.data)
+			console.log(receiveData)
+
+			// メッセージやプロフィール情報をプロックでまとめるための要素を設定
+			var $body = $('<div class="direct-chat-msg"></div>');
+			if (receiveData.sender == "{{login_user_id}}") {
+				$body.addClass("right");
+			}
+
+			// プロフィール情報をブロックでまとめるための要素を設定
+			var $profileBody = $(
+				'<div class="direct-chat-light clearfix"></div>'
+			);
+
+			// プロフィール名を表示する要素を設定
+			var $profileName = $('<small class="text-muted"></small>');
+			if (receiveData.sender == "{{login_user_id}}") {
+				$profileName.addClass("float-right");
+			} else {
+				$profileName.addClass("float-left");
+			}
+			$profileName.text(receiveData.name);
+
+			// プロフィール名を親要素にappend
+			$profileBody.append($profileName);
+
+			// プロフィール画像が設定されていない場合defaultの画像を表示
+			if (receiveData.profile_image) {
+				var $profileImage = $(
+					'<img class="direct-chat-img" src=' +
+					receiveData.profile_image +
+					' alt="message user image"/>'
+				);
+			} else {
+				var $profileImage = $(
+					'<img class="direct-chat-img" src="/media/default_profile.jpg" alt="message user image"/>'
+				);
+			}
+
+			// メッセージ情報をブロックでまとめるための要素を設定
+			if (receiveData.sender == "{{login_user_id}}") {
+				var $messageBody = $(
+					'<div class="direct-chat-text w-50 float-right mr-2"></div>'
+				);
+			} else {
+				var $messageBody = $(
+					'<div class="direct-chat-text w-50 float-left ml-2"></div>'
+				);
+			}
+			$messageBody.text(receiveData.body);
+
+			if (receiveData.sender == "{{login_user_id}}") {
+				var $createDate = $(
+					'<span class="direct-chat-timestamp float-right mr-2"></span>'
+				);
+			} else {
+				var $createDate = $(
+					'<span class="direct-chat-timestamp float-left ml-2"></span>'
+				);
+			}
+			// timestamp -> HH:mmに変換
+			var createTime = receiveData.create_at.match(/\d+:\d+/);
+			$createDate.text(createTime);
+
+			// メッセージとプロフィール情報を親ブロックにappend
+			$body.append($profileBody);
+			$body.append($profileImage);
+			$body.append($messageBody);
+			$body.append($createDate);
+			$(".chat-body").append($body);
+			$("#id_talk_room_" + receiveData.talk_room_id + " .text-muted").text(receiveData.body);
+			$('input[name="message"]').val("")
+			// 一番最新のメッセージへスクロールする
+			var obj = document.getElementById("id_chat_body");
+			obj.scrollTop = obj.scrollHeight;
+
+		}
+	})
+</script>
 
 </html>
