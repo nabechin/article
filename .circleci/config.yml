@@ -52,8 +52,8 @@ commands:
             - run:
                 name: "migrate database"
                 command: |
-                    python manage.py makemigrations
-                    python manage.py migrate
+                    python ~/article/app/manage.py makemigrations
+                    python ~/article/app/manage.py migrate
     execute_test:
         description: "テストを実行"
         steps:
