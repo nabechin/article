@@ -36,7 +36,7 @@ commands:
         steps:
             - run:
                 name : Install Package
-                command: pip install -r requirements.txt
+                command: pip install -r ~/article/requirements.txt
     save_package:
         description: "インストールしたパッケージをキャッシュする"
         steps:
