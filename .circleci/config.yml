@@ -1,0 +1,90 @@
+version: 2.1
+description: "Djangoプロジェクトの自動テストとEC2に自動デプロイ"
+
+executors:
+    article_django:
+        working_directory: ~/article
+        docker:
+            - image: circleci/python:3.8.0
+              environment:
+                PYTHONDONTWRITEBYTECODE: 1
+                PYTHONUNBUFFERED : 1
+                TZ: Asia/Tokyo
+            - image: circleci/postgres:12.0-alpine
+              environment:
+                POSTGRES_USER: postgres
+                POSTGRES_PASSWORD: postgres
+                TZ: Asia/Tokyo
+                
+commands:
+    chown_package:
+        description: "installするパッケージのインストール先ディレクトリの権限をcircleciにする"
+        steps:
+            - run:
+                name: "Change Owner of Package Directory"
+                commands: |
+                    sudo chown -R circleci:circleci /usr/local/bin
+                    sudo chown -R circleci:circleci /usr/local/lib/python3.8/site-packages
+    restore_package:
+        description: "インストールしたパッケージがキャッシュされていれば読み込む"
+        steps:
+            - restore_cache:
+                name: Restore Package
+                key: dependency-cache-{{ checksum "requirements.txt" }}
+    pip_install:
+        description: "requirements.txtに記述のあるパッケージをインストールする"
+        steps:
+            - run:
+                name : Install Package
+                command: pip install -r requirements.txt
+    save_package:
+        description: "インストールしたパッケージをキャッシュする"
+        steps:
+            - save_cache:
+                name: Save Package
+                key: dependency-cache-{{ checksum "requirements.txt" }}
+                paths:
+                - /usr/local/bin
+                - /usr/local/lib/python3.8/site-packages
+    database_migration:
+        description: "テスト用にデータベースをマイグレーションする"
+        steps:
+            - run:
+                name: "migrate database"
+                commands: |
+                    python manage.py makemigrations
+                    python manage.py migrate
+    execute_test:
+        description: "テストを実行"
+        steps:
+            - run:
+                name: Execute Test
+                command: python manage.py test
+
+jobs:
+    build_and_test:
+        executor: article_django
+        steps:
+            - checkout
+            - chown_package
+            - restore_package
+            - pip_install
+            - save_package
+            - save_package
+            - database_migration
+            - execute_test
+
+workflows:
+    version: 2
+    test:
+        jobs:
+            - build_and_test:
+                filters:
+                    branches:
+                        ignore: master
+
+            
+
+
+
+                     

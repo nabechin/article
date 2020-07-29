@@ -2,6 +2,13 @@ Django>=2.2.4,<2.5.0
 djangorestframework>=3.9.0,<3.10.0
 gunicorn>=20.0.4,<20.1.0
 psycopg2-binary>=2.8.5,<2.9.0
+django-cors-headers>=3.4.0,<3.5.0
+django-adminlte3>=0.1.6,<0.2.0
+boto3>=1.14.30,<1.15.0
+django-storages>=1.9.1,<1.10.0
+setuptools>=41.6.0,<41.7.0
+pytz==2020.1
+python-dateutil>=2.8.1,<2.9.0
 flake8>=3.6.0,<3.7.0
 ptvsd>=4.3.2,<4.4.0
 Pillow>=7.1.2,<7.2.0
