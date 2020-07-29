@@ -22,7 +22,7 @@ commands:
         steps:
             - run:
                 name: "Change Owner of Package Directory"
-                commands: |
+                command: |
                     sudo chown -R circleci:circleci /usr/local/bin
                     sudo chown -R circleci:circleci /usr/local/lib/python3.8/site-packages
     restore_package:
@@ -51,7 +51,7 @@ commands:
         steps:
             - run:
                 name: "migrate database"
-                commands: |
+                command: |
                     python manage.py makemigrations
                     python manage.py migrate
     execute_test:
