@@ -30,19 +30,19 @@ commands:
         steps:
             - restore_cache:
                 name: Restore Package
-                key: dependency-cache-{{ checksum "~/article/requirements.txt" }}
+                key: dependency-cache-{{ checksum "requirements.txt" }}
     pip_install:
         description: "requirements.txtに記述のあるパッケージをインストールする"
         steps:
             - run:
                 name : Install Package
-                command: pip install -r ~/article/requirements.txt
+                command: pip install -r ~/article/app/requirements.txt
     save_package:
         description: "インストールしたパッケージをキャッシュする"
         steps:
             - save_cache:
                 name: Save Package
-                key: dependency-cache-{{ checksum "~/article/requirements.txt" }}
+                key: dependency-cache-{{ checksum "requirements.txt" }}
                 paths:
                 - /usr/local/bin
                 - /usr/local/lib/python3.8/site-packages
