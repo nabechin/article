@@ -1,6 +1,6 @@
 # Project
 
-記事を投稿したり、気になる人の記事を見たりコメントしたりできる
+記事を投稿したり、気になる人の記事を見たりコメントできる
 アプリケーションです。
 
 # 実装した機能
@@ -30,7 +30,7 @@
   - いいね数表示を表示
   - 記事にいいねしたユーザを表示
 
-- ユーザ同士１対１のメッセージ
+- ユーザ同士１対１のメッセージ（メッセージ送信、受信の自動更新）
 
 # 技術
 
@@ -51,9 +51,13 @@
 
 ## インフラ
 
+- インフラ構成図
+
+  ![Infrascracture](https://user-images.githubusercontent.com/53550752/88672688-b391ee00-d122-11ea-9123-4a883efef3dd.jpg)
+
 - AWS
 
-  - ALB / EC2 / VPC / RDS(PostgreSQL) / S3
+  - ALB / EC2 / VPC / RDS(PostgreSQL) / S3 / Route53 / ACM / ElasticCache
 
 - Docker
 
@@ -66,4 +70,4 @@
 
 # ER 図
 
-![Article-ER](https://user-images.githubusercontent.com/53550752/88293859-84e8d180-cd36-11ea-8ecb-b4db95c1accf.jpg)
+![Article-ER](https://user-images.githubusercontent.com/53550752/88674055-4b440c00-d124-11ea-8819-379e9172062b.jpg)
