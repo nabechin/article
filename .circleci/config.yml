@@ -90,8 +90,7 @@ jobs:
             - run:
                 name: deploy project
                 command: |
-                     ssh ${USER_NAME}@${HOST_NAME_1} 'cd /usr/src/article && sudo git pull origin master'
-                     yes
+                     ssh -oStrictHostKeyChecking=no　${USER_NAME}@${HOST_NAME_1} 'cd /usr/src/article && sudo git pull origin master'
 
 
 workflows:
