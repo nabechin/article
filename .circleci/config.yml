@@ -65,7 +65,7 @@ commands:
         steps:
             - run:
                 name: Execute Test
-                command: python manage.py test
+                command: python ~/article/app/manage.py test
 
 jobs:
     build_and_test:
