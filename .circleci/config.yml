@@ -80,6 +80,13 @@ jobs:
             - set_env_variable
             - database_migration
             - execute_test
+    project_deploy:
+        executor: article_django
+        steps:
+            - checkout
+            - add_ssh_keys:
+            - run: ssh ${USER_NAME}@{HOST_NAME_1} 'cd /usr/src/article/ && git pull origin master'
+
 
 workflows:
     version: 2
@@ -89,6 +96,13 @@ workflows:
                 filters:
                     branches:
                         ignore: master
+            - project_deploy:
+                requires:
+                    - build_and_test
+                filters:
+                    branches:
+                        only: master
+
 
             
 
