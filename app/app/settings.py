@@ -110,9 +110,9 @@ WSGI_APPLICATION = 'app.wsgi.application'
 ASGI_APPLICATION = 'app.routing.application'
 
 
-##################
-#  　 REDIS   　　#
-##################
+###################
+#  　  REDIS  　　 #
+###################
 
 CHANNEL_LAYERS = {
     "default": {
