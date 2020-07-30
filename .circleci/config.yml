@@ -30,36 +30,42 @@ commands:
         steps:
             - restore_cache:
                 name: Restore Package
-                key: dependency-cache-{{ checksum "requirements.txt" }}
+                key: dependency-cache-{{ checksum "~/article/app/requirements.txt" }}
     pip_install:
         description: "requirements.txtに記述のあるパッケージをインストールする"
         steps:
             - run:
                 name : Install Package
-                command: pip install -r requirements.txt
+                command: pip install -r ~/article/app/requirements.txt
     save_package:
         description: "インストールしたパッケージをキャッシュする"
         steps:
             - save_cache:
                 name: Save Package
-                key: dependency-cache-{{ checksum "requirements.txt" }}
+                key: dependency-cache-{{ checksum "~/article/app/requirements.txt" }}
                 paths:
                 - /usr/local/bin
                 - /usr/local/lib/python3.8/site-packages
+    set_env_variable:
+        description: "環境変数を設定"
+        steps:
+            - run:
+                name: base64 decode env file
+                command: echo $ENV_FILE | base64 -di > .env
     database_migration:
         description: "テスト用にデータベースをマイグレーションする"
         steps:
             - run:
                 name: "migrate database"
                 command: |
-                    python manage.py makemigrations
-                    python manage.py migrate
+                    python ~/article/app/manage.py makemigrations
+                    python ~/article/app/manage.py migrate
     execute_test:
         description: "テストを実行"
         steps:
             - run:
                 name: Execute Test
-                command: python manage.py test
+                command: python ~/article/app/manage.py test
 
 jobs:
     build_and_test:
@@ -71,6 +77,7 @@ jobs:
             - pip_install
             - save_package
             - save_package
+            - set_env_variable
             - database_migration
             - execute_test
 

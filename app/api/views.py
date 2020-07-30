@@ -10,6 +10,7 @@ from rest_framework import permissions
 from rest_framework.authentication import TokenAuthentication
 
 
+# ユーザプロフィール情報を操作するAPI
 class UserProfileView(viewsets.ModelViewSet):
     serializer_class = UserProfileSerializer
     queryset = UserProfile.objects.all()
