@@ -96,7 +96,7 @@ workflows:
     version: 2.1
     test_and_deploy:
         jobs:
-            - build_and_test:
+            - build_and_test
             - deploy:
                 requires:
                     - build_and_test
