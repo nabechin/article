@@ -2,7 +2,7 @@ settings.py
 media/
 __pycache__/
 memo/
-env.dev
+.env
 test.rest
 package-lock.json
 package.json

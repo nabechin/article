@@ -46,6 +46,12 @@ commands:
                 paths:
                 - /usr/local/bin
                 - /usr/local/lib/python3.8/site-packages
+    set_env_variable:
+        description: "環境変数を設定"
+        steps:
+            - run:
+                name: base64 decode env file
+                command: echo $ENV_FILE | base64 -di > .env
     database_migration:
         description: "テスト用にデータベースをマイグレーションする"
         steps:

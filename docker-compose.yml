@@ -13,7 +13,7 @@ services:
       - postgres
     command: sh -c "python manage.py migrate && gunicorn app.wsgi -b 0.0.0.0:3031 && --module app.wsgi & daphne -b 0.0.0.0 -p 3001 --ping-interval 10 --ping-timeout 120 app.asgi:application"
     env_file:
-      - ./env.dev
+      - ./.env
   nginx:
     restart: always
     image: nginx:1.19.1
