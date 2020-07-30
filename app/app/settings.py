@@ -111,7 +111,7 @@ ASGI_APPLICATION = 'app.routing.application'
 
 
 ##################
-####  REDIS   ####
+#  　 REDIS   　　#
 ##################
 
 CHANNEL_LAYERS = {
