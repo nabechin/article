@@ -12,6 +12,7 @@ from django.shortcuts import redirect
 from django.db.models import Count
 from django.db.models import Q
 from django.views.generic import TemplateView, CreateView
+from django.views.generic.edit import UpdateView
 from django.views.decorators.cache import never_cache
 
 from .forms import UserRegisterForm, LoginForm
@@ -252,3 +253,32 @@ class ArticleMedia(UserProfileView):
         context['user_profile'] = UserProfile.objects.select_related(
             'user').get(user__id=user_id)
         return render(self.request, self.template_name, context)
+
+
+class SettingsView(TemplateView, LoginRequiredMixin):
+    template_name = 'settings.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user'] = self.request.user
+        return context
+
+
+class UserUpdateView(UpdateView, LoginRequiredMixin):
+    model = get_user_model()
+    fields = ['email', 'username']
+    success_url = '/settings/'
+    template_name_suffix = '_update_form'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user'] = self.request.user
+        return context
+
+    def get_form(self):
+        form = super(UserUpdateView, self).get_form()
+        form.fields['email'].widget.attrs = {'class': 'form-control'}
+        form.fields['email'].label = 'メールアドレス'
+        form.fields['username'].widget.attrs = {'class': 'form-control'}
+        form.fields['username'].label = 'ユーザネーム'
+        return form

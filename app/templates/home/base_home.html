@@ -33,9 +33,10 @@
             //////////////////////////////////////////////
             ///////      　　ユーザ検索機能           ///////
             //////////////////////////////////////////////
-            
+
             // 戻るボタンを押した際、ユーザ検索フォームの値を空にする
             deleteKeyword()
+
             function deleteKeyword() {
                 $('#id_user_keyword').val("");
             }
@@ -109,7 +110,6 @@
     <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
         <ul class="navbar-nav mr-auto">
         </ul>
-        <a class="nav-link text-dark" href="{% url 'account:login' %}" tabindex="-1" aria-disabled="true">ログイン</a>
         <a class="nav-link text-dark" href="{% url 'account:logout' %}" tabindex="-1" aria-disabled="true">ログアウト</a>
     </nav>
     <div>
@@ -126,7 +126,7 @@
                         <a class="nav-link" id="v-pills-messages-tab" href="{% url 'messages:talkroom' %}" role="tab"
                             aria-controls="v-pills-messages" aria-selected="false">
                             <i class="fa fa-envelope text-lg mr-3"></i><span class="side-bar-content">Message</span></a>
-                        <a class="nav-link on-implementing" id="v-pills-settings-tab">
+                        <a class="nav-link" id="v-pills-settings-tab" href="{% url 'account:settings' user.id %}">
                             <i class="fa fa-cog text-lg mr-3"></i><span class="side-bar-content">Setting</span></a>
                     </div>
                 </div>
