@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth import (logout as auth_logout, login as auth_login,)
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import render
@@ -282,3 +282,18 @@ class UserUpdateView(UpdateView, LoginRequiredMixin):
         form.fields['username'].widget.attrs = {'class': 'form-control'}
         form.fields['username'].label = 'ユーザネーム'
         return form
+
+
+class PasswordChangeView(LoginRequiredMixin, PasswordChangeView):
+    sucess_url = '/password_change/'
+    template_name = 'password_change.html'
+
+    def get_form(self, form_class=None):
+        form = super(PasswordChangeView, self).get_form()
+        for field in form.fields.values():
+            field.widget.attrs = {'class': 'form-control'}
+        return form
+
+
+class PasswordChangeDoneView(LoginRequiredMixin, PasswordChangeDoneView):
+    template_name = 'password_change.html'
