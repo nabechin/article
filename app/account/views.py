@@ -15,7 +15,7 @@ from django.views.generic import TemplateView, CreateView
 from django.views.generic.edit import UpdateView
 from django.views.decorators.cache import never_cache
 
-from .forms import UserRegisterForm, LoginForm
+from .forms import UserRegisterForm, LoginForm, CustomPasswordChangeForm
 from .models import UserProfile, Relation
 from rest_framework import permissions
 from rest_framework.authtoken.models import Token
@@ -285,15 +285,10 @@ class UserUpdateView(UpdateView, LoginRequiredMixin):
 
 
 class PasswordChangeView(LoginRequiredMixin, PasswordChangeView):
-    sucess_url = '/password_change/'
     template_name = 'password_change.html'
-
-    def get_form(self, form_class=None):
-        form = super(PasswordChangeView, self).get_form()
-        for field in form.fields.values():
-            field.widget.attrs = {'class': 'form-control'}
-        return form
+    success_url = '/password_change_done/'
+    form_class = CustomPasswordChangeForm
 
 
-class PasswordChangeDoneView(LoginRequiredMixin, PasswordChangeDoneView):
-    template_name = 'password_change.html'
+class PasswordChangeDoneView(PasswordChangeDoneView):
+    template_name = 'password_change_done.html'

@@ -1,7 +1,7 @@
 import re
 from django import forms
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.utils.translation import ugettext, ugettext_lazy as _
 
 
@@ -85,3 +85,11 @@ class LoginForm(AuthenticationForm):
             field.widget.attrs['placeholder'] = field.label
             field.widget.label = field.label
             field.required = False
+
+
+class CustomPasswordChangeForm(PasswordChangeForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs = {'class': 'form-control'}
