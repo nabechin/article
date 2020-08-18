@@ -30,3 +30,16 @@ class ArticleInfo:
             comment_info.is_login_user_like_comment(login_user_id)
             comment_list.append(comment_info)
         self.comment_list = comment_list
+
+
+class ArticleInfoList:
+    def __init__(self, article_list):
+        self.article_list = article_list
+
+    def make_article_info_list(self, login_user):
+        article_info_list = []
+        for article in self.article_list:
+            article_info = ArticleInfo(article)
+            article_info.is_login_user_like(login_user.id)
+            article_info_list.append(article_info)
+        return article_info_list

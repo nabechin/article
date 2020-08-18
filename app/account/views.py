@@ -22,7 +22,7 @@ from rest_framework.authtoken.models import Token
 
 
 from article.models import Article, FavoriteArticle
-from article.article_info import ArticleInfo
+from article.article_info import ArticleInfo, ArticleInfoList
 from app.dto import RelationInfo
 
 
@@ -86,15 +86,11 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
     def get(self, request, *args, **kwargs):
         login_user = self.request.user
         user_id = kwargs['user_id']
-        article_info_list = []
         article_list = Article.objects.all().prefetch_related(
             'comment').filter(user__id=user_id)
-        for article in article_list:
-            article_info = ArticleInfo(article)
-            article_info.is_login_user_like(login_user.id)
-            article_info_list.append(article_info)
         context = super(UserProfileView, self).get_context_data(**kwargs)
-        context['article_info_list'] = article_info_list
+        article_info_list = ArticleInfoList(article_list)
+        context['article_info_list'] = article_info_list.make_article_info_list(login_user)
         relation = Relation.objects.filter(
             follower=login_user.id, target=user_id)
         if not relation:
@@ -195,15 +191,9 @@ class LikeArticleView(UserProfileView):
         favorite_article_ids = FavoriteArticle.objects.values(
             'article__id').filter(article__in=sub_query)
         article_list = Article.objects.filter(pk__in=favorite_article_ids)
-        article_info_list = []
-        for article in article_list:
-            article_info = ArticleInfo(article)
-            article_info.is_login_user_like(login_user.id)
-            article_info_list.append(article_info)
-
-        # article_idに対応するArticleとそのfavoriteが１対１になるDTOを用意しリスト化
+        article_info_list = ArticleInfoList(article_list)
         context = super(LikeArticleView, self).get_context_data(**kwargs)
-        context['article_info_list'] = article_info_list
+        context['article_info_list'] = article_info_list.make_article_info_list(login_user)
         relation = Relation.objects.filter(
             follower=login_user.id, target=user_id)
         if not relation:
@@ -230,11 +220,7 @@ class ArticleMedia(UserProfileView):
         user_id = kwargs['user_id']
         article_list = Article.objects.all().prefetch_related(
             'comment').filter(user__id=user_id).exclude(article_media='')
-        article_info_list = []
-        for article in article_list:
-            article_info = ArticleInfo(article)
-            article_info.is_login_user_like(login_user.id)
-            article_info_list.append(article_info)
+        article_info_list = ArticleInfoList(article_list)
         context = super(ArticleMedia, self).get_context_data(**kwargs)
         relation = Relation.objects.filter(
             follower=login_user.id, target=user_id)
@@ -247,7 +233,7 @@ class ArticleMedia(UserProfileView):
             follower=user_id).count()
         context['number_of_follower'] = Relation.objects.filter(
             target=user_id).count()
-        context['article_info_list'] = article_info_list
+        context['article_info_list'] = article_info_list.make_article_info_list(login_user)
         context['user'] = get_user_model().objects.get(pk=user_id)
         context['login_user'] = login_user
         context['user_profile'] = UserProfile.objects.select_related(
