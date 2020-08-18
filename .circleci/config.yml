@@ -87,13 +87,10 @@ jobs:
             - add_ssh_keys:
                 fingerprints:
                     - 'b6:d5:b5:6d:63:c7:5f:9b:48:88:d2:c0:cd:22:6f:e0'
-                    - '0e:44:0c:88:cd:75:3f:47:89:7f:7f:f3:23:49:98:ae'
             - run:
                 name: deploy
                 command: |
                      ssh -oStrictHostKeyChecking=no ${USER_NAME}@${HOST_NAME_1} 'cd /usr/src/article && sudo git pull origin master'
-                     ssh -oStrictHostKeyChecking=no ${USER_NAME}@${HOST_NAME_2} 'cd /usr/src/article && sudo git pull origin master'
-
 
 workflows:
     version: 2.1
