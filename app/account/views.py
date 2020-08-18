@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth import (logout as auth_logout, login as auth_login,)
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import render
@@ -12,16 +12,17 @@ from django.shortcuts import redirect
 from django.db.models import Count
 from django.db.models import Q
 from django.views.generic import TemplateView, CreateView
+from django.views.generic.edit import UpdateView
 from django.views.decorators.cache import never_cache
 
-from .forms import UserRegisterForm, LoginForm
+from .forms import UserRegisterForm, LoginForm, CustomPasswordChangeForm
 from .models import UserProfile, Relation
 from rest_framework import permissions
 from rest_framework.authtoken.models import Token
 
 
 from article.models import Article, FavoriteArticle
-from article.article_info import ArticleInfo
+from article.article_info import ArticleInfo, ArticleInfoList
 from app.dto import RelationInfo
 
 
@@ -85,15 +86,11 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
     def get(self, request, *args, **kwargs):
         login_user = self.request.user
         user_id = kwargs['user_id']
-        article_info_list = []
         article_list = Article.objects.all().prefetch_related(
             'comment').filter(user__id=user_id)
-        for article in article_list:
-            article_info = ArticleInfo(article)
-            article_info.is_login_user_like(login_user.id)
-            article_info_list.append(article_info)
         context = super(UserProfileView, self).get_context_data(**kwargs)
-        context['article_info_list'] = article_info_list
+        article_info_list = ArticleInfoList(article_list)
+        context['article_info_list'] = article_info_list.make_article_info_list(login_user)
         relation = Relation.objects.filter(
             follower=login_user.id, target=user_id)
         if not relation:
@@ -194,15 +191,9 @@ class LikeArticleView(UserProfileView):
         favorite_article_ids = FavoriteArticle.objects.values(
             'article__id').filter(article__in=sub_query)
         article_list = Article.objects.filter(pk__in=favorite_article_ids)
-        article_info_list = []
-        for article in article_list:
-            article_info = ArticleInfo(article)
-            article_info.is_login_user_like(login_user.id)
-            article_info_list.append(article_info)
-
-        # article_idに対応するArticleとそのfavoriteが１対１になるDTOを用意しリスト化
+        article_info_list = ArticleInfoList(article_list)
         context = super(LikeArticleView, self).get_context_data(**kwargs)
-        context['article_info_list'] = article_info_list
+        context['article_info_list'] = article_info_list.make_article_info_list(login_user)
         relation = Relation.objects.filter(
             follower=login_user.id, target=user_id)
         if not relation:
@@ -229,11 +220,7 @@ class ArticleMedia(UserProfileView):
         user_id = kwargs['user_id']
         article_list = Article.objects.all().prefetch_related(
             'comment').filter(user__id=user_id).exclude(article_media='')
-        article_info_list = []
-        for article in article_list:
-            article_info = ArticleInfo(article)
-            article_info.is_login_user_like(login_user.id)
-            article_info_list.append(article_info)
+        article_info_list = ArticleInfoList(article_list)
         context = super(ArticleMedia, self).get_context_data(**kwargs)
         relation = Relation.objects.filter(
             follower=login_user.id, target=user_id)
@@ -246,9 +233,48 @@ class ArticleMedia(UserProfileView):
             follower=user_id).count()
         context['number_of_follower'] = Relation.objects.filter(
             target=user_id).count()
-        context['article_info_list'] = article_info_list
+        context['article_info_list'] = article_info_list.make_article_info_list(login_user)
         context['user'] = get_user_model().objects.get(pk=user_id)
         context['login_user'] = login_user
         context['user_profile'] = UserProfile.objects.select_related(
             'user').get(user__id=user_id)
         return render(self.request, self.template_name, context)
+
+
+class SettingsView(TemplateView, LoginRequiredMixin):
+    template_name = 'settings.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user'] = self.request.user
+        return context
+
+
+class UserUpdateView(UpdateView, LoginRequiredMixin):
+    model = get_user_model()
+    fields = ['email', 'username']
+    success_url = '/settings/'
+    template_name_suffix = '_update_form'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user'] = self.request.user
+        return context
+
+    def get_form(self):
+        form = super(UserUpdateView, self).get_form()
+        form.fields['email'].widget.attrs = {'class': 'form-control'}
+        form.fields['email'].label = 'メールアドレス'
+        form.fields['username'].widget.attrs = {'class': 'form-control'}
+        form.fields['username'].label = 'ユーザネーム'
+        return form
+
+
+class PasswordChangeView(LoginRequiredMixin, PasswordChangeView):
+    template_name = 'password_change.html'
+    success_url = '/password_change_done/'
+    form_class = CustomPasswordChangeForm
+
+
+class PasswordChangeDoneView(PasswordChangeDoneView):
+    template_name = 'password_change_done.html'
